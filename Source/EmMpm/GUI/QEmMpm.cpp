@@ -206,6 +206,14 @@ void QEmMpm::closeEvent(QCloseEvent *event)
 }
 
 // -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::resizeEvent ( QResizeEvent * event )
+{
+  emit parentResized();
+}
+
+// -----------------------------------------------------------------------------
 //  Read the prefs from the local storage file
 // -----------------------------------------------------------------------------
 void QEmMpm::readSettings()
@@ -218,9 +226,9 @@ void QEmMpm::readSettings()
   QString val;
   bool ok;
   qint32 i;
-  READ_STRING_SETTING(prefs, m_Beta, "0.5");
-    READ_STRING_SETTING(prefs, m_Gamma, "0.0");
-    READ_SETTING(prefs, m_MpmIterations, ok, i, 2, Int);
+  READ_STRING_SETTING(prefs, m_Beta, "5.5");
+    READ_STRING_SETTING(prefs, m_Gamma, "0.1");
+    READ_SETTING(prefs, m_MpmIterations, ok, i, 5, Int);
     READ_SETTING(prefs, m_EmIterations, ok, i, 5, Int);
     READ_SETTING(prefs, m_NumClasses, ok, i, 2, Int);
 
@@ -247,15 +255,49 @@ void QEmMpm::writeSettings()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void QEmMpm::dragEnterEvent(QDragEnterEvent* e)
+{
+  const QMimeData* dat = e->mimeData();
+  QList<QUrl> urls = dat->urls();
+  QString file = urls.count() ? urls[0].toLocalFile() : QString();
+  QDir parent(file);
+  this->m_OpenDialogLastDirectory = parent.dirName();
+  QFileInfo fi(file);
+  QString ext = fi.suffix();
+  if (fi.exists() && fi.isFile())
+  {
+    e->accept();
+  }
+  else
+  {
+    e->ignore();
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::dropEvent(QDropEvent* e)
+{
+  const QMimeData* dat = e->mimeData();
+  QList<QUrl> urls = dat->urls();
+  QString file = urls.count() ? urls[0].toLocalFile() : QString();
+  _openFile(file);
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void QEmMpm::setupGui()
 {
 
 #ifdef Q_WS_MAC
   // Adjust for the size of the menu bar which is at the top of the screen not in the window
-//  QSize minSize = minimumSize();
+  //  QSize minSize = minimumSize();
   QSize mySize = size();
-//  std::cout << "minSize: " << minSize.width() << " x " << minSize.height() << std::endl;
-//  std::cout << "mySize: " << mySize.width() << " x " << mySize.height() << std::endl;
+  //  std::cout << "minSize: " << minSize.width() << " x " << minSize.height() << std::endl;
+  //  std::cout << "mySize: " << mySize.width() << " x " << mySize.height() << std::endl;
   mySize.setHeight( mySize.height() -30);
   resize(mySize);
 #endif
@@ -297,9 +339,9 @@ void QEmMpm::setupGui()
 void QEmMpm::setWidgetListEnabled(bool b)
 {
   foreach (QWidget* w, m_WidgetList)
-    {
-      w->setEnabled(b);
-    }
+  {
+    w->setEnabled(b);
+  }
 }
 
 
@@ -311,40 +353,6 @@ void QEmMpm::on_compositeWithOriginal_stateChanged(int state)
   m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
   m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
   m_SegmentedGDelegate->updateGraphicsScene();
-}
-
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::dragEnterEvent(QDragEnterEvent* e)
-{
-  const QMimeData* dat = e->mimeData();
-  QList<QUrl> urls = dat->urls();
-  QString file = urls.count() ? urls[0].toLocalFile() : QString();
-  QDir parent(file);
-  this->m_OpenDialogLastDirectory = parent.dirName();
-  QFileInfo fi(file);
-  QString ext = fi.suffix();
-  if (fi.exists() && fi.isFile())
-  {
-    e->accept();
-  }
-  else
-  {
-    e->ignore();
-  }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::dropEvent(QDropEvent* e)
-{
-  const QMimeData* dat = e->mimeData();
-  QList<QUrl> urls = dat->urls();
-  QString file = urls.count() ? urls[0].toLocalFile() : QString();
-  _openFile(file);
 }
 
 
@@ -410,17 +418,6 @@ qint32 QEmMpm::_checkDirtyDocument()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_aboutBtn_clicked()
-{
-  AboutBox about(this);
-  QString an = QCoreApplication::applicationName();
-  about.setApplicationName(an);
-  about.exec();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void QEmMpm::updateRecentFileList(const QString &file)
 {
   // std::cout << "QEmMpm::updateRecentFileList" << std::endl;
@@ -474,6 +471,17 @@ void QEmMpm::_openFile(QString &imageFile)
   setWidgetListEnabled(true);
 }
 
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_aboutBtn_clicked()
+{
+  AboutBox about(this);
+  QString an = QCoreApplication::applicationName();
+  about.setApplicationName(an);
+  about.exec();
+}
 
 // -----------------------------------------------------------------------------
 //
@@ -555,58 +563,132 @@ void QEmMpm::on_m_SegmentBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskMessage(const QString &message)
+void QEmMpm::on_actionOpen_Segmented_Image_triggered()
 {
-  this->statusBar()->showMessage(message);
-}
+  //std::cout << "on_actionOpen_triggered" << std::endl;
+  QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Segmented Image File"),
+    m_OpenDialogLastDirectory,
+    tr("Images (*.tif *.tiff)") );
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskProgress(int p)
-{
-  this->progressBar->setValue(p);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskFinished()
-{
-  m_SegmentBtn->setText("Segment");
- // this->statusbar->showMessage("Ready To Encode");
-
-  m_EmMpmThread->deleteLater();
-  this->progressBar->setValue(0);
-
- // m_SegmentedImage = m_ThreadedFillHolesFilter->getOutputImage();
-  // Now put the image into the QGraphicsView
-  qint32 width = m_SegmentedImage->getImagePixelWidth();
-  qint32 height = m_SegmentedImage->getImagePixelHeight();
-  uint8* dataPointer = m_SegmentedImage->getImageBuffer();
-  QImage image(width, height, QImage::Format_Indexed8);
-  QVector<QRgb> colorTable(256);
-  for (quint32 i = 0; i < 256; ++i)
+  if ( true == imageFile.isEmpty() )
   {
-    colorTable[i] = qRgb(i, i, i);
+    return;
   }
-  image.setColorTable(colorTable);
-  qint32 index;
-  for (qint32 j=0; j<height; j++) {
-    for (qint32 i =0; i<width; i++) {
-      index = (j *  width) + i;
-      image.setPixel(i, j, dataPointer[index]);
+  _openSegmentedImage(imageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_actionOpen_triggered()
+{
+  //std::cout << "on_actionOpen_triggered" << std::endl;
+  QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
+    m_OpenDialogLastDirectory,
+    tr("Images (*.tif *.tiff)") );
+
+  if ( true == imageFile.isEmpty() )
+  {
+    return;
+  }
+  _openFile(imageFile);
+
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_actionSave_triggered()
+{
+  saveSegmentedImage();
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_actionSave_As_triggered()
+{
+  m_CurrentSegmentedFile = QString();
+  saveSegmentedImage();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_actionClose_triggered() {
+  // std::cout << "AIMMountMaker::on_actionClose_triggered" << std::endl;
+  qint32 err = -1;
+  err = _checkDirtyDocument();
+  if (err >= 0)
+  {
+    // Close the window. Files have been saved if needed
+    if (QApplication::activeWindow() == this)
+    {
+      this->close();
+    }
+    else
+    {
+      QApplication::activeWindow()->close();
     }
   }
-  m_SegmentedGDelegate->setCachedImage(image);
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_modeComboBox_currentIndexChanged()
+{
+  if (NULL == m_SegmentedGDelegate) { return; }
+  int index = modeComboBox->currentIndex();
+  switch(index)
+  {
+  case 0: m_SegmentedGDelegate->setExclusionMode(); break;
+  case 1: m_SegmentedGDelegate->setSourceMode(); break;
+  case 2: m_SegmentedGDelegate->setDestinationMode(); break;
+  case 3: m_SegmentedGDelegate->setSourceOverMode(); break;
+  case 4: m_SegmentedGDelegate->setDestinationOverMode(); break;
+  case 5: m_SegmentedGDelegate->setSourceInMode(); break;
+  case 6: m_SegmentedGDelegate->setDestInMode(); break;
+  case 7: m_SegmentedGDelegate->setDifferenceMode(); break;
+  case 8: m_SegmentedGDelegate->setDestOutMode(); break;
+  case 9: m_SegmentedGDelegate->setSourceAtopMode(); break;
+  case 10: m_SegmentedGDelegate->setDestAtopMode(); break;
+  case 11: m_SegmentedGDelegate->setPlusMode(); break;
+  case 12: m_SegmentedGDelegate->setMultiplyMode(); break;
+  case 13: m_SegmentedGDelegate->setScreenMode(); break;
+  case 14: m_SegmentedGDelegate->setOverlayMode(); break;
+  case 15: m_SegmentedGDelegate->setDarkenMode(); break;
+  case 16: m_SegmentedGDelegate->setLightenMode(); break;
+  case 17: m_SegmentedGDelegate->setColorDodgeMode(); break;
+  case 18: m_SegmentedGDelegate->setColorBurnMode(); break;
+  case 19: m_SegmentedGDelegate->setHardLightMode(); break;
+  case 20: m_SegmentedGDelegate->setSoftLightMode(); break;
+
+
+  default:
+    m_SegmentedGDelegate->setExclusionMode(); break;
+  }
+
   m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
   m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
   m_SegmentedGDelegate->updateGraphicsScene();
-  this->setWindowModified(true);
-  setWidgetListEnabled(true);
-
-
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::_openSegmentedImage(QString mountImage)
+{
+  if ( true == mountImage.isEmpty() ) // User cancelled the operation
+  {
+    return;
+  }
+  this->initWithFile(m_CurrentImageFile, mountImage);
+  setWidgetListEnabled(true);
+}
+
 
 // -----------------------------------------------------------------------------
 //
@@ -644,76 +726,57 @@ qint32 QEmMpm::saveSegmentedImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_actionOpen_Segmented_Image_triggered()
+void QEmMpm::receiveTaskMessage(const QString &message)
 {
-  //std::cout << "on_actionOpen_triggered" << std::endl;
-  QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Segmented Image File"),
-                                                 m_OpenDialogLastDirectory,
-                                                 tr("Images (*.tif *.tiff)") );
-
-  if ( true == imageFile.isEmpty() )
-  {
-    return;
-  }
-  _openSegmentedImage(imageFile);
+  this->statusBar()->showMessage(message);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::_openSegmentedImage(QString mountImage)
+void QEmMpm::receiveTaskProgress(int p)
 {
-  if ( true == mountImage.isEmpty() ) // User cancelled the operation
+  this->progressBar->setValue(p);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::receiveTaskFinished()
+{
+  m_SegmentBtn->setText("Segment");
+  // this->statusbar->showMessage("Ready To Encode");
+
+  m_EmMpmThread->deleteLater();
+  this->progressBar->setValue(0);
+
+  // m_SegmentedImage = m_ThreadedFillHolesFilter->getOutputImage();
+  // Now put the image into the QGraphicsView
+  qint32 width = m_SegmentedImage->getImagePixelWidth();
+  qint32 height = m_SegmentedImage->getImagePixelHeight();
+  uint8* dataPointer = m_SegmentedImage->getImageBuffer();
+  QImage image(width, height, QImage::Format_Indexed8);
+  QVector<QRgb> colorTable(256);
+  for (quint32 i = 0; i < 256; ++i)
   {
-    return;
+    colorTable[i] = qRgb(i, i, i);
   }
-  this->initWithFile(m_CurrentImageFile, mountImage);
+  image.setColorTable(colorTable);
+  qint32 index;
+  for (qint32 j=0; j<height; j++) {
+    for (qint32 i =0; i<width; i++) {
+      index = (j *  width) + i;
+      image.setPixel(i, j, dataPointer[index]);
+    }
+  }
+  m_SegmentedGDelegate->setCachedImage(image);
+  m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
+  m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+  m_SegmentedGDelegate->updateGraphicsScene();
+  this->setWindowModified(true);
   setWidgetListEnabled(true);
-}
 
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::on_actionOpen_triggered()
-{
-  //std::cout << "on_actionOpen_triggered" << std::endl;
-  QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
-                                                 m_OpenDialogLastDirectory,
-                                                 tr("Images (*.tif *.tiff)") );
-
-  if ( true == imageFile.isEmpty() )
-  {
-    return;
-  }
-  _openFile(imageFile);
-
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::resizeEvent ( QResizeEvent * event )
-{
- emit parentResized();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::on_actionSave_triggered()
-{
-  saveSegmentedImage();
-}
-
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::on_actionSave_As_triggered()
-{
-  m_CurrentSegmentedFile = QString();
-  saveSegmentedImage();
 }
 
 // -----------------------------------------------------------------------------
@@ -921,28 +984,6 @@ AIMImage::Pointer QEmMpm::readTiffFile(QString filename,
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_actionClose_triggered() {
- // std::cout << "AIMMountMaker::on_actionClose_triggered" << std::endl;
-  qint32 err = -1;
-  err = _checkDirtyDocument();
-  if (err >= 0)
-  {
-    // Close the window. Files have been saved if needed
-    if (QApplication::activeWindow() == this)
-    {
-      this->close();
-    }
-    else
-    {
-      QApplication::activeWindow()->close();
-    }
-  }
-}
-
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void QEmMpm::initWithFile(const QString imageFile, QString mountImage)
 {
   QFileInfo fileInfo(imageFile);
@@ -969,44 +1010,3 @@ void QEmMpm::initWithFile(const QString imageFile, QString mountImage)
   this->statusBar()->showMessage("Input Image Loaded");
 }
 
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::on_modeComboBox_currentIndexChanged()
-{
-  if (NULL == m_SegmentedGDelegate) { return; }
-  int index = modeComboBox->currentIndex();
-  switch(index)
-  {
-    case 0: m_SegmentedGDelegate->setExclusionMode(); break;
-    case 1: m_SegmentedGDelegate->setSourceMode(); break;
-    case 2: m_SegmentedGDelegate->setDestinationMode(); break;
-    case 3: m_SegmentedGDelegate->setSourceOverMode(); break;
-    case 4: m_SegmentedGDelegate->setDestinationOverMode(); break;
-    case 5: m_SegmentedGDelegate->setSourceInMode(); break;
-    case 6: m_SegmentedGDelegate->setDestInMode(); break;
-    case 7: m_SegmentedGDelegate->setDifferenceMode(); break;
-    case 8: m_SegmentedGDelegate->setDestOutMode(); break;
-    case 9: m_SegmentedGDelegate->setSourceAtopMode(); break;
-    case 10: m_SegmentedGDelegate->setDestAtopMode(); break;
-    case 11: m_SegmentedGDelegate->setPlusMode(); break;
-    case 12: m_SegmentedGDelegate->setMultiplyMode(); break;
-    case 13: m_SegmentedGDelegate->setScreenMode(); break;
-    case 14: m_SegmentedGDelegate->setOverlayMode(); break;
-    case 15: m_SegmentedGDelegate->setDarkenMode(); break;
-    case 16: m_SegmentedGDelegate->setLightenMode(); break;
-    case 17: m_SegmentedGDelegate->setColorDodgeMode(); break;
-    case 18: m_SegmentedGDelegate->setColorBurnMode(); break;
-    case 19: m_SegmentedGDelegate->setHardLightMode(); break;
-    case 20: m_SegmentedGDelegate->setSoftLightMode(); break;
-
-
-    default:
-      m_SegmentedGDelegate->setExclusionMode(); break;
-  }
-
-  m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_SegmentedGDelegate->updateGraphicsScene();
-}

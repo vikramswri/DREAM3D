@@ -1,6 +1,6 @@
 #///////////////////////////////////////////////////////////////////////////////
 #//
-#//  Copyright (c) 2009, Michael A. Jackson. BlueQuartz Software
+#//  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
 #//  All rights reserved.
 #//  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #//
@@ -10,7 +10,7 @@
 # Copy the needed Qt libraries into the Build directory. Also add installation
 # and CPack code to support installer generation.
 # --------------------------------------------------------------------
-if (${PROJECT_PREFIX}_BUILD_QT_APPS AND NOT Q_WS_MAC)
+if ( NOT Q_WS_MAC)
     if (DEFINED QT_QMAKE_EXECUTABLE)
         SET (QTLIBLIST QtCore QtGui)
         
