@@ -56,13 +56,12 @@ macro(InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
     
     
     INSTALL(TARGETS ${EXE_NAME} 
-        RUNTIME
-        DESTINATION ./
+        BUNDLE DESTINATION .
+        COMPONENT Applications
+        RUNTIME DESTINATION ./
         COMPONENT Applications
         LIBRARY DESTINATION ./ 
-        ARCHIVE DESTINATION ./
-        RUNTIME DESTINATION ./
-        BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}/.
+        ARCHIVE DESTINATION ./        
     )   
     
     # --- If we are on OS X copy all the embedded libraries to the app bundle
@@ -78,7 +77,7 @@ macro(InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
                 MakeOSXBundleApp(${EXE_NAME} 
                                  ${EXE_BINARY_DIR}
                                  ${OSX_TOOLS_DIR} )
-            endif()
+            endif() 
         endif()
     else(DEFINED GUI_TYPE)
       #  message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
@@ -226,4 +225,57 @@ macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
                
 endmacro()
 
+#-------------------------------------------------------------------------------
+# Finds plugins from the Qt installation. The pluginlist argument should be
+# something like "qgif;qjpeg;qtiff"
+#-------------------------------------------------------------------------------
+macro (FindQtPlugins pluginlist)
+  set (qt_plugin_list ${pluginlist})
+  set (qt_plugin_types "Debug;Release")
+  if (WIN32)
+    set(qt_plugin_prefix "")
+    set(qt_plugin_DEBUG_suffix "d4")
+    set(qt_plugin_RELEASE_suffix "4")
+  else ()
+    set(qt_plugin_prefix "lib")
+    set(qt_plugin_DEBUG_suffix "_debug")
+    set(qt_plugin_RELEASE_suffix "")
+  endif()
+
+  #message(STATUS "qt_plugin_debug_suffix: ${qt_plugin_debug_suffix}")
+  set (QTPLUGINS_RELEASE "")
+  set (QTPLUGINS_DEBUG   "")
+  set (QTPLUGINS "")
+
+  # Loop through all the Build Types and all the plugins to find each one.
+  foreach(build_type ${qt_plugin_types})
+  	string(TOUPPER ${build_type} BTYPE)
+      foreach(plugin ${qt_plugin_list})
+  	  STRING(TOUPPER ${plugin} PLUGIN)
+  #      message(STATUS "|-- Looking for q${plugin}${qt_plugin_${build_type}_suffix}")
+         FIND_LIBRARY( QT_${PLUGIN}_PLUGIN_${BTYPE} 
+                      NAMES ${plugin}${qt_plugin_${BTYPE}_suffix} 
+                      PATHS ${QT_PLUGINS_DIR}/imageformats 
+                      DOC "Library Path for ${plugin}"
+                      NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+         mark_as_advanced(QT_${PLUGIN}_PLUGIN_${BTYPE})
+  #      message(STATUS "|--  Q${plugin}_PLUGIN_${build_type}_LIB: ${Q${plugin}_PLUGIN_${build_type}_LIB}")
+        LIST(APPEND QTPLUGINS_${BTYPE} ${QT_${PLUGIN}_PLUGIN_${BTYPE}})
+      endforeach()
+  endforeach()
+
+  # Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
+  if (NOT MSVC)
+      if ( NOT DEFINED CMAKE_BUILD_TYPE )
+        if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+            set (QTPLUGINS ${QTPLUGINS_DEBUG})
+        else()
+            set (QTPLUGINS ${QTPLUGINS_RELEASE})
+        endif()
+      else()
+        set (QTPLUGINS ${QTPLUGINS_RELEASE})
+      endif()
+  endif()
+
+endmacro(FindQtPlugins pluginlist)
 
