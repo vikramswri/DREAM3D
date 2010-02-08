@@ -15,8 +15,7 @@ if ( NOT Q_WS_MAC AND MSVC AND DEFINED QT_QMAKE_EXECUTABLE)
     SET (QTLIBLIST QtCore QtGui)
     SET (QTPLUGINLIST qgif qjpeg qtiff)
     set (BUILD_TYPES "Debug;Release")
-    
-    
+
     foreach (btype ${BUILD_TYPES})
         string(TOUPPER ${btype} BTYPE)
         file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${btype})
@@ -41,37 +40,37 @@ if ( NOT Q_WS_MAC AND MSVC AND DEFINED QT_QMAKE_EXECUTABLE)
                 
         endforeach()
         
-    #  For this project we also need to copy the imageformat Qt plugins which should have already been defined
+    # For this project we also need to copy the imageformat Qt plugins which should have already been defined
     # in the cmake variables QTPLUGINS_DEBUG, QTPLUGINS_RELEASE and QTPLUGINS
         file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${btype}/plugins/imageformats)     
         foreach(plugin ${QTPLUGINLIST})
             string(TOUPPER ${plugin} PLUGIN)
            # message(STATUS "QT_${QTLIB}_LIBRARY_${BTYPE}: ${QT_${QTLIB}_LIBRARY_${BTYPE}}")
-            GET_FILENAME_COMPONENT(DLL_NAME ${QT_${PLUGIN}_LIBRARY_${BTYPE}} NAME_WE)
+            GET_FILENAME_COMPONENT(DLL_NAME ${QT_${PLUGIN}_PLUGIN_${BTYPE}} NAME_WE)
            # message(STATUS "DLL_NAME: ${DLL_NAME}")
            # GET_FILENAME_COMPONENT(QT_BIN_PATH ${QT_QMAKE_EXECUTABLE} PATH)
            # message(STATUS "QT_BIN_PATH: ${QT_BIN_PATH}")
             
             INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${DLL_NAME}.dll 
-                DESTINATION ./
+                DESTINATION ./plugins/imageformats
                 CONFIGURATIONS ${btype}
                 COMPONENT Applications)
                 
-            add_custom_target(Z_${qtlib}-${BTYPE}-Copy ALL
-                        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_BIN_PATH}/${DLL_NAME}.dll 
-                        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${btype}/ 
-                        COMMENT "Copying ${QT_BIN_PATH}/${DLL_NAME}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${btype}/")                    
+            add_custom_target(Z_${plugin}-${BTYPE}-Copy ALL
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_PLUGINS_DIR}/imageformats/${DLL_NAME}.dll 
+                        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${btype}/plugins/imageformats/
+                        COMMENT "Copying ${QT_PLUGINS_DIR}/imageformats/${DLL_NAME}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${btype}/plugins/imageformats")                    
                 
         endforeach(plugin ${QTPLUGINS_${BTYPE}})
-        
-        
-         
+		
+		#write a qt.conf file into the application directory and install it
+		file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${btype}/qt.conf "")
+		INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${btype}/qt.conf
+				DESTINATION .
+				CONFIGURATIONS ${btype}
+				COMPONENT Applications )
+		
     endforeach()
-   
-
-    
-
-
 endif()
 
 # Install MinGW support libraries if those are needed

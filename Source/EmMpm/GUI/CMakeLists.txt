@@ -208,8 +208,8 @@ INSTALL(CODE "
 # directories to look for dependencies
 SET(DIRS ${QT_LIBRARY_DIRS})
 
-set (qt_plugin_list tiff;jpeg;gif)
-set (qt_plugin_types "RELEASE;DEBUG")
+set (qt_plugin_list qtiff;qjpeg;qgif)
+set (qt_plugin_types "Debug;Release")
 if (WIN32)
   set(qt_plugin_prefix "")
   set(qt_plugin_DEBUG_suffix "d4")
@@ -227,15 +227,17 @@ set (QTPLUGINS "")
 
 # Loop through all the Build Types and all the plugins to find each one.
 foreach(build_type ${qt_plugin_types})
+	string(TOUPPER ${build_type} BTYPE)
     foreach(plugin ${qt_plugin_list})
+	  STRING(TOUPPER ${plugin} PLUGIN)
 #      message(STATUS "|-- Looking for q${plugin}${qt_plugin_${build_type}_suffix}")
-      FIND_LIBRARY( Q${plugin}_PLUGIN_${build_type}_LIB 
-                    NAMES q${plugin}${qt_plugin_${build_type}_suffix} 
+       FIND_LIBRARY( QT_${PLUGIN}_PLUGIN_${BTYPE} 
+                    NAMES ${plugin}${qt_plugin_${BTYPE}_suffix} 
                     PATHS ${QT_PLUGINS_DIR}/imageformats 
                     DOC "Library Path for ${plugin}"
                     NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
 #      message(STATUS "|--  Q${plugin}_PLUGIN_${build_type}_LIB: ${Q${plugin}_PLUGIN_${build_type}_LIB}")
-      LIST(APPEND QTPLUGINS_${build_type} ${Q${plugin}_PLUGIN_${build_type}_LIB})
+      LIST(APPEND QTPLUGINS_${BTYPE} ${QT_${PLUGIN}_PLUGIN_${BTYPE}})
     endforeach()
 endforeach()
 
