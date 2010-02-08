@@ -46,7 +46,6 @@ ENDMACRO (IDE_SOURCE_PROPERTIES NAME HEADERS SOURCES)
 # ------------------------------------------------------------------------------ 
 # This CMake code installs the needed support libraries
 # ------------------------------------------------------------------------------ 
-
 macro(InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
 
     SET_TARGET_PROPERTIES( ${EXE_NAME} 
@@ -158,7 +157,9 @@ macro(ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
 endmacro(ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
 
 
-
+# --------------------------------------------------------------------
+#
+#
 macro(StaticLibraryProperties targetName )
     if (WIN32 AND NOT MINGW)
         SET (DEBUG_EXTENSION "_d")

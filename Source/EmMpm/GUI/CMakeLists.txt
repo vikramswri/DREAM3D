@@ -209,50 +209,44 @@ INSTALL(CODE "
 SET(DIRS ${QT_LIBRARY_DIRS})
 
 set (qt_plugin_list tiff;jpeg;gif)
-set (qt_plugin_type "RELEASE")
+set (qt_plugin_types "RELEASE;DEBUG")
 if (WIN32)
   set(qt_plugin_prefix "")
-  if ( CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(qt_plugin_debug_suffix "d")
-    set (qt_plugin_type "DEBUG")
-  endif()
+  set(qt_plugin_DEBUG_suffix "d4")
+  set(qt_plugin_RELEASE_suffix "4")
 else ()
   set(qt_plugin_prefix "lib")
-  if ( CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(qt_plugin_debug_suffix "_debug")
-    set (qt_plugin_type "DEBUG")
-  endif()
+  set(qt_plugin_DEBUG_suffix "_debug")
+  set(qt_plugin_RELEASE_suffix "")
 endif()
 
-message(STATUS "qt_plugin_debug_suffix: ${qt_plugin_debug_suffix}")
+#message(STATUS "qt_plugin_debug_suffix: ${qt_plugin_debug_suffix}")
+set (QTPLUGINS_RELEASE "")
+set (QTPLUGINS_DEBUG   "")
 set (QTPLUGINS "")
-foreach(plugin ${qt_plugin_list})
-  message(STATUS "|-- Looking for q${plugin}${qt_plugin_debug_suffix}")
-  
-  FIND_LIBRARY( Q${plugin}_PLUGIN_${qt_plugin_type}_LIB NAMES q${plugin}${qt_plugin_debug_suffix} PATHS ${QT_PLUGINS_DIR}/imageformats DOC "Library Path for ${plugin}"
-                NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-  message(STATUS "|--  Q${plugin}_PLUGIN_${qt_plugin_type}_LIB: ${Q${plugin}_PLUGIN_${qt_plugin_type}_LIB}")
-  LIST(APPEND QTPLUGINS ${Q${plugin}_PLUGIN_${qt_plugin_type}_LIB})
+
+# Loop through all the Build Types and all the plugins to find each one.
+foreach(build_type ${qt_plugin_types})
+    foreach(plugin ${qt_plugin_list})
+#      message(STATUS "|-- Looking for q${plugin}${qt_plugin_${build_type}_suffix}")
+      FIND_LIBRARY( Q${plugin}_PLUGIN_${build_type}_LIB 
+                    NAMES q${plugin}${qt_plugin_${build_type}_suffix} 
+                    PATHS ${QT_PLUGINS_DIR}/imageformats 
+                    DOC "Library Path for ${plugin}"
+                    NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+#      message(STATUS "|--  Q${plugin}_PLUGIN_${build_type}_LIB: ${Q${plugin}_PLUGIN_${build_type}_LIB}")
+      LIST(APPEND QTPLUGINS_${build_type} ${Q${plugin}_PLUGIN_${build_type}_LIB})
+    endforeach()
 endforeach()
 
-#file(GLOB_RECURSE QTPLUGINS ${QT_PLUGINS_DIR}/imageformats/*${CMAKE_SHARED_LIBRARY_SUFFIX} )
-message(STATUS "QTPLUGINS: ${QTPLUGINS}")
-
- #--------------------------------------------------------------------------------
- # Install needed Qt plugins by copying directories from the qt installation
- # One can cull what gets copied by using 'REGEX "..." EXCLUDE'
- #INSTALL(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" DESTINATION ${plugin_dest_dir}/plugins COMPONENT Runtime)
- #INSTALL(FILES ${QTPLUGINS} DESTINATION ${plugin_dest_dir}/plugins/imageformats )
- 
- # Now the work of copying dependencies into the bundle/package
- # The quotes are escaped and variables to use at install time have their $ escaped
- # An alternative is the do a configure_file() on a script and use install(SCRIPT  ...).
- # Note that the image plugins depend on QtSvg and QtXml, and it got those copied
- # over.
- #INSTALL(CODE "
- #    include(BundleUtilities)
- #    fixup_bundle(\"${APPS}\" "${QTPLUGINS}" \"${DIRS}\" )
- #    " COMPONENT Runtime)
+# Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
+if (NOT MSVC)
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        set (QTPLUGINS ${QTPLUGINS_DEBUG})
+    else()
+        set (QTPLUGINS ${QTPLUGINS_RELEASE})
+    endif()
+endif()
 
 InstallationSupport(${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} ${QEmMpm_BINARY_DIR})                
 
