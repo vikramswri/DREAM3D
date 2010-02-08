@@ -39,14 +39,6 @@ SET (EXE_DEBUG_EXTENSION "_debug")
 INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/CMakeMacros.cmake )
 INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/ConfigureChecks.cmake)
 
-
-INCLUDE ( ${EmMpmGUI_CMAKE_DIR}/MXAFindTiff.cmake)
-
-IF (NOT TIFF_FOUND)
-  MESSAGE (FATAL_ERROR " Tiff Library was NOT Found and is needed.")
-ENDIF (NOT TIFF_FOUND)
-INCLUDE_DIRECTORIES(${TIFF_INCLUDE_DIRS})
-
 # --------------------------------------------------------------------
 # Add in some compiler definitions
 # --------------------------------------------------------------------
@@ -112,5 +104,6 @@ configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 ${PROJECT_BINARY_DIR}/ReadMe.txt )
                 
+
 include(${PROJECT_RESOURCES_DIR}/CMake/InstallSupportLibraries.cmake)
-include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)
+#include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)

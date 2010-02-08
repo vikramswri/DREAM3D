@@ -1,3 +1,4 @@
+message (STATUS "#------------ Starting OS X Bundle Fixup --------------------------")
 cmake_minimum_required(VERSION 2.6)
 
 #-- Need this for link line stuff?
@@ -35,17 +36,23 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   set(path "@executable_path/../../Contents/MacOS")
 
   set(overridden 0)
+  # For Qt Based Plugins for the image formats, the plugins MUST reside in
+  # the "PlugIns/imageformats" directory. Since THIS particular project ONLY has
+  # the Qt Frameworks AND the plugins the below regex will suffice to separate
+  # them from each other. On other projects we could use better logic to
+  # put things where they go. Maybe using some "configured" CMake List of libraries
+  # then looking through each list for the currect library being fixed up.
   # Embed .dylibs right next to the main bundle executable:
   #
   if(item MATCHES "\\.dylib$")
-    set(path "@executable_path/../Libraries")
+    set(path "@executable_path/../PlugIns/imageformats")
     set(overridden 1)
   endif(item MATCHES "\\.dylib$")
 
   # Embed .so right next to the main bundle executable:
   #
   if(item MATCHES "\\.so$")
-    set(path "@executable_path/../Plugins")
+    set(path "@executable_path/../Plugins/imageformats")
     set(overridden 1)
   endif(item MATCHES "\\.so$")
   
@@ -63,12 +70,14 @@ endfunction(gp_item_default_embedded_path_override)
 
 
 #-- Be sure all the internal directories are created first before calling the 'fixup_bundle'
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Libraries")
+#file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Libraries")
 file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Plugins")
 file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Frameworks")
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Support")
+#file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Support")
 
-#-- Put an empty qt.conf file in the bundle so as to NOT load plugins from the installed Qt.
+#--------------------------------------------------------------------------------
+# install a qt.conf file
+# this inserts some cmake code into the install script to write the file
 file(WRITE "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Resources/qt.conf" "")
 
 #-- Check for Qt4 stuff
@@ -78,6 +87,10 @@ if ("@QT_MAC_USE_COCOA@" STREQUAL "1")
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "@QT_LIBRARY_DIR@/QtGui.framework/Resources/qt_menu.nib" "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Resources/qt_menu.nib")
 endif()
 
+set (QTPLUGINS "@QTPLUGINS@")
+
 # -- Run the BundleUtilities cmake code
 include(BundleUtilities)
-fixup_bundle("@CMAKE_INSTALL_PREFIX@/@target@.app" "${PluginList}" "Plugins")
+fixup_bundle("@CMAKE_INSTALL_PREFIX@/@target@.app" "${QTPLUGINS}" "@QT_PLUGINS_DIR@/imageformats")
+
+message (STATUS "#------------ End OS X Bundle Fixup --------------------------")

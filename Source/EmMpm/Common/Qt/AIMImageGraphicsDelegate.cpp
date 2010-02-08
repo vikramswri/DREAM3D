@@ -215,7 +215,7 @@ QImage AIMImageGraphicsDelegate::_scaleImage()
     imageSize *= _zoomFactor;
   }
 
-  return this->m_CachedImage.scaled(imageSize, Qt::KeepAspectRatio );
+  return this->m_CachedImage.scaled(imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
 }
 
 // -----------------------------------------------------------------------------

@@ -22,8 +22,9 @@
 //
 // -----------------------------------------------------------------------------
 EmMpmTask::EmMpmTask(QObject* parent) :
-  QObject(parent), m_Cancel(false),
+  QObject(parent),
   m_Debug(false),
+  m_Cancel(false),
   m_Beta(0.1),
   m_Gamma(0.0),
   m_EmIterations(5),

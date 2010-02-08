@@ -160,7 +160,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
 
      void _openSegmentedImage(QString mountImage);
 
-
+     AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
      qint32 initGraphicViews();
 

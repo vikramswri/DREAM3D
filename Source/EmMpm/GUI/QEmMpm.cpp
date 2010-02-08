@@ -32,10 +32,6 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QListWidget>
 
-//-- TIFF Headers
-#include <tif_config.h>
-#include <tiffio.h>
-
 
 
 #define READ_STRING_SETTING(prefs, var, emptyValue)\
@@ -521,7 +517,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
         outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
         if (!outputFile.isNull())
         {
-          this->m_CurrentSegmentedFile;
+          this->m_CurrentSegmentedFile = "";
           this->m_OutputExistsCheck = true;
         }
         else // The user clicked cancel from the save file dialog
@@ -754,7 +750,7 @@ void QEmMpm::receiveTaskFinished()
   // Now put the image into the QGraphicsView
   qint32 width = m_SegmentedImage->getImagePixelWidth();
   qint32 height = m_SegmentedImage->getImagePixelHeight();
-  uint8* dataPointer = m_SegmentedImage->getImageBuffer();
+  quint8* dataPointer = m_SegmentedImage->getImageBuffer();
   QImage image(width, height, QImage::Format_Indexed8);
   QVector<QRgb> colorTable(256);
   for (quint32 i = 0; i < 256; ++i)
@@ -785,8 +781,10 @@ void QEmMpm::receiveTaskFinished()
 qint32 QEmMpm::initGraphicViews()
 {
   qint32 err = 0;
+  QImage image;
   if (m_CurrentImageFile.isEmpty() == false)
   {
+#if 0
     m_OriginalImage = readTiffFile(m_CurrentImageFile, true, false);
     if (NULL == m_OriginalImage.data() )
     {
@@ -810,6 +808,31 @@ qint32 QEmMpm::initGraphicViews()
         image.setPixel(i, j, dataPointer[index]);
       }
     }
+#endif
+
+    image = QImage(m_CurrentImageFile);
+    if (image.isNull() == true)
+    {
+      this->statusbar->showMessage("Error loading image from file");
+      return -1;
+    }
+    QVector<QRgb> colorTable(256);
+    for (quint32 i = 0; i < 256; ++i)
+    {
+      colorTable[i] = qRgb(i, i, i);
+    }
+    image.setColorTable(colorTable);
+#if 0
+    if (image.format() != QImage::Format_Indexed8)
+    {
+      QVector<QRgb> colorTable(256);
+      for (quint32 i = 0; i < 256; ++i)
+      {
+        colorTable[i] = qRgb(i, i, i);
+      }
+      image = image.convertToFormat(QImage::Format_Indexed8, colorTable);
+    }
+#endif
 
     // Create the QGraphicsScene Objects
     m_OriginalImageGScene = new QGraphicsScene(this);
@@ -832,45 +855,51 @@ qint32 QEmMpm::initGraphicViews()
     connect(fitToWindow, SIGNAL(clicked()),
             m_OriginalGDelegate, SLOT(fitToWindow() ));
 
+    // Create the m_OriginalImage and m_Segmented Image Objects
+
+
+    m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
+    if (NULL == m_OriginalImage.data())
+    {
+      return -1;
+    }
+
   }
 
 
+  // If we have NOT loaded a segmented file AND we have a valid Original Image, then
+  // create the Segmented image based on the input image.
+  QImage segImage;
   if (m_CurrentSegmentedFile.isEmpty() == true && NULL != m_OriginalImage.data() )
   {
-    m_SegmentedImage = AIMImage::NewFromSourceMosaic(m_OriginalImage, true);
-    err = m_SegmentedImage->initializeImageWithSourceData(m_SegmentedImage->getImagePixelWidth(),
-                                                             m_SegmentedImage->getImagePixelHeight(),
-                                                             m_OriginalImage->getImageBuffer());
+    segImage = image;
+    m_SegmentedImage = convertQImageToGrayScaleAIMImage(segImage);
+    if (NULL == m_SegmentedImage.data())
+    {
+      return -1;
+    }
   }
-  else
+  else // We have an actual segmented image file that the user wants us to read.
   {
-    m_SegmentedImage = readTiffFile(m_CurrentSegmentedFile, true, false);
+    segImage = QImage(m_CurrentSegmentedFile);
+    if (segImage.isNull() == true)
+    {
+      this->statusbar->showMessage("Error loading Segmented image from file");
+      return -1;
+    }
+    // Convert it to an AIMImage in GrayScale
+    m_SegmentedImage = convertQImageToGrayScaleAIMImage(segImage);
     if (NULL == m_SegmentedImage.data() )
     {
-      std::cout << "Error loading Segmented image" << std::endl;
+      std::cout << "Error loading Segmented image from file" << std::endl;
       return -1;
     }
   }
 
   if (NULL != m_SegmentedImage.data() )
   {
-    qint32 width = m_SegmentedImage->getImagePixelWidth();
-    qint32 height = m_SegmentedImage->getImagePixelHeight();
-    quint8* dataPointer = m_SegmentedImage->getImageBuffer();
-    QImage image(width, height, QImage::Format_Indexed8);
-    QVector<QRgb> colorTable(256);
-    for (quint32 i = 0; i < 256; ++i)
-    {
-      colorTable[i] = qRgb(i, i, i);
-    }
-    image.setColorTable(colorTable);
-    qint32 index;
-    for (qint32 j=0; j<height; j++) {
-      for (qint32 i =0; i<width; i++) {
-        index = (j *  width) + i;
-        image.setPixel(i, j, dataPointer[index]);
-      }
-    }
+
+
     // Create the QGraphicsScene Objects
     m_SegmentedImageGScene = new QGraphicsScene(this);
     mountImageGView->setScene(m_SegmentedImageGScene);
@@ -878,7 +907,7 @@ qint32 QEmMpm::initGraphicViews()
     m_SegmentedGDelegate->setGraphicsView(mountImageGView);
     m_SegmentedGDelegate->setGraphicsScene(m_SegmentedImageGScene);
     m_SegmentedGDelegate->setMainWindow(this);
-    m_SegmentedGDelegate->setCachedImage(image);
+    m_SegmentedGDelegate->setCachedImage(segImage);
     m_SegmentedGDelegate->fitToWindow();
     connect(this, SIGNAL(parentResized () ),
             m_SegmentedGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
@@ -895,6 +924,36 @@ qint32 QEmMpm::initGraphicViews()
   return err;
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+AIMImage::Pointer QEmMpm::convertQImageToGrayScaleAIMImage(QImage image)
+{
+  AIMImage::Pointer aimImage = AIMImage::New();
+  quint8* oImage = aimImage->allocateImageBuffer(image.width(), image.height(), true);
+  if (NULL == oImage)
+  {
+    statusbar->showMessage("Error creating AIMImage object from QImage");
+    return AIMImage::NullPointer();
+  }
+
+  // Copy the QImage into the AIMImage object, converting to gray scale as we go.
+  qint32 height = image.height();
+  qint32 width = image.width();
+  QRgb rgbPixel;
+  int gray;
+  qint32 index;
+  for (qint32 y=0; y<height; y++) {
+    for (qint32 x =0; x<width; x++) {
+      index = (y *  width) + x;
+      rgbPixel = image.pixel(x, y);
+      gray = qGray(rgbPixel);
+      oImage[index] = static_cast<unsigned char>(gray);
+    }
+  }
+  return aimImage;
+}
+
 
 // -----------------------------------------------------------------------------
 //
@@ -903,7 +962,9 @@ AIMImage::Pointer QEmMpm::readTiffFile(QString filename,
                                               bool asGrayscale,
                                               bool blackIsZero )
 {
+
   AIMImage::Pointer image = AIMImage::NullPointer();
+#if 0
   TIFF* _tiff = NULL;
   if (NULL != _tiff)
   {
@@ -978,6 +1039,7 @@ AIMImage::Pointer QEmMpm::readTiffFile(QString filename,
      image->initializeImageWithSourceData(width, height, raster);
      _TIFFfree( raster );
   }
+#endif
   return image;
 }
 
