@@ -191,7 +191,7 @@ void EmMpmTask::mpm( T* imageData, S* segmentation,
     {
       for (size_t i = 0; i < idim; ++i)
       {
-        int index = j*idim*components+i*components;
+        size_t index = j*idim*components+i*components;
 
         double sum = 0;
         for (uint32_t l = 0; l < NumberClasses; ++l)
