@@ -106,4 +106,4 @@ configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 
 
 include(${PROJECT_RESOURCES_DIR}/CMake/InstallSupportLibraries.cmake)
-#include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)
+include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)

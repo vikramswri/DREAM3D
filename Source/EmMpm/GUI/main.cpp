@@ -82,8 +82,7 @@ int main (int argc, char *argv[])
     //Look for a plugins at the same level as Application.app
     plugin_path += appDir.absolutePath() + QDir::separator() + ";";
 #else
-    plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
-      + "plugins";
+    plugin_path = QCoreApplication::applicationDirPath() + QDir::separator() + "plugins";
 #endif
 
 

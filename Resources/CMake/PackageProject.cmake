@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 #INCLUDE (InstallRequiredSystemLibraries)
 INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/InstallMSVCLibraries.cmake)
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SHP Encoder")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GUI Application to run EmMpm segmentation Algorithm")
 SET(CPACK_PACKAGE_VENDOR "BlueQuartz Software, Michael A. Jackson")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${EmMpmGUI_BINARY_DIR}/ReadMe.txt")
 SET(CPACK_RESOURCE_FILE_LICENSE "${EmMpmGUI_BINARY_DIR}/License.txt")
@@ -20,16 +20,13 @@ SET(CPACK_PACKAGE_VERSION_MAJOR ${EmMpmGUI_VER_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${EmMpmGUI_VER_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${EmMpmGUI_VER_PATCH})
 SET(CPACK_PACKAGE_VERSION ${EmMpmGUI_VERSION})
-SET(CPACK_COMPONENTS_ALL Applications Tools)
+SET(CPACK_COMPONENTS_ALL Applications)
 set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Applications")
 set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION  "The Gui Versions of the EmMpmGUI Software Tools Suite")
 set(CPACK_COMPONENT_APPLICATIONS_REQUIRED 1)
-set(CPACK_COMPONENT_TOOLS_DISPLAY_NAME "Tools")
-set(CPACK_COMPONENT_TOOLS_DESCRIPTION  "The Command Line versions of the EmMpmGUI Software Tools Suite")
-set(CPACK_COMPONENT_TOOLS_REQUIRED 1)
 
 set(CPACK_PACKAGE_EXECUTABLES
-    EmMpmGUI encoder
+    QEmMpm EmMpmGUI
 )
 
 # Create an NSID based installer for Windows Systems

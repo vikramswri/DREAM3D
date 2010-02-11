@@ -78,9 +78,6 @@ set (EMMPM_COMMON_HDRS
     ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/AIMImage.h   )
 IDE_SOURCE_PROPERTIES("EmMpm/Common" "${EMMPM_COMMON_HDRS}" "${EMMPM_COMMON_SRCS}")
 
-
-
-
 # List the source files here
 SET (Encoder_SRCS
 
@@ -169,80 +166,7 @@ ADD_EXECUTABLE( ${PROJECT_NAME} ${GUI_TYPE} ${QEmMpm_PROJECT_SRCS} )
 TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
                         ${QT_LIBRARIES})
 
-
-#--------------------------------------------------------------------------------
-# Now the installation stuff below
-#--------------------------------------------------------------------------------
-IF(NOT APPLE)
-    #--------------------------------------------------------------------------------
-    # install a qt.conf file
-    # this inserts some cmake code into the install script to write the file
-    INSTALL(CODE "
-       file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
-       " COMPONENT Runtime)
-
-
-#--------------------------------------------------------------------------------
-# Install the QtTest application, on Apple, the bundle is at the root of the
-# install tree, and on other platforms it'll go into the bin directory.
-INSTALL(TARGETS ${PROJECT_NAME} 
-   BUNDLE DESTINATION . COMPONENT Runtime
-   RUNTIME DESTINATION bin COMPONENT Runtime
-   )
-ENDIF(NOT APPLE)
-#--------------------------------------------------------------------------------
-# Use BundleUtilities to get all other dependencies for the application to work.
-# It takes a bundle or executable along with possible plugins and inspects it
-# for dependencies.  If they are not system dependencies, they are copied.
-
-# directories to look for dependencies
-SET(DIRS ${QT_LIBRARY_DIRS})
-
-set (qt_plugin_list tiff;jpeg;gif)
-set (qt_plugin_type "RELEASE")
-if (WIN32)
-  set(qt_plugin_prefix "")
-  if ( CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(qt_plugin_debug_suffix "d")
-    set (qt_plugin_type "DEBUG")
-  endif()
-else ()
-  set(qt_plugin_prefix "lib")
-  if ( CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(qt_plugin_debug_suffix "_debug")
-    set (qt_plugin_type "DEBUG")
-  endif()
-endif()
-
-message(STATUS "qt_plugin_debug_suffix: ${qt_plugin_debug_suffix}")
-set (QTPLUGINS "")
-foreach(plugin ${qt_plugin_list})
-  message(STATUS "|-- Looking for q${plugin}${qt_plugin_debug_suffix}")
-  
-  FIND_LIBRARY( Q${plugin}_PLUGIN_${qt_plugin_type}_LIB NAMES q${plugin}${qt_plugin_debug_suffix} PATHS ${QT_PLUGINS_DIR}/imageformats DOC "Library Path for ${plugin}"
-                NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-  message(STATUS "|--  Q${plugin}_PLUGIN_${qt_plugin_type}_LIB: ${Q${plugin}_PLUGIN_${qt_plugin_type}_LIB}")
-  LIST(APPEND QTPLUGINS ${Q${plugin}_PLUGIN_${qt_plugin_type}_LIB})
-endforeach()
-
-#file(GLOB_RECURSE QTPLUGINS ${QT_PLUGINS_DIR}/imageformats/*${CMAKE_SHARED_LIBRARY_SUFFIX} )
-message(STATUS "QTPLUGINS: ${QTPLUGINS}")
-
- #--------------------------------------------------------------------------------
- # Install needed Qt plugins by copying directories from the qt installation
- # One can cull what gets copied by using 'REGEX "..." EXCLUDE'
- #INSTALL(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" DESTINATION ${plugin_dest_dir}/plugins COMPONENT Runtime)
- #INSTALL(FILES ${QTPLUGINS} DESTINATION ${plugin_dest_dir}/plugins/imageformats )
- 
- # Now the work of copying dependencies into the bundle/package
- # The quotes are escaped and variables to use at install time have their $ escaped
- # An alternative is the do a configure_file() on a script and use install(SCRIPT  ...).
- # Note that the image plugins depend on QtSvg and QtXml, and it got those copied
- # over.
- #INSTALL(CODE "
- #    include(BundleUtilities)
- #    fixup_bundle(\"${APPS}\" "${QTPLUGINS}" \"${DIRS}\" )
- #    " COMPONENT Runtime)
+FindQtPlugins("qgif;qjpeg;qtiff")
 
 InstallationSupport(${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} ${QEmMpm_BINARY_DIR})                
 
