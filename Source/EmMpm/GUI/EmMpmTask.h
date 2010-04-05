@@ -29,8 +29,8 @@
   emit sendTaskProgress( (p) );
 
 /**
-* @class EmMpmTask EmMpmTask.h SHP/GUI/EmMpmTask.h
-* @brief THis is the wrapper code for the SHP encoding code. This is called as a "worker" class from a separate thread
+* @class EmMpmTask EmMpmTask.h EmMpm/GUI/EmMpmTask.h
+* @brief THis is the wrapper code for the code. This is called as a "worker" class from a separate thread
 * of execution in order to not lock up the GUI.
 * @author Michael A. Jackson for BlueQuartz Software
 * @date Dec 20, 2009

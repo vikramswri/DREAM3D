@@ -7,15 +7,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef SHPTHREAD_H_
-#define SHPTHREAD_H_
+#ifndef EMMPMTHREAD_H
+#define EMMPMTHREAD_H
 
 #include <QtCore/QThread>
 
 #include "EmMpmTask.h"
 
 /**
-* @class EmMpmThread EmMpmThread.h SHP/GUI/EmMpmThread.h
+* @class EmMpmThread EmMpmThread.h EmMpm/GUI/EmMpmThread.h
 * @brief This class extends the QThread to take ownership of the EmMpmTask object, run the encoding and delete
 * the object when the encoding is complete.
 * @author Michael A. Jackson for BlueQuartz Software
@@ -49,7 +49,7 @@ class EmMpmThread : public QThread
   protected:
 
     /**
-     * @brief This is the entry point for the SHP encoding task. This is called from the QThread::Started signal.
+     * @brief This is the entry point for the task. This is called from the QThread::Started signal.
      */
     virtual void run();
 
@@ -60,4 +60,4 @@ class EmMpmThread : public QThread
     void operator=(const EmMpmThread&);  // Operator '=' Not Implemented
 };
 
-#endif /* SHPTHREAD_H_ */
+#endif /* EMMPMTHREAD_H */

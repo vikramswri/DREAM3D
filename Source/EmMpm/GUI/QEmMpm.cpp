@@ -75,7 +75,7 @@
     prefs.setValue(#combobox, this->combobox->currentIndex());
 
 #define CHECK_QLABEL_OUTPUT_FILE_EXISTS_BODY1(prefixname, name)\
-  prefixname->setText(SHP::Representation::name.c_str());\
+  prefixname->setText(EmMpm::Representation::name.c_str());\
   prefixname##Icon->setPixmap(QPixmap(iconFile));\
 
 
@@ -94,7 +94,7 @@
 
 #define CHECK_QLABEL_OUTPUT_FILE_EXISTS(prefix, name) \
 { \
-  QString absPath = prefix##OutputDir->text() + QDir::separator() + SHP::Representation::name.c_str();\
+  QString absPath = prefix##OutputDir->text() + QDir::separator() + EmMpm::Representation::name.c_str();\
   absPath = QDir::toNativeSeparators(absPath);\
   QFileInfo fi ( absPath );\
   QString iconFile;\
@@ -108,7 +108,7 @@
 
 #define CHECK_QLABEL_INPUT_FILE_EXISTS(prefix, name) \
 { \
-  QString absPath = prefix##InputDir->text() + QDir::separator() + SHP::Representation::name.c_str();\
+  QString absPath = prefix##InputDir->text() + QDir::separator() + EmMpm::Representation::name.c_str();\
   absPath = QDir::toNativeSeparators(absPath);\
   QFileInfo fi ( absPath );\
   QString iconFile;\
@@ -122,7 +122,7 @@
 
 #define SANITY_CHECK_INPUT(prefix, input)\
   if (_verifyPathExists(prefix##input->text(), prefix##input) == false) {\
-  QMessageBox::critical(this, tr("SHP Representation"),\
+  QMessageBox::critical(this, tr("EmMpm Representation"),\
   tr("The input " #input " does not exist. Please ensure the file or folder exists before starting the operation"),\
   QMessageBox::Ok,\
   QMessageBox::Ok);\
@@ -131,13 +131,13 @@
 
 #define SANITY_CHECK_QLABEL_FILE(prefix, input) \
   { \
-  QString absPath = prefix##InputDir->text() + QDir::separator() + SHP::Representation::input.c_str();\
+  QString absPath = prefix##InputDir->text() + QDir::separator() + EmMpm::Representation::input.c_str();\
   absPath = QDir::toNativeSeparators(absPath);\
   QFileInfo fi ( absPath );\
-  QString theMessage = QString("The input ") + QString(SHP::Representation::input.c_str()) + \
+  QString theMessage = QString("The input ") + QString(EmMpm::Representation::input.c_str()) + \
   QString(" does not exist. Please ensure the file or folder exists before starting the operation");\
   if ( fi.exists() == false)  {\
-  QMessageBox::critical(this, tr("SHP Representation"),\
+  QMessageBox::critical(this, tr("EmMpm Representation"),\
   theMessage,\
   QMessageBox::Ok,\
   QMessageBox::Ok);\

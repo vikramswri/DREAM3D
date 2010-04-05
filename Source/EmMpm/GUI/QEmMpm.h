@@ -25,7 +25,7 @@
 #include "EmMpm/Common/Qt/AIMImageGraphicsDelegate.h"
 
 /**
-* @class QEmMpm QEmMpm.h SHP/GUI/QEmMpm.h
+* @class QEmMpm QEmMpm.h EmMpm/GUI/QEmMpm.h
 * @brief Main class that drives the GUI elements.
 * @author Michael A. Jackson for BlueQuartz Software
 * @date Dec 23, 2009
