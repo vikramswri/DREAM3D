@@ -551,6 +551,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
   connect(m_EmMpmThread, SIGNAL(finished()), this, SLOT(receiveTaskFinished() ));
   connect(task, SIGNAL(sendTaskMessage(const QString &) ), this, SLOT(receiveTaskMessage(const QString &) ) );
   connect(task, SIGNAL(sendTaskProgress(int) ), this, SLOT(receiveTaskProgress(int) ) );
+  connect(this, SIGNAL(cancelTask()), task, SLOT(cancelTask()));
 
   m_SegmentBtn->setText("Cancel");
   m_EmMpmThread->start();

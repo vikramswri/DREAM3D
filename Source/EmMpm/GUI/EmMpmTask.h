@@ -36,7 +36,7 @@
 * @date Dec 20, 2009
 * @version 1.0
 */
-class EmMpmTask: public QObject, public QRunnable
+class EmMpmTask : public QObject, public QRunnable
 {
 
   Q_OBJECT
