@@ -41,6 +41,11 @@ IF(WIN32)
  SET(GUI_TYPE WIN32)
 ENDIF(WIN32)
 
+# Set some include directories
+include_directories( ${EmMpmGUI_SOURCE_DIR}/Source )
+include_directories( ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt )
+include_directories( ${QEmMpm_BINARY_DIR} )
+
 
 # List the source files here
 SET (QEmMpm_SRCS
@@ -60,14 +65,17 @@ IDE_SOURCE_PROPERTIES( "EmMpm/GUI" "${QEmMpm_HDRS}" "${QEmMpm_SRCS}")
 set (EMMPM_COMMON_QT_SRCS
     ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AboutBox.cpp
     ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QRecentFileList.cpp
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QR3DFileCompleter.cpp
+    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QFileCompleter.cpp
     ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AIMImageGraphicsDelegate.cpp
+    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QFSDroppableGraphicsView.cpp
 )
 set (EMMPM_COMMON_QT_HDRS
     ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AboutBox.h
     ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QRecentFileList.h
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QR3DFileCompleter.h
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AIMImageGraphicsDelegate.h    )
+    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QFileCompleter.h
+    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AIMImageGraphicsDelegate.h
+    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QFSDroppableGraphicsView.h
+)
 IDE_SOURCE_PROPERTIES("EmMpm/Common/Qt" "${EMMPM_COMMON_QT_HDRS}" "${EMMPM_COMMON_QT_SRCS}")
 
 set (EMMPM_COMMON_SRCS
@@ -78,15 +86,7 @@ set (EMMPM_COMMON_HDRS
     ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/AIMImage.h   )
 IDE_SOURCE_PROPERTIES("EmMpm/Common" "${EMMPM_COMMON_HDRS}" "${EMMPM_COMMON_SRCS}")
 
-# List the source files here
-SET (Encoder_SRCS
 
-)
-
-set (Encoder_HDRS 
-
-)
-IDE_SOURCE_PROPERTIES("EmMpm/Encoder" "${Encoder_HDRS}" "${Encoder_SRCS}")
 
 # --------------------------------------------------------------------
 #  Get a list of the header to run 'moc' on 
@@ -108,7 +108,7 @@ SET( QEmMpm_UIS
 SET( QEmMpm_RCS ${PROJECT_RESOURCES_DIR}/icons/images/Icons.qrc)
 
 # --------------------------------------------------------------------
-# -- Run MOC and UIC on the necessary files   
+# Run MOC on the files   
 QT4_ADD_RESOURCES( Generated_RC_SRCS ${QEmMpm_RCS} )
 
 # --------------------------------------------------------------------
@@ -139,8 +139,7 @@ SET (QEmMpm_PROJECT_SRCS
     ${Generated_MOC_SRCS}
 )
 
-include_directories( ${EmMpmGUI_SOURCE_DIR}/Source )
-include_directories( ${QEmMpm_BINARY_DIR} )
+
 #-- Set up OS X Application Bundle properties
 #-- This file have tools for OS X Bunlde creation and configuration
 INCLUDE (${EmMpmGUI_SOURCE_DIR}/Resources/OSX_Tools/OSX_BundleTools.cmake)

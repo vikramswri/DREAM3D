@@ -21,8 +21,10 @@
 #include <ui_QEmMpm.h>
 
 #include "EmMpm/Common/AIMImage.h"
-#include "EmMpmThread.h"
-#include "EmMpm/Common/Qt/AIMImageGraphicsDelegate.h"
+
+class AIMImageGraphicsDelegate;
+class EmMpmThread;
+
 
 /**
 * @class QEmMpm QEmMpm.h EmMpm/GUI/QEmMpm.h
@@ -40,10 +42,6 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     virtual ~QEmMpm();
 
     void initWithFile(const QString imageFile, QString mountImage);
-
-    AIMImage::Pointer readTiffFile(QString filename,
-                                                  bool asGrayscale,
-                                                  bool blackIsZero );
 
     MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, OriginalImage)
     MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, SegmentedImage)
@@ -91,6 +89,10 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
      */
     void openRecentFile();
 
+    void loadImageFile(const QString &filename);
+
+    void loadSegmentedImageFile(const QString  &filename);
+
   protected:
 
     /**
@@ -99,6 +101,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
      */
     void closeEvent(QCloseEvent *event);
 
+#if 0
     /**
      * @brief Drag and drop implementation
      */
@@ -108,6 +111,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
      * @brief Drag and drop implementation
      */
     void dropEvent(QDropEvent*);
+#endif
 
     /**
      * @brief Enables or Disables all the widgets in a list
@@ -156,7 +160,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
       * @brief Opens an Image file
       * @param imageFile The path to the image file to open.
       */
-     void _openFile(QString &imageFile);
+     void _openFile(QString imageFile);
 
      void _openSegmentedImage(QString mountImage);
 

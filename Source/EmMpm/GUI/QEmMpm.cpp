@@ -8,10 +8,11 @@
 
 #include "QEmMpm.h"
 #include "EmMpmTask.h"
+#include "EmMpmThread.h"
 #include "EmMpm/Common/Qt/AboutBox.h"
 #include "EmMpm/Common/Qt/QRecentFileList.h"
-#include "EmMpm/Common/Qt/QR3DFileCompleter.h"
-
+#include "EmMpm/Common/Qt/QFileCompleter.h"
+#include "EmMpm/Common/Qt/AIMImageGraphicsDelegate.h"
 
 
 //-- C++ includes
@@ -38,9 +39,6 @@
   var->setText( prefs.value(#var).toString() );\
   if (var->text().isEmpty() == true) { var->setText(emptyValue); }
 
-#define READ_FILEPATH_SETTING(prefs, var, emptyValue)\
-  var->setText( prefs.value(#var).toString() );\
-  if (var->text().isEmpty() == true) { var->setText(emptyValue); }
 
 #define READ_SETTING(prefs, var, ok, temp, default, type)\
   ok = false;\
@@ -48,16 +46,6 @@
   if (false == ok) {temp = default;}\
   var->setValue(temp);
 
-#define READ_BOOL_SETTING(prefs, var, emptyValue)\
-  { QString s = prefs.value(#var).toString();\
-  if (s.compare("true") == 0) {\
-     var->setChecked(true); }\
-  else if (s.compare("false") == 0) {\
-    var->setChecked(false);\
- } else { var->setChecked(emptyValue); } }
-
-#define WRITE_BOOL_SETTING(prefs, var, b)\
-    prefs.setValue(#var, (b) );
 
 #define WRITE_STRING_SETTING(prefs, var)\
   prefs.setValue(#var , this->var->text());
@@ -65,85 +53,7 @@
 #define WRITE_SETTING(prefs, var)\
   prefs.setValue(#var, this->var->value());
 
-#define READ_COMBO_BOX(prefs, combobox)\
-    { bool ok = false;\
-    int i = prefs.value(#combobox).toInt(&ok);\
-    if (false == ok) {i=0;}\
-    combobox->setCurrentIndex(i); }
 
-#define WRITE_COMBO_BOX(prefs, combobox)\
-    prefs.setValue(#combobox, this->combobox->currentIndex());
-
-#define CHECK_QLABEL_OUTPUT_FILE_EXISTS_BODY1(prefixname, name)\
-  prefixname->setText(EmMpm::Representation::name.c_str());\
-  prefixname##Icon->setPixmap(QPixmap(iconFile));\
-
-
-#define CHECK_QLINEEDIT_FILE_EXISTS(name) \
-  { \
-  QString absPath = QDir::toNativeSeparators(name->text());\
-  QFileInfo fi ( absPath );\
-  QString iconFile;\
-  if ( fi.exists() && fi.isFile() )  {\
-    iconFile = QString(":/") + QString("Check") + QString("-16x16.png");\
-  } else {\
-    iconFile = QString(":/") + QString("Delete") + QString("-16x16.png");\
-  }\
-  name##Icon->setPixmap(QPixmap(iconFile));\
- }
-
-#define CHECK_QLABEL_OUTPUT_FILE_EXISTS(prefix, name) \
-{ \
-  QString absPath = prefix##OutputDir->text() + QDir::separator() + EmMpm::Representation::name.c_str();\
-  absPath = QDir::toNativeSeparators(absPath);\
-  QFileInfo fi ( absPath );\
-  QString iconFile;\
-  if ( fi.exists() )  {\
-  iconFile = QString(":/") + QString("Check") + QString("-16x16.png");\
-  } else {\
-  iconFile = QString(":/") + QString("Delete") + QString("-16x16.png");\
-  }\
-  CHECK_QLABEL_OUTPUT_FILE_EXISTS_BODY1(prefix##name, name)\
-}
-
-#define CHECK_QLABEL_INPUT_FILE_EXISTS(prefix, name) \
-{ \
-  QString absPath = prefix##InputDir->text() + QDir::separator() + EmMpm::Representation::name.c_str();\
-  absPath = QDir::toNativeSeparators(absPath);\
-  QFileInfo fi ( absPath );\
-  QString iconFile;\
-  if ( fi.exists() )  {\
-  iconFile = QString(":/") + QString("Check") + QString("-16x16.png");\
-  } else {\
-  iconFile = QString(":/") + QString("Delete") + QString("-16x16.png");\
-  }\
-  CHECK_QLABEL_OUTPUT_FILE_EXISTS_BODY1(prefix##name, name)\
-}
-
-#define SANITY_CHECK_INPUT(prefix, input)\
-  if (_verifyPathExists(prefix##input->text(), prefix##input) == false) {\
-  QMessageBox::critical(this, tr("EmMpm Representation"),\
-  tr("The input " #input " does not exist. Please ensure the file or folder exists before starting the operation"),\
-  QMessageBox::Ok,\
-  QMessageBox::Ok);\
-  return;\
-  }
-
-#define SANITY_CHECK_QLABEL_FILE(prefix, input) \
-  { \
-  QString absPath = prefix##InputDir->text() + QDir::separator() + EmMpm::Representation::input.c_str();\
-  absPath = QDir::toNativeSeparators(absPath);\
-  QFileInfo fi ( absPath );\
-  QString theMessage = QString("The input ") + QString(EmMpm::Representation::input.c_str()) + \
-  QString(" does not exist. Please ensure the file or folder exists before starting the operation");\
-  if ( fi.exists() == false)  {\
-  QMessageBox::critical(this, tr("EmMpm Representation"),\
-  theMessage,\
-  QMessageBox::Ok,\
-  QMessageBox::Ok);\
-  return;\
-  }\
- }
 
 // -----------------------------------------------------------------------------
 //
@@ -165,7 +75,7 @@ m_OpenDialogLastDirectory("~/")
   connect(recentFileList, SIGNAL (fileListChanged(const QString &)), this, SLOT(updateRecentFileList(const QString &)));
   // Get out initial Recent File List
   this->updateRecentFileList(QString::null);
-  this->setAcceptDrops(true);
+  //this->setAcceptDrops(true);
 }
 
 // -----------------------------------------------------------------------------
@@ -223,11 +133,10 @@ void QEmMpm::readSettings()
   bool ok;
   qint32 i;
   READ_STRING_SETTING(prefs, m_Beta, "5.5");
-    READ_STRING_SETTING(prefs, m_Gamma, "0.1");
-    READ_SETTING(prefs, m_MpmIterations, ok, i, 5, Int);
-    READ_SETTING(prefs, m_EmIterations, ok, i, 5, Int);
-    READ_SETTING(prefs, m_NumClasses, ok, i, 2, Int);
-
+  READ_STRING_SETTING(prefs, m_Gamma, "0.1");
+  READ_SETTING(prefs, m_MpmIterations, ok, i, 5, Int);
+  READ_SETTING(prefs, m_EmIterations, ok, i, 5, Int);
+  READ_SETTING(prefs, m_NumClasses, ok, i, 2, Int);
 }
 
 // -----------------------------------------------------------------------------
@@ -241,13 +150,14 @@ void QEmMpm::writeSettings()
   QSettings prefs(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
 #endif
   WRITE_STRING_SETTING(prefs, m_Beta);
-    WRITE_STRING_SETTING(prefs, m_Gamma);
-    WRITE_SETTING(prefs, m_MpmIterations);
-    WRITE_SETTING(prefs, m_EmIterations);
-    WRITE_SETTING(prefs, m_NumClasses);
+  WRITE_STRING_SETTING(prefs, m_Gamma);
+  WRITE_SETTING(prefs, m_MpmIterations);
+  WRITE_SETTING(prefs, m_EmIterations);
+  WRITE_SETTING(prefs, m_NumClasses);
 
 }
 
+#if 0
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -280,7 +190,7 @@ void QEmMpm::dropEvent(QDropEvent* e)
   QString file = urls.count() ? urls[0].toLocalFile() : QString();
   _openFile(file);
 }
-
+#endif
 
 // -----------------------------------------------------------------------------
 //
@@ -303,30 +213,45 @@ void QEmMpm::setupGui()
   modeComboBox->blockSignals(true);
 
   modeComboBox->insertItem(0, "Exclusion");
-  modeComboBox->insertItem(1, "Source");
-  modeComboBox->insertItem(2, "Destination");
-  modeComboBox->insertItem(3, "Source Over");
-  modeComboBox->insertItem(4, "Destination Over");
-  modeComboBox->insertItem(5, "Source In");
-  modeComboBox->insertItem(6, "Dest In");
-  modeComboBox->insertItem(7, "Difference");
-  modeComboBox->insertItem(8, "Dest Out");
-  modeComboBox->insertItem(9, "Source Atop");
-  modeComboBox->insertItem(10, "Dest Atop");
-  modeComboBox->insertItem(11, "Plus");
-  modeComboBox->insertItem(12, "Multiply");
-  modeComboBox->insertItem(13, "Screen");
-  modeComboBox->insertItem(14, "Overlay");
-  modeComboBox->insertItem(15, "Darken");
-  modeComboBox->insertItem(16, "Lighten");
-  modeComboBox->insertItem(17, "Color Dodge");
-  modeComboBox->insertItem(18, "Color Burn");
-  modeComboBox->insertItem(19, "Hard Light");
-  modeComboBox->insertItem(20, "Soft Light");
+  modeComboBox->insertItem(1, "Difference");
+  modeComboBox->insertItem(2, "Plus");
+  modeComboBox->insertItem(3, "Multiply");
+  modeComboBox->insertItem(4, "Screen");
+  modeComboBox->insertItem(5, "Darken");
+  modeComboBox->insertItem(6, "Lighten");
+  modeComboBox->insertItem(7, "Color Dodge");
+  modeComboBox->insertItem(8, "Color Burn");
+  modeComboBox->insertItem(9, "Hard Light");
+  modeComboBox->insertItem(10, "Soft Light");
+#if 0
+  modeComboBox->insertItem(11, "Source");
+  modeComboBox->insertItem(12, "Destination");
+  modeComboBox->insertItem(13, "Source Over");
+  modeComboBox->insertItem(14, "Destination Over");
+  modeComboBox->insertItem(15, "Source In");
+  modeComboBox->insertItem(16, "Dest In");
+
+  modeComboBox->insertItem(17, "Dest Out");
+  modeComboBox->insertItem(18, "Source Atop");
+  modeComboBox->insertItem(19, "Dest Atop");
+
+  modeComboBox->insertItem(20, "Overlay");
+#endif
 
 
   modeComboBox->setCurrentIndex(0);
   modeComboBox->blockSignals(false);
+
+  modeComboBox->setEnabled(compositeWithOriginal->isChecked());
+
+  connect (originalImageGView, SIGNAL(loadImageFileRequested(const QString &)),
+           this, SLOT(loadImageFile(const QString &)), Qt::QueuedConnection);
+
+  connect (segmentedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
+           this, SLOT(loadSegmentedImageFile(const QString &)));
+
+
+
 }
 
 // -----------------------------------------------------------------------------
@@ -346,6 +271,7 @@ void QEmMpm::setWidgetListEnabled(bool b)
 // -----------------------------------------------------------------------------
 void QEmMpm::on_compositeWithOriginal_stateChanged(int state)
 {
+  modeComboBox->setEnabled(compositeWithOriginal->isChecked());
   m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
   m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
   m_SegmentedGDelegate->updateGraphicsScene();
@@ -454,7 +380,7 @@ void QEmMpm::openRecentFile()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::_openFile(QString &imageFile)
+void QEmMpm::_openFile(QString imageFile)
 {
   if ( true == imageFile.isEmpty() ) // User cancelled the operation
   {
@@ -565,7 +491,7 @@ void QEmMpm::on_actionOpen_Segmented_Image_triggered()
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Segmented Image File"),
     m_OpenDialogLastDirectory,
-    tr("Images (*.tif *.tiff)") );
+    tr("Images (*.tif *.bmp *.jpg *.png)") );
 
   if ( true == imageFile.isEmpty() )
   {
@@ -582,7 +508,7 @@ void QEmMpm::on_actionOpen_triggered()
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
     m_OpenDialogLastDirectory,
-    tr("Images (*.tif *.tiff)") );
+    tr("Images (*.tif *.bmp *.jpg *.png)") );
 
   if ( true == imageFile.isEmpty() )
   {
@@ -591,6 +517,33 @@ void QEmMpm::on_actionOpen_triggered()
   _openFile(imageFile);
 
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::loadImageFile(const QString &imageFile)
+{
+  if ( true == imageFile.isEmpty() )
+  {
+    return;
+  }
+  _openFile(imageFile);
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::loadSegmentedImageFile(const QString  &imageFile)
+{
+  if ( true == imageFile.isEmpty() )
+  {
+    return;
+  }
+  _openSegmentedImage(imageFile);
+}
+
+
 
 // -----------------------------------------------------------------------------
 //
@@ -697,7 +650,7 @@ qint32 QEmMpm::saveSegmentedImage()
   if (m_CurrentSegmentedFile.isEmpty())
   {
     QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Segmented.tif";
-    outputFile = QFileDialog::getSaveFileName(this, tr("Save Segmented Image As ..."), outputFile, tr("tif (*.tif *.tiff)"));
+    outputFile = QFileDialog::getSaveFileName(this, tr("Save Segmented Image As ..."), outputFile, tr("Images (*.tif *.bmp *.jpg *.png)"));
     if ( !outputFile.isEmpty() )
     {
       m_CurrentSegmentedFile = outputFile;
@@ -709,7 +662,7 @@ qint32 QEmMpm::saveSegmentedImage()
 
   bool ok = image.save(m_CurrentSegmentedFile);
   if (ok == true) {
-    mountImageTitle->setText(m_CurrentSegmentedFile);
+    segmentedImageTitle->setText(m_CurrentSegmentedFile);
   }
   else
   {
@@ -785,32 +738,6 @@ qint32 QEmMpm::initGraphicViews()
   QImage image;
   if (m_CurrentImageFile.isEmpty() == false)
   {
-#if 0
-    m_OriginalImage = readTiffFile(m_CurrentImageFile, true, false);
-    if (NULL == m_OriginalImage.data() )
-    {
-      std::cout << "Error loading Tif image" << std::endl;
-      return -1;
-    }
-    qint32 width = m_OriginalImage->getImagePixelWidth();
-    qint32 height = m_OriginalImage->getImagePixelHeight();
-    quint8* dataPointer = m_OriginalImage->getImageBuffer();
-    QImage image(width, height, QImage::Format_Indexed8);
-    QVector<QRgb> colorTable(256);
-    for (quint32 i = 0; i < 256; ++i)
-    {
-      colorTable[i] = qRgb(i, i, i);
-    }
-    image.setColorTable(colorTable);
-    qint32 index;
-    for (qint32 j=0; j<height; j++) {
-      for (qint32 i =0; i<width; i++) {
-        index = (j *  width) + i;
-        image.setPixel(i, j, dataPointer[index]);
-      }
-    }
-#endif
-
     image = QImage(m_CurrentImageFile);
     if (image.isNull() == true)
     {
@@ -823,17 +750,7 @@ qint32 QEmMpm::initGraphicViews()
       colorTable[i] = qRgb(i, i, i);
     }
     image.setColorTable(colorTable);
-#if 0
-    if (image.format() != QImage::Format_Indexed8)
-    {
-      QVector<QRgb> colorTable(256);
-      for (quint32 i = 0; i < 256; ++i)
-      {
-        colorTable[i] = qRgb(i, i, i);
-      }
-      image = image.convertToFormat(QImage::Format_Indexed8, colorTable);
-    }
-#endif
+
 
     // Create the QGraphicsScene Objects
     m_OriginalImageGScene = new QGraphicsScene(this);
@@ -903,9 +820,9 @@ qint32 QEmMpm::initGraphicViews()
 
     // Create the QGraphicsScene Objects
     m_SegmentedImageGScene = new QGraphicsScene(this);
-    mountImageGView->setScene(m_SegmentedImageGScene);
+    segmentedImageGView->setScene(m_SegmentedImageGScene);
     m_SegmentedGDelegate = new AIMImageGraphicsDelegate(this);
-    m_SegmentedGDelegate->setGraphicsView(mountImageGView);
+    m_SegmentedGDelegate->setGraphicsView(segmentedImageGView);
     m_SegmentedGDelegate->setGraphicsScene(m_SegmentedImageGScene);
     m_SegmentedGDelegate->setMainWindow(this);
     m_SegmentedGDelegate->setCachedImage(segImage);
@@ -959,94 +876,6 @@ AIMImage::Pointer QEmMpm::convertQImageToGrayScaleAIMImage(QImage image)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer QEmMpm::readTiffFile(QString filename,
-                                              bool asGrayscale,
-                                              bool blackIsZero )
-{
-
-  AIMImage::Pointer image = AIMImage::NullPointer();
-#if 0
-  TIFF* _tiff = NULL;
-  if (NULL != _tiff)
-  {
-    (void) TIFFClose(_tiff); // Close any open tiff file first
-  }
-
-  _tiff = TIFFOpen(filename.toAscii(), "r");
-  if (_tiff == NULL) {
-    std::cout << "Error Opening Tiff file with Absolute Path:\n    "
-        << filename.toStdString() << std::endl;
-    return image;
-  }
-
-  if (asGrayscale) {
-     uint8* raster = NULL;     /* retrieve RGBA image */
-     uint32  width, height;    /* image width & height */
-     int16 samplesPerPixel = 0;
-     int32 orientation = ORIENTATION_TOPLEFT;
-     int32 minIsBlack = PHOTOMETRIC_MINISBLACK;
-     //std::cout << "Importing grayscale tiff image" << std::endl;
-
-     TIFFGetField(_tiff, TIFFTAG_IMAGEWIDTH, &width);
-     TIFFGetField(_tiff, TIFFTAG_IMAGELENGTH, &height);
-     TIFFGetField(_tiff, TIFFTAG_SAMPLESPERPIXEL, &samplesPerPixel);
-     TIFFGetField(_tiff, TIFFTAG_ORIENTATION, &orientation);
-     TIFFGetField(_tiff, TIFFTAG_PHOTOMETRIC, &minIsBlack);
-
-
-
-     raster = (unsigned char*)_TIFFmalloc(width * height * 4);
-     if (raster == 0) {
-       TIFFError(TIFFFileName(_tiff), "No space for raster buffer");
-       return image;
-     }
-
-     // TIFFReadRGBAImageOriented converts non 8bit images including:
-     //  Grayscale, bilevel, CMYK, and YCbCR transparently into 32bit RGBA
-     //  samples
-
-     /* Read the image in one chunk into an RGBA array */
-     if (!TIFFReadRGBAImageOriented(_tiff, width, height, (uint32*)(raster), orientation, 0)) {
-       _TIFFfree(raster);
-       return image;
-     }
-
-     // Collapse the data down to a single channel, that will end up
-     //  being the grayscale values
-     size_t pixel_count = width * height;
-     uint8* src = raster;
-     uint8* dst = raster;
-
-     while( pixel_count > 0 )
-     {
-       *(dst) =  (unsigned char)((float)src[0] * 0.299f +
-                   (float)src[1] * 0.587f +
-                   (float)src[2] * 0.114f);
-       dst++;
-       src += 4; //skip ahead by 4 bytes because we read the raw array into an RGBA array.
-       pixel_count--;
-     }
-
-    pixel_count = width * height;
-     if (blackIsZero && minIsBlack != PHOTOMETRIC_MINISBLACK )
-     {
-       for (size_t p = 0; p < pixel_count; ++p)
-       {
-         raster[p] = 255 - raster[p];
-       }
-     }
-
-     image = AIMImage::New();
-     image->initializeImageWithSourceData(width, height, raster);
-     _TIFFfree( raster );
-  }
-#endif
-  return image;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void QEmMpm::initWithFile(const QString imageFile, QString mountImage)
 {
   QFileInfo fileInfo(imageFile);
@@ -1061,14 +890,18 @@ void QEmMpm::initWithFile(const QString imageFile, QString mountImage)
     this->statusBar()->showMessage("Error Loading Original Image");
     return;
   }
-  this->originalImageTitle->setText(m_CurrentImageFile);
+  this->originalImageTitle->setText(fileInfo.fileName());
+  this->originalImageTitle->setToolTip(m_CurrentImageFile);
+
   if (m_CurrentSegmentedFile.isEmpty())
   {
-    this->mountImageTitle->setText("Unsaved Segmented Image");
+    this->segmentedImageTitle->setText("Unsaved Segmented Image");
     this->setWindowModified(true);
   }
   else {
-    this->mountImageTitle->setText(m_CurrentSegmentedFile);
+    QFileInfo segInfo(m_CurrentSegmentedFile);
+    this->segmentedImageTitle->setText(segInfo.fileName());
+    this->segmentedImageTitle->setToolTip(m_CurrentSegmentedFile);
   }
   this->statusBar()->showMessage("Input Image Loaded");
 }

@@ -298,6 +298,7 @@ void AIMImageGraphicsDelegate::updateGraphicsScene(bool update)
   }
 
   m_CurrentGraphicsItem = m_GraphicsScene->addPixmap(imagePixmap); // Add the new image into the display
+  m_CurrentGraphicsItem->setAcceptDrops(true);
   QRectF rect = m_CurrentGraphicsItem->boundingRect();
   m_GraphicsScene->setSceneRect(rect);
   m_GraphicsView->setScene(m_GraphicsScene);
