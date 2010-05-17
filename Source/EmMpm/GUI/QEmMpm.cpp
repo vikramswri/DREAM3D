@@ -467,6 +467,10 @@ void QEmMpm::on_m_SegmentBtn_clicked()
   task->setEmIterations(m_EmIterations->value() );
   task->setMpmIterations(m_MpmIterations->value());
   task->setNumberOfClasses(m_NumClasses->value() );
+  if (useSimulatedAnnealing->isChecked() )
+  {
+    task->useSimulatedAnnealing();
+  }
 
 
 

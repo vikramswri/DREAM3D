@@ -65,6 +65,7 @@ class EmMpmTask : public QObject, public QRunnable
     void setEmIterations(int emIterations);
     void setMpmIterations(int mpmIterations);
     void setNumberOfClasses(int numClasses);
+    void useSimulatedAnnealing();
 
     /**
      *
@@ -136,7 +137,7 @@ class EmMpmTask : public QObject, public QRunnable
     int m_EmIterations;
     int m_MpmIterations;
     int m_NumberOfClasses;
-
+    bool m_UseSimulatedAnnealing;
     int m_TotalIterations;
     int m_CurrentIteration;
 
@@ -290,7 +291,7 @@ void EmMpmTask::execute( T* imageData, S* outputData)
   local_sigma = (s2 - s1*local_mu)/s0;
   local_sigma = sqrt(local_sigma);
 
-  // initialize varaibles on main thread
+  // initialize variables on main thread
   double local_mean_estimate[MAX_CLASSES];
   double local_variance[MAX_CLASSES];
   int NumberClasses = m_NumberOfClasses;
@@ -359,7 +360,11 @@ void EmMpmTask::execute( T* imageData, S* outputData)
   double* bt = new double[EMIterations];
   for (uint32_t i = 0; i < EMIterations; ++i)
   {
-    bt[i] = Beta + ::pow(i/(EMIterations-1.0), 8) * (25.0*Beta - Beta);
+    bt[i] = Beta;
+    if (m_UseSimulatedAnnealing == true)
+    {
+      bt[i] = bt[i] + ::pow(i/(EMIterations-1.0), 8) * (10.0*Beta - Beta);
+    }
   }
 
   // random access for mpm

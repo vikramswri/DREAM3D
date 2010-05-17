@@ -28,7 +28,8 @@ EmMpmTask::EmMpmTask(QObject* parent) :
   m_Beta(0.1f),
   m_Gamma(0.0f),
   m_EmIterations(5),
-  m_MpmIterations(5)
+  m_MpmIterations(5),
+  m_UseSimulatedAnnealing(false)
 {
 
 }
@@ -91,5 +92,10 @@ void EmMpmTask::setMpmIterations(int mpmIterations)
 void EmMpmTask::setNumberOfClasses(int numClasses)
 {
  m_NumberOfClasses = numClasses;
+}
+
+void EmMpmTask::useSimulatedAnnealing()
+{
+  m_UseSimulatedAnnealing = true;
 }
 
