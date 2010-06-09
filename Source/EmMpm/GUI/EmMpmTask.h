@@ -13,8 +13,9 @@
 #include <math.h>
 
 #include <QtCore/QObject>
-#include <QtCore/QRunnable>
+#include <QtCore/QThread>
 #include <QtCore/QString>
+#include <QtGui/QImage>
 
 #include "EmMpm/Common/AIMImage.h"
 #include "EmMpm/Common/Random.h"
@@ -36,7 +37,7 @@
 * @date Dec 20, 2009
 * @version 1.0
 */
-class EmMpmTask : public QObject, public QRunnable
+class EmMpmTask : public QThread
 {
 
   Q_OBJECT
@@ -52,14 +53,12 @@ class EmMpmTask : public QObject, public QRunnable
      */
     bool isCanceled();
 
-    /**
-     * @brief The path to the input file to feed into the encoder program
-     * @param inFilename
-     */
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, OriginalImage)
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, SegmentedImage)
+//    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, OriginalImage)
+//    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, SegmentedImage)
     MXA_INSTANCE_PROPERTY_m(bool, Debug);
 
+    MXA_INSTANCE_PROPERTY_m(QString, InputFilePath);
+    MXA_INSTANCE_PROPERTY_m(QString, OutputFilePath);
     void setBeta(float beta);
     void setGamma(float gamma);
     void setEmIterations(int emIterations);
@@ -125,13 +124,11 @@ class EmMpmTask : public QObject, public QRunnable
     virtual void run();
 
   protected:
-
+    AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
 
   private:
     bool m_Cancel;
-    QString m_InFilename;
-    QString m_OutFilename;
     float m_Beta;
     float m_Gamma;
     int m_EmIterations;
@@ -140,6 +137,9 @@ class EmMpmTask : public QObject, public QRunnable
     bool m_UseSimulatedAnnealing;
     int m_TotalIterations;
     int m_CurrentIteration;
+
+    AIMImage::Pointer m_OriginalImage;
+    AIMImage::Pointer m_SegmentedImage;
 
     EmMpmTask(const EmMpmTask&); // Copy Constructor Not Implemented
     void operator=(const EmMpmTask&); // Operator '=' Not Implemented

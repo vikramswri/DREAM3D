@@ -13,9 +13,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QList>
+#include <QtCore/QStringList>
 #include <QtGui/QWidget>
 #include <QtGui/QMainWindow>
 #include <QtGui/QResizeEvent>
+#include <QtGui/QSortFilterProxyModel>
 
 //-- UIC generated Header
 #include <ui_QEmMpm.h>
@@ -23,8 +25,8 @@
 #include "EmMpm/Common/AIMImage.h"
 
 class AIMImageGraphicsDelegate;
-class EmMpmThread;
-
+//class ProcessQueueWindow;
+class ProcessQueueController;
 
 /**
 * @class QEmMpm QEmMpm.h EmMpm/GUI/QEmMpm.h
@@ -53,6 +55,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
 
   signals:
     void cancelTask();
+    void cancelProcessQueue();
     void parentResized();
 
   protected slots:
@@ -71,11 +74,21 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     void on_compositeWithOriginal_stateChanged(int state);
     void on_modeComboBox_currentIndexChanged();
 
+    void on_processFolder_stateChanged(int state  );
+    void on_sourceDirectoryBtn_clicked();
+    void on_outputDirectoryBtn_clicked();
 
-    /* Slots to receive events from the Encoder task */
+
+    void on_filterPatternLineEdit_textChanged();
+
+    /* Slots to receive events from the ProcessQueueController */
+    void queueControllerFinished();
+
+    /* Slots to receive events from the Encoder task
     void receiveTaskMessage(const QString &msg);
     void receiveTaskProgress(int p);
     void receiveTaskFinished();
+*/
 
     /**
      * @brief Updates the QMenu 'Recent Files' with the latest list of files. This
@@ -92,6 +105,8 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     void loadImageFile(const QString &filename);
 
     void loadSegmentedImageFile(const QString  &filename);
+
+    QStringList generateInputFileList();
 
   protected:
 
@@ -124,14 +139,14 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
      * @param outFilePath The file path to check
      * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
      */
-    bool _verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
 
     /**
      * @brief Verifies that a parent path exists on the file system.
      * @param outFilePath The parent file path to check
      * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
      */
-    bool _verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit);
+    bool verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit);
 
     /**
      * @brief Reads the Preferences from the users pref file
@@ -152,7 +167,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
      * @brief Checks the currently open file for changes that need to be saved
      * @return
      */
-    qint32 _checkDirtyDocument();
+    qint32 checkDirtyDocument();
 
     void resizeEvent ( QResizeEvent * event );
 
@@ -160,21 +175,24 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
       * @brief Opens an Image file
       * @param imageFile The path to the image file to open.
       */
-     void _openFile(QString imageFile);
+     void openFile(QString imageFile);
 
-     void _openSegmentedImage(QString mountImage);
+     void openSegmentedImage(QString mountImage);
 
      AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
      qint32 initGraphicViews();
 
+     void populateFileTable();
+
+     void addProcess(QString name);
 
   private:
-
+    QSortFilterProxyModel* m_ProxyModel;
     QString m_OpenDialogLastDirectory;
     QList<QWidget*> m_WidgetList;
 
-    EmMpmThread*      m_EmMpmThread;
+  //  EmMpmThread*      m_EmMpmThread;
     bool            m_OutputExistsCheck;
 
     QGraphicsScene*             m_OriginalImageGScene;
@@ -182,6 +200,9 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
 
     AIMImageGraphicsDelegate*      m_OriginalGDelegate;
     AIMImageGraphicsDelegate*      m_SegmentedGDelegate;
+
+    ProcessQueueController*        m_QueueController;
+ //   ProcessQueueWindow*            m_queueDialog;
 
     QEmMpm(const QEmMpm&); // Copy Constructor Not Implemented
     void operator=(const QEmMpm&); // Operator '=' Not Implemented
