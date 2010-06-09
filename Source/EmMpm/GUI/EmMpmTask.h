@@ -26,8 +26,8 @@
 #define MAXPRIME  2147483647       /*  MAXPRIME = (2^31)-1     */
 
 #define UPDATE_PROGRESS(m, p)\
-  emit sendTaskMessage( (m) );\
-  emit sendTaskProgress( (p) );
+  emit progressTextChanged( (m) );\
+  emit progressValueChanged( (p) );
 
 /**
 * @class EmMpmTask EmMpmTask.h EmMpm/GUI/EmMpmTask.h
@@ -102,24 +102,26 @@ class EmMpmTask : public QThread
   /**
    * @brief Signal sent when the encoder has a message to relay to the GUI or other output device.
    */
-    void sendTaskMessage(const QString &message);
+    void progressTextChanged ( const QString & progressText );
 
     /**
      * @brief Signal sent to the GUI to indicate progress of the encoder which is an integer value between 0 and 100.
      * @param value
      */
-    void sendTaskProgress(int value);
+    void progressValueChanged(int value);
 
     /**
      * @brief Signal sent when the encoding task is complete
      */
-    void sendTaskFinished();
+    void finished();
+    void finished(QObject *);
 
   public slots:
+
     /**
      * @brief Slot to receive a signal to cancel the operation
      */
-    void cancelTask();
+    void cancel();
 
     virtual void run();
 
@@ -182,11 +184,13 @@ void EmMpmTask::mpm( T* imageData, S* segmentation,
   }
 
 
-
   for (uint32_t k = 0; k < MPMIterations; ++k)
   {
+    if (m_Cancel == true) { break; }
     ++m_CurrentIteration;
-    emit sendTaskProgress(  (float)m_CurrentIteration/(float)m_TotalIterations * 100.0f );
+    int progress = (float)m_CurrentIteration/(float)m_TotalIterations * 100.0f;
+    emit progressValueChanged( progress );
+    emit progressTextChanged(QString::number(progress));
     int extent_index = 0;
     for (size_t j = 0; j < jdim; ++j)
     {
@@ -242,11 +246,17 @@ void EmMpmTask::mpm( T* imageData, S* segmentation,
       }
     }
   }
-
-  // normalize probabilities
-  for (uint32_t l = 0; l < NumberClasses; ++l)
-    for (size_t i = 0; i < extent_ijdim; ++i)
-      pr[l][i] = pr[l][i]/(double)MPMIterations;
+  if (m_Cancel == false)
+  {
+    // normalize probabilities
+    for (uint32_t l = 0; l < NumberClasses; ++l)
+    {
+      for (size_t i = 0; i < extent_ijdim; ++i)
+      {
+        pr[l][i] = pr[l][i] / (double)MPMIterations;
+      }
+    }
+  }
 }
 
 
@@ -375,12 +385,13 @@ void EmMpmTask::execute( T* imageData, S* outputData)
   // perform EM
   for (uint32_t k = 0; k < EMIterations; ++k)
   {
+    if (m_Cancel == true) { break; }
     double local_N[MAX_CLASSES];
 
     // perform MPM
     mpm<T>( imageData, xt, local_probs, local_yk, bt[k], gamma, local_mean_estimate, local_variance, idim, jdim, random);
     // reset model parameters to zero
-
+    if (m_Cancel == true) { break; }
     for (int l = 0; l < NumberClasses; ++l)
     {
       local_mean_estimate[l] = local_variance[l] = local_N[l] = 0.0;
@@ -450,16 +461,17 @@ void EmMpmTask::execute( T* imageData, S* outputData)
 
   }
 
-  // scale range of classes to fit pixel depth
-  for (size_t i = 0; i < ijdim; ++i)
-  {
-    if (outputData[i] != 0)
+  if (m_Cancel == false) {
+    // scale range of classes to fit pixel depth
+    for (size_t i = 0; i < ijdim; ++i)
     {
-      outputData[i] = static_cast<S>(outputData[i] * 255 / (NumberClasses - 1 ) );
-      //outputData[i] = 175 + outputData[i];
+      if (outputData[i] != 0)
+      {
+        outputData[i] = static_cast<S>(outputData[i] * 255 / (NumberClasses - 1 ) );
+        //outputData[i] = 175 + outputData[i];
+      }
     }
   }
-
   //Clean up all the memory that got allocated:
   for (int k = 0; k < NumberClasses; ++k)
   {
@@ -467,7 +479,6 @@ void EmMpmTask::execute( T* imageData, S* outputData)
     delete[] local_yk[k];
   }
   delete[] bt;
-
 }
 
 

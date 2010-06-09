@@ -53,8 +53,7 @@ SET (QEmMpm_SRCS
     ${QEmMpm_SOURCE_DIR}/QEmMpm.cpp
     ${QEmMpm_SOURCE_DIR}/EmMpmTask.cpp
     ${QEmMpm_SOURCE_DIR}/EmMpmThread.cpp
-    ${QEmMpm_SOURCE_DIR}/ProcessQueueWindow.cpp
-  #  ${QEmMpm_SOURCE_DIR}/ProcessQueue.cpp
+    ${QEmMpm_SOURCE_DIR}/ProcessQueueDialog.cpp
     ${QEmMpm_SOURCE_DIR}/ProcessQueueController.cpp
 )
 
@@ -62,8 +61,7 @@ SET (QEmMpm_HDRS
     ${QEmMpm_SOURCE_DIR}/QEmMpm.h
     ${QEmMpm_SOURCE_DIR}/EmMpmTask.h
     ${QEmMpm_SOURCE_DIR}/EmMpmThread.h
-    ${QEmMpm_SOURCE_DIR}/ProcessQueueWindow.h
-  #  ${QEmMpm_SOURCE_DIR}/ProcessQueue.h
+    ${QEmMpm_SOURCE_DIR}/ProcessQueueDialog.h
     ${QEmMpm_SOURCE_DIR}/ProcessQueueController.h
 )
 IDE_SOURCE_PROPERTIES( "EmMpm/GUI" "${QEmMpm_HDRS}" "${QEmMpm_SRCS}")
@@ -107,7 +105,7 @@ SET( QEmMpm_MOC_HDRS
 # --------------------------------------------------------------------
 SET( QEmMpm_UIS
   ${QEmMpm_SOURCE_DIR}/UI_Files/QEmMpm.ui
-  ${QEmMpm_SOURCE_DIR}/UI_Files/ProcessQueueWindow.ui
+  ${QEmMpm_SOURCE_DIR}/UI_Files/ProcessQueueDialog.ui
   ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/UI_Files/AboutBox.ui
 )
 

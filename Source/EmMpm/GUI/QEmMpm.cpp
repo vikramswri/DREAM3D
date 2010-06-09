@@ -29,7 +29,7 @@
 #include "EmMpmTask.h"
 
 #include "ProcessQueueController.h"
-//#include "ProcessQueue.h"
+#include "ProcessQueueDialog.h"
 #include "EmMpm/Common/Qt/AboutBox.h"
 #include "EmMpm/Common/Qt/QRecentFileList.h"
 #include "EmMpm/Common/Qt/QFileCompleter.h"
@@ -86,6 +86,8 @@ m_OpenDialogLastDirectory("~/")
   // Get out initial Recent File List
   this->updateRecentFileList(QString::null);
   //this->setAcceptDrops(true);
+  m_QueueDialog = new ProcessQueueDialog(this);
+  m_QueueDialog->setVisible(false);
 }
 
 // -----------------------------------------------------------------------------
@@ -154,6 +156,7 @@ void QEmMpm::readSettings()
   READ_STRING_SETTING(prefs, outputPrefix, "");
   READ_STRING_SETTING(prefs, outputSuffix, "");
 
+  on_processFolder_stateChanged(processFolder->isChecked());
 
   if (this->sourceDirectoryLE->text().isEmpty() == false)
   {
@@ -277,8 +280,6 @@ void QEmMpm::setupGui()
 
   connect (segmentedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
            this, SLOT(loadSegmentedImageFile(const QString &)));
-
-  processTableWidget->setVisible(false);
 
 }
 
@@ -438,14 +439,14 @@ void QEmMpm::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 void QEmMpm::on_m_SegmentBtn_clicked()
 {
-  if (m_SegmentBtn->text().compare("Cancel") == 0)
-  {
-    if (m_QueueController != NULL)
-    {
-      emit cancelProcessQueue();
-    }
-    return;
-  }
+//
+//  if (m_QueueController != NULL && m_QueueController->isFinished() == false)
+//  {
+//    emit cancelProcessQueue();
+//    return;
+//  }
+
+
 
   if (this->m_OutputExistsCheck == false)
   {
@@ -499,7 +500,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
     if (this->outputDirectoryLE->text().isEmpty() == true)
     {
       this->statusBar()->showMessage("Error: Output Directory must be set");
-      int r = QMessageBox::critical(this, tr("Output Parameter Error"),
+      QMessageBox::critical(this, tr("Output Parameter Error"),
                                     tr("Output Directory must be set."),
                                     QMessageBox::Ok);
       return;
@@ -508,7 +509,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
     if (this->fileListView->model()->rowCount() == 0  )
     {
       this->statusBar()->showMessage("Error: No image files are available in the file list view.");
-      int r = QMessageBox::critical(this, tr("Parameter Error"),
+      QMessageBox::critical(this, tr("Parameter Error"),
                                     tr("No image files are available in the file list view."),
                                     QMessageBox::Ok);
       return;
@@ -522,11 +523,20 @@ void QEmMpm::on_m_SegmentBtn_clicked()
 
   }
 
- // ProcessQueue* queue = new ProcessQueue(this);
+  m_QueueDialog->clearTable();
+
   m_QueueController = new ProcessQueueController(this);
   bool ok;
   if (this->processFolder->isChecked() == false)
   {
+    if (m_CurrentImageFile.isEmpty() )
+    {
+      QMessageBox::critical(this, tr("Input File Error"),
+                                    tr("No image file is open in the viewer to segment. Use the File->Open menu itme to open an image first."),
+                                    QMessageBox::Ok);
+      m_QueueController->deleteLater();
+      return;
+    }
     EmMpmTask* task = new EmMpmTask(NULL);
     task->setBeta(m_Beta->text().toFloat(&ok));
     task->setGamma(m_Gamma->text().toFloat(&ok));
@@ -550,7 +560,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
     task->setOutputFilePath(filepath);
 
     m_QueueController->addTask(static_cast<QThread*>(task) );
-    this->addProcess(task->getInputFilePath());
+    this->addProcess(task);
   }
   else
   {
@@ -583,7 +593,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
       task->setOutputFilePath(filepath);
 
       m_QueueController->addTask(static_cast<QThread*>(task) );
-      this->addProcess(task->getInputFilePath());
+      this->addProcess(task);
     }
 
   }
@@ -591,42 +601,22 @@ void QEmMpm::on_m_SegmentBtn_clicked()
   // When the event loop of the controller starts it will signal the ProcessQueue to run
   connect(m_QueueController, SIGNAL(started()), m_QueueController, SLOT(processTask()));
   // When the ProcessQueue finishes it will signal the QueueController to 'quit', thus stopping the thread
-  //connect(queue, SIGNAL(finished()), m_QueueController, SLOT(quit()), Qt::DirectConnection);
   connect(m_QueueController, SIGNAL(finished()), this, SLOT(queueControllerFinished()));
- // connect(this, SIGNAL(cancelProcessQueue()), queue, SLOT(cancel()));
 
+  this->m_QueueDialog->setVisible(true);
+  m_SegmentBtn->setEnabled(false);
 
-
-#if 0
-  m_EmMpmThread = new EmMpmThread(task, this);
-  task->moveToThread(m_EmMpmThread);
-  connect(m_EmMpmThread, SIGNAL(started()), task, SLOT(run()));
-  connect(task, SIGNAL(sendTaskFinished() ), m_EmMpmThread, SLOT(quit()), Qt::DirectConnection);
-  connect(m_EmMpmThread, SIGNAL(finished()), this, SLOT(receiveTaskFinished() ));
-  connect(task, SIGNAL(sendTaskMessage(const QString &) ), this, SLOT(receiveTaskMessage(const QString &) ) );
-  connect(task, SIGNAL(sendTaskProgress(int) ), this, SLOT(receiveTaskProgress(int) ) );
-  connect(this, SIGNAL(cancelTask()), task, SLOT(cancelTask()));
-#endif
-
-
-  m_SegmentBtn->setText("Cancel");
-
-  processTableWidget->setVisible(true);
-  fileListView->setVisible(false);
   m_QueueController->start();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::addProcess(QString name)
+void QEmMpm::addProcess(EmMpmTask* task)
 {
-  qint32 rowCount = this->processTableWidget->rowCount();
-  this->processTableWidget->setRowCount(rowCount + 1);
-  this->processTableWidget->setCellWidget(rowCount, 0, new QLabel(name));
-  this->processTableWidget->setCellWidget(rowCount, 1, new QProgressBar());
-}
+  this->m_QueueDialog->addProcess(task);
 
+}
 
 // -----------------------------------------------------------------------------
 //
@@ -899,15 +889,11 @@ void QEmMpm::receiveTaskFinished()
 // -----------------------------------------------------------------------------
 void QEmMpm::queueControllerFinished()
 {
-  m_SegmentBtn->setText("Segment");
-  this->progressBar->setValue(0);
+  m_SegmentBtn->setEnabled(true);
   m_QueueController->deleteLater();
-
-  // Now get the first segmented image from the list (or the queue.task()) and
-  // display it in the QGraphicsView
-  std::cout << "QEmMpm::queueControllerFinished() --- Complete" << std::endl;
-  processTableWidget->setVisible(false);
-  fileListView->setVisible(true);
+  m_QueueController = NULL;
+ // std::cout << "QEmMpm::queueControllerFinished() --- Complete" << std::endl;
+  m_QueueDialog->setVisible(false);
 }
 
 // -----------------------------------------------------------------------------

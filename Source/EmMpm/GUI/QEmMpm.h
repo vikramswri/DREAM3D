@@ -24,9 +24,11 @@
 
 #include "EmMpm/Common/AIMImage.h"
 
+
 class AIMImageGraphicsDelegate;
-//class ProcessQueueWindow;
+class ProcessQueueDialog;
 class ProcessQueueController;
+class EmMpmTask;
 
 /**
 * @class QEmMpm QEmMpm.h EmMpm/GUI/QEmMpm.h
@@ -185,7 +187,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
 
      void populateFileTable();
 
-     void addProcess(QString name);
+     void addProcess(EmMpmTask* name);
 
   private:
     QSortFilterProxyModel* m_ProxyModel;
@@ -202,7 +204,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     AIMImageGraphicsDelegate*      m_SegmentedGDelegate;
 
     ProcessQueueController*        m_QueueController;
- //   ProcessQueueWindow*            m_queueDialog;
+    ProcessQueueDialog*            m_QueueDialog;
 
     QEmMpm(const QEmMpm&); // Copy Constructor Not Implemented
     void operator=(const QEmMpm&); // Operator '=' Not Implemented

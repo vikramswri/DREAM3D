@@ -14,10 +14,6 @@
 
 #include <iostream>
 
-
-
-
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -39,7 +35,7 @@ EmMpmTask::EmMpmTask(QObject* parent) :
 // -----------------------------------------------------------------------------
 EmMpmTask::~EmMpmTask()
 {
-//  std::cout << "   ~EmMpmTask()" << std::endl;
+ // std::cout << "   ~EmMpmTask()" << std::endl;
 }
 
 // -----------------------------------------------------------------------------
@@ -56,7 +52,7 @@ void EmMpmTask::run()
   if (NULL == m_OriginalImage.data())
   {
     std::cout << "Error loading image '" << m_InputFilePath.toStdString() << "'" << std::endl;
-    emit sendTaskFinished();
+    emit finished();
     return;
   }
 
@@ -66,53 +62,55 @@ void EmMpmTask::run()
   if (NULL == m_SegmentedImage)
   {
     std::cout << "Error Allocating Memory for segmented Image." << std::endl;
-    emit sendTaskFinished();
+    emit finished();
     return;
   }
 
 
   execute<uint8_t, uint8_t>( m_OriginalImage->getImageBuffer(), m_SegmentedImage->getImageBuffer());
 
-
-  // Save the image to the output file:
-  qint32 width = m_SegmentedImage->getImagePixelWidth();
-  qint32 height = m_SegmentedImage->getImagePixelHeight();
-  quint8* dataPointer = m_SegmentedImage->getImageBuffer();
-  QImage outImage(width, height, QImage::Format_Indexed8);
-  QVector<QRgb> colorTable(256);
-  for (quint32 i = 0; i < 256; ++i)
+  if (m_Cancel == false)
   {
-    colorTable[i] = qRgb(i, i, i);
-  }
-  outImage.setColorTable(colorTable);
-  qint32 index;
-  for (qint32 j=0; j<height; j++)
-  {
-    for (qint32 i =0; i<width; i++)
+    // Save the image to the output file:
+    qint32 width = m_SegmentedImage->getImagePixelWidth();
+    qint32 height = m_SegmentedImage->getImagePixelHeight();
+    quint8* dataPointer = m_SegmentedImage->getImageBuffer();
+    QImage outImage(width, height, QImage::Format_Indexed8);
+    QVector<QRgb> colorTable(256);
+    for (quint32 i = 0; i < 256; ++i)
     {
-      index = (j * width) + i;
-      outImage.setPixel(i, j, dataPointer[index]);
+      colorTable[i] = qRgb(i, i, i);
     }
+    outImage.setColorTable(colorTable);
+    qint32 index;
+    for (qint32 j=0; j<height; j++)
+    {
+      for (qint32 i =0; i<width; i++)
+      {
+        index = (j * width) + i;
+        outImage.setPixel(i, j, dataPointer[index]);
+      }
+    }
+    bool ok = outImage.save(m_OutputFilePath);
+    if (false == ok)
+    {
+      std::cout << "Error saving segmented image to '" << m_OutputFilePath.toStdString() << "'" << std::endl;
+    }
+    // Clean up memory usage
+    m_SegmentedImage = AIMImage::NullPointer();
+    m_OriginalImage = AIMImage::NullPointer();
   }
-  bool ok = outImage.save(m_OutputFilePath);
-  if (false == ok)
-  {
-    std::cout << "Error saving segmented image to '" << m_OutputFilePath.toStdString() << "'" << std::endl;
-  }
-  // Clean up memory usage
-  m_SegmentedImage = AIMImage::NullPointer();
-  m_OriginalImage = AIMImage::NullPointer();
-
   // Notify observers that we are finished
-  emit sendTaskFinished();
-  std::cout << "  EmMpm Task Finished." << std::endl;
+  emit finished();
+  emit finished(this);
+ // std::cout << "  EmMpm Task Finished." << std::endl;
 }
 
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void EmMpmTask::cancelTask()
+void EmMpmTask::cancel()
 {
   this->m_Cancel = true;
 }
