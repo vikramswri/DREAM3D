@@ -53,8 +53,6 @@ class EmMpmTask : public QThread
      */
     bool isCanceled();
 
-//    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, OriginalImage)
-//    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, SegmentedImage)
     MXA_INSTANCE_PROPERTY_m(bool, Debug);
 
     MXA_INSTANCE_PROPERTY_m(QString, InputFilePath);

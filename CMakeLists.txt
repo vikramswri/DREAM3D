@@ -5,7 +5,7 @@
 #  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #
 #///////////////////////////////////////////////////////////////////////////////
-project (EmMpmGUI)
+project (EmMpmProj)
 cmake_minimum_required(VERSION 2.6)
 
 # ---------- Setup output Directories -------------------------
@@ -29,9 +29,9 @@ SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
   "Single Directory for all static libraries."
   )
 
-SET (EmMpmGUI_PROJECT_DIR ${EmMpmGUI_SOURCE_DIR})
-SET (PROJECT_RESOURCES_DIR ${EmMpmGUI_SOURCE_DIR}/Resources)
-SET (EmMpmGUI_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/CMake)
+SET (EmMpmProj_PROJECT_DIR ${EmMpmProj_SOURCE_DIR})
+SET (PROJECT_RESOURCES_DIR ${EmMpmProj_SOURCE_DIR}/Resources)
+SET (EmMpmProj_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/CMake)
 SET (OSX_TOOLS_DIR ${PROJECT_RESOURCES_DIR}/OSX_Tools)
 SET (PROJECT_PREFIX "EMMPM" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
 SET (EXE_DEBUG_EXTENSION "_debug")
@@ -69,7 +69,7 @@ include_directories(${PROJECT_BINARY_DIR})
 # --------------------------------------------------------------------
 # Generate a Header file with Compile Version variables
 # --------------------------------------------------------------------
-GenerateVersionString( ${PROJECT_NAME} "${EmMpmGUI_BINARY_DIR}/EmMpm/Common/EmMpmVersion.h" "EMMPM" )
+GenerateVersionString( ${PROJECT_NAME} "${EmMpmProj_BINARY_DIR}/EmMpm/Common/EmMpmVersion.h" "EMMPM" )
 
 # ------------------------------------------------------------------------------
 #  Qt 4 Section
@@ -89,16 +89,15 @@ FIND_PACKAGE( Qt4 REQUIRED )
 INCLUDE( ${QT_USE_FILE} )
    
 # Add our Qt based GUI project to the list of targets
-ADD_SUBDIRECTORY( ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/GUI ${EmMpmGUI_BINARY_DIR}/GUI)
+ADD_SUBDIRECTORY( ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/GUI ${EmMpmProj_BINARY_DIR}/GUI)
    
 # --------------------------------------------------------------------
 # Generate our header files
 # --------------------------------------------------------------------
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/Configuration.h.in
-               ${EmMpmGUI_BINARY_DIR}/EMMPM/Common/EMMPMConfiguration.h )
-
+               ${EmMpmProj_BINARY_DIR}/EMMPM/Common/EMMPMConfiguration.h )
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/PrimitiveTypes.h.in
-               ${EmMpmGUI_BINARY_DIR}/EmMpm/Common/${PROJECT_PREFIX}Types.h )
+               ${EmMpmProj_BINARY_DIR}/EmMpm/Common/${PROJECT_PREFIX}Types.h )
 configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
                 ${PROJECT_BINARY_DIR}/License.txt )
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in

@@ -27,7 +27,7 @@ m_AutoDelete(true)
 // -----------------------------------------------------------------------------
 ProcessQueueController::~ProcessQueueController()
 {
-  std::cout << "   ~ProcessQueueController()" << std::endl;
+ // std::cout << "   ~ProcessQueueController()" << std::endl;
   for (int i = 0; i < m_CompletedTasks.count(); ++i)
   {
     QThread* t = m_CompletedTasks.at(i);

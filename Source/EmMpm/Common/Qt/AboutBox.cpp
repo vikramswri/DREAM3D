@@ -37,7 +37,7 @@ void AboutBox::setApplicationName(QString applicationName)
 
   appName->setText(applicationName);
   QString version("Version ");
-  version.append(EmMpmGUI_VERSION);
+  version.append(EmMpmProj_VERSION);
   appVersion->setText( version );
 }
 
