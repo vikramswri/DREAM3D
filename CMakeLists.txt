@@ -33,7 +33,7 @@ SET (EmMpmGUI_PROJECT_DIR ${EmMpmGUI_SOURCE_DIR})
 SET (PROJECT_RESOURCES_DIR ${EmMpmGUI_SOURCE_DIR}/Resources)
 SET (EmMpmGUI_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/CMake)
 SET (OSX_TOOLS_DIR ${PROJECT_RESOURCES_DIR}/OSX_Tools)
-SET (PROJECT_PREFIX "EMMPM" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
+SET (PROJECT_PREFIX "EmMpm" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
 SET (EXE_DEBUG_EXTENSION "_debug")
 
 INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/CMakeMacros.cmake )
@@ -69,7 +69,7 @@ include_directories(${PROJECT_BINARY_DIR})
 # --------------------------------------------------------------------
 # Generate a Header file with Compile Version variables
 # --------------------------------------------------------------------
-GenerateVersionString( ${PROJECT_NAME} "${EmMpmGUI_BINARY_DIR}/EmMpm/Common/EmMpmVersion.h" "EMMPM" )
+GenerateVersionString( ${PROJECT_NAME} "${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/EmMpmVersion.h" "EMMPM" )
 
 # ------------------------------------------------------------------------------
 #  Qt 4 Section
@@ -95,10 +95,10 @@ ADD_SUBDIRECTORY( ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/GUI ${EmMpmGUI_BINARY_DIR}
 # Generate our header files
 # --------------------------------------------------------------------
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/Configuration.h.in
-               ${EmMpmGUI_BINARY_DIR}/EMMPM/Common/EMMPMConfiguration.h )
+               ${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h )
 
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/PrimitiveTypes.h.in
-               ${EmMpmGUI_BINARY_DIR}/EmMpm/Common/${PROJECT_PREFIX}Types.h )
+               ${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h )
 configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
                 ${PROJECT_BINARY_DIR}/License.txt )
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
