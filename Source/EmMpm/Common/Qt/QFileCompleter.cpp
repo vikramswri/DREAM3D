@@ -1,14 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
-//  Copyright (c) 2009, Michael Groeber, US Air Force Research Laboratory
 //  All rights reserved.
 //  BSD License: http://www.opensource.org/licenses/bsd-license.html
 //
 // This code was partly written under US Air Force Contract FA8650-07-D-5800
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "QR3DFileCompleter.h"
+#include "QFileCompleter.h"
+
 #include <QtGui/QDirModel>
 
 // -----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ static QDirModel* pathDirModel()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QR3DFileCompleter::QR3DFileCompleter(QObject* o, bool dirs) :
+QFileCompleter::QFileCompleter(QObject* o, bool dirs) :
   QCompleter(o)
 {
   QDirModel* m = dirs ? pathDirModel() : fileDirModel();
@@ -55,7 +55,7 @@ QR3DFileCompleter::QR3DFileCompleter(QObject* o, bool dirs) :
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QString QR3DFileCompleter::pathFromIndex(const QModelIndex& idx) const
+QString QFileCompleter::pathFromIndex(const QModelIndex& idx) const
 {
   return QDir::fromNativeSeparators(QCompleter::pathFromIndex(idx));
 }

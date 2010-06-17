@@ -41,6 +41,11 @@ IF(WIN32)
  SET(GUI_TYPE WIN32)
 ENDIF(WIN32)
 
+# Set some include directories
+include_directories( ${EmMpmProj_SOURCE_DIR}/Source )
+include_directories( ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt )
+include_directories( ${QEmMpm_BINARY_DIR} )
+
 
 # List the source files here
 SET (QEmMpm_SRCS
@@ -48,34 +53,41 @@ SET (QEmMpm_SRCS
     ${QEmMpm_SOURCE_DIR}/QEmMpm.cpp
     ${QEmMpm_SOURCE_DIR}/EmMpmTask.cpp
     ${QEmMpm_SOURCE_DIR}/EmMpmThread.cpp
+    ${QEmMpm_SOURCE_DIR}/ProcessQueueDialog.cpp
+    ${QEmMpm_SOURCE_DIR}/ProcessQueueController.cpp
 )
 
 SET (QEmMpm_HDRS
     ${QEmMpm_SOURCE_DIR}/QEmMpm.h
     ${QEmMpm_SOURCE_DIR}/EmMpmTask.h
     ${QEmMpm_SOURCE_DIR}/EmMpmThread.h
+    ${QEmMpm_SOURCE_DIR}/ProcessQueueDialog.h
+    ${QEmMpm_SOURCE_DIR}/ProcessQueueController.h
 )
 IDE_SOURCE_PROPERTIES( "EmMpm/GUI" "${QEmMpm_HDRS}" "${QEmMpm_SRCS}")
 
 set (EMMPM_COMMON_QT_SRCS
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AboutBox.cpp
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QRecentFileList.cpp
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QR3DFileCompleter.cpp
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AIMImageGraphicsDelegate.cpp
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/AboutBox.cpp
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/QRecentFileList.cpp
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/QFileCompleter.cpp
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/AIMImageGraphicsDelegate.cpp
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/QFSDroppableGraphicsView.cpp
 )
 set (EMMPM_COMMON_QT_HDRS
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AboutBox.h
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QRecentFileList.h
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/QR3DFileCompleter.h
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/AIMImageGraphicsDelegate.h    )
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/AboutBox.h
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/QRecentFileList.h
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/QFileCompleter.h
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/AIMImageGraphicsDelegate.h
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/QFSDroppableGraphicsView.h
+)
 IDE_SOURCE_PROPERTIES("EmMpm/Common/Qt" "${EMMPM_COMMON_QT_HDRS}" "${EMMPM_COMMON_QT_SRCS}")
 
 set (EMMPM_COMMON_SRCS
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/AIMImage.cpp
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/AIMImage.cpp
 )
 set (EMMPM_COMMON_HDRS
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/AIMArray.hpp
-    ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/AIMImage.h   )
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/AIMArray.hpp
+    ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/AIMImage.h   )
 IDE_SOURCE_PROPERTIES("EmMpm/Common" "${EMMPM_COMMON_HDRS}" "${EMMPM_COMMON_SRCS}")
 
 
@@ -92,14 +104,15 @@ SET( QEmMpm_MOC_HDRS
 # --------------------------------------------------------------------
 SET( QEmMpm_UIS
   ${QEmMpm_SOURCE_DIR}/UI_Files/QEmMpm.ui
-  ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/Common/Qt/UI_Files/AboutBox.ui
+  ${QEmMpm_SOURCE_DIR}/UI_Files/ProcessQueueDialog.ui
+  ${EmMpmProj_SOURCE_DIR}/Source/EmMpm/Common/Qt/UI_Files/AboutBox.ui
 )
 
 # and finally any resource files
 SET( QEmMpm_RCS ${PROJECT_RESOURCES_DIR}/icons/images/Icons.qrc)
 
 # --------------------------------------------------------------------
-# -- Run MOC and UIC on the necessary files   
+# Run MOC on the files   
 QT4_ADD_RESOURCES( Generated_RC_SRCS ${QEmMpm_RCS} )
 
 # --------------------------------------------------------------------
@@ -130,17 +143,16 @@ SET (QEmMpm_PROJECT_SRCS
     ${Generated_MOC_SRCS}
 )
 
-include_directories( ${EmMpmGUI_SOURCE_DIR}/Source )
-include_directories( ${QEmMpm_BINARY_DIR} )
+
 #-- Set up OS X Application Bundle properties
 #-- This file have tools for OS X Bunlde creation and configuration
-INCLUDE (${EmMpmGUI_SOURCE_DIR}/Resources/OSX_Tools/OSX_BundleTools.cmake)
+INCLUDE (${EmMpmProj_SOURCE_DIR}/Resources/OSX_Tools/OSX_BundleTools.cmake)
 
 IF(APPLE)
  SET(GUI_TYPE MACOSX_BUNDLE)
  ConfigureMacOSXBundlePlist(${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} 
                             ${PROJECT_RESOURCES_DIR}/icons/icns/${PROJECT_NAME}.icns
-                            ${EmMpmGUI_VERSION} )
+                            ${EmMpmProj_VERSION} )
 ENDIF (APPLE)
 
 IF(Q_WS_WIN)
@@ -160,5 +172,6 @@ TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
                         ${QT_LIBRARIES})
 
 FindQtPlugins("qgif;qjpeg;qtiff")
+
 InstallationSupport(${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} ${QEmMpm_BINARY_DIR})                
 
