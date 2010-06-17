@@ -69,7 +69,7 @@ include_directories(${PROJECT_BINARY_DIR})
 # --------------------------------------------------------------------
 # Generate a Header file with Compile Version variables
 # --------------------------------------------------------------------
-GenerateVersionString( ${PROJECT_NAME} "${EmMpmGUI_BINARY_DIR}/EmMpm/Common/EmMpmVersion.h" "EMMPM" )
+GenerateVersionString( ${PROJECT_NAME} "${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h" "${PROJECT_PREFIX}" )
 
 # ------------------------------------------------------------------------------
 #  Qt 4 Section
@@ -95,15 +95,15 @@ ADD_SUBDIRECTORY( ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/GUI ${EmMpmGUI_BINARY_DIR}
 # Generate our header files
 # --------------------------------------------------------------------
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/Configuration.h.in
-               ${EmMpmGUI_BINARY_DIR}/EMMPM/Common/EMMPMConfiguration.h )
+               ${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h )
 
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/PrimitiveTypes.h.in
-               ${EmMpmGUI_BINARY_DIR}/EmMpm/Common/${PROJECT_PREFIX}Types.h )
+               ${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h )
 configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
                 ${PROJECT_BINARY_DIR}/License.txt )
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 ${PROJECT_BINARY_DIR}/ReadMe.txt )
-                
+IDE_SOURCE_PROPERTIES( "EmMpm/Configured" "${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
 
 include(${PROJECT_RESOURCES_DIR}/CMake/InstallSupportLibraries.cmake)
 include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)

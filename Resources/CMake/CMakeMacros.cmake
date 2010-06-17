@@ -201,28 +201,69 @@ endmacro(StaticLibraryProperties)
 #
 #-------------------------------------------------------------------------------
 macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
-#    message(STATUS "Generating Versions String for ${PROJECT_NAME}")
-#    message(STATUS "EmInit_CMAKE_DIR: ${EmInit_CMAKE_DIR}")
-    try_run(RUN_RESULT_VAR COMPILE_RESULT_VAR 
+    #message(STATUS "Generating Versions String for ${PROJECT_NAME}")
+    #message(STATUS "VERSION_COMPILE_FLAGS: ${VERSION_COMPILE_FLAGS}")
+    
+    SET (VERSION_COMPILE_FLAGS "")
+
+    if (MSVC)
+     set(HAVE_TIME_GETTIMEOFDAY "TRUE")
+     set(VERSION_COMPILE_FLAGS "/DHAVE_TIME_GETTIMEOFDAY")
+    endif()
+     
+    IF (NOT MSVC)
+        TRY_COMPILE(HAVE_TIME_GETTIMEOFDAY
+              ${CMAKE_BINARY_DIR}
+              ${PROJECT_RESOURCES_DIR}/CMake/GetTimeOfDayTest.cpp
+              COMPILE_DEFINITIONS -DTRY_TIME_H
+              OUTPUT_VARIABLE OUTPUT)
+        IF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
+            SET (HAVE_TIME_GETTIMEOFDAY "1")
+            set(VERSION_COMPILE_FLAGS "-DHAVE_TIME_GETTIMEOFDAY")
+        ENDIF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
+    
+        TRY_COMPILE(HAVE_SYS_TIME_GETTIMEOFDAY
+              ${CMAKE_BINARY_DIR}
+              ${PROJECT_RESOURCES_DIR}/CMake/GetTimeOfDayTest.cpp
+              COMPILE_DEFINITIONS -DTRY_SYS_TIME_H
+              OUTPUT_VARIABLE OUTPUT)
+        IF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
+            SET (HAVE_SYS_TIME_GETTIMEOFDAY "1")
+            set(VERSION_COMPILE_FLAGS "-DHAVE_SYS_TIME_GETTIMEOFDAY")
+        ENDIF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
+    
+        if (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_TIME_GETTIMEOFDAY)
+            message(STATUS "---------------------------------------------------------------")
+            message(STATUS "Function 'gettimeofday()' was not found. MXADataModel will use its")
+            message(STATUS "  own implementation.. This can happen on older versions of")
+            message(STATUS "  MinGW on Windows. Consider upgrading your MinGW installation")
+            message(STATUS "  to a newer version such as MinGW 3.12")
+            message(STATUS "---------------------------------------------------------------")
+        endif()
+    ENDIF (NOT MSVC)
+    
+   if ( HAVE_SYS_TIME_GETTIMEOFDAY OR HAVE_TIME_GETTIMEOFDAY)
+        try_run(RUN_RESULT_VAR COMPILE_RESULT_VAR 
             ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_RESOURCES_DIR}/CMake/GenerateVersionString.cpp
             COMPILE_DEFINITIONS ${VERSION_COMPILE_FLAGS}
             COMPILE_OUTPUT_VARIABLE VERSION_COMPILE_OUTPUT
             RUN_OUTPUT_VARIABLE VERSION_GEN_COMPLETE )
-   
-    # and now the version string given by qmake
-    STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MAJOR "${VERSION_GEN_COMPLETE}")
-    STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MINOR "${VERSION_GEN_COMPLETE}")
-    STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_GEN_VER_PATCH "${VERSION_GEN_COMPLETE}")
-    
-    set (VERSION_GEN_NAME "${PROJECT_NAME}")
-    set (VERSION_GEN_NAMESPACE "${NAMESPACE}")
-    set (${PROJECT_NAME}_VERSION   ${VERSION_GEN_COMPLETE}  CACHE STRING "Complete Version String")
-    set (${PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
-    set (${PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
-    set (${PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
-    configure_file(${PROJECT_RESOURCES_DIR}/CMake/Version.h.in
+           
+            # and now the version string given by qmake
+        STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MAJOR "${VERSION_GEN_COMPLETE}")
+        STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MINOR "${VERSION_GEN_COMPLETE}")
+        STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_GEN_VER_PATCH "${VERSION_GEN_COMPLETE}")
+        
+        set (VERSION_GEN_NAME "${PROJECT_NAME}")
+        set (VERSION_GEN_NAMESPACE "${NAMESPACE}")
+        set (${PROJECT_NAME}_VERSION   ${VERSION_GEN_COMPLETE}  CACHE STRING "Complete Version String")
+        set (${PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
+        set (${PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
+        set (${PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
+        configure_file(${PROJECT_RESOURCES_DIR}/CMake/Version.h.in
                    ${GENERATED_FILE_PATH})
-               
+    endif()
+    
 endmacro()
 
 #-------------------------------------------------------------------------------

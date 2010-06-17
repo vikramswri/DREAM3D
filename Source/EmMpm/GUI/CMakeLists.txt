@@ -79,18 +79,6 @@ set (EMMPM_COMMON_HDRS
 IDE_SOURCE_PROPERTIES("EmMpm/Common" "${EMMPM_COMMON_HDRS}" "${EMMPM_COMMON_SRCS}")
 
 
-
-
-# List the source files here
-SET (Encoder_SRCS
-
-)
-
-set (Encoder_HDRS 
-
-)
-IDE_SOURCE_PROPERTIES("EmMpm/Encoder" "${Encoder_HDRS}" "${Encoder_SRCS}")
-
 # --------------------------------------------------------------------
 #  Get a list of the header to run 'moc' on 
 # --------------------------------------------------------------------                   
@@ -159,10 +147,12 @@ IF(Q_WS_WIN)
     include_directories(${PROJECT_RESOURCES_DIR}/icons/ico)
     configure_file(${PROJECT_RESOURCES_DIR}/icons/ico/IconResource.rc.in ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.rc)
     SET (${PROJECT_NAME}_PROJECT_SRCS ${${PROJECT_NAME}_PROJECT_SRCS} ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.rc) 
-    IDE_SOURCE_PROPERTIES ("ConfiguredFiles" "${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.rc" "")
+    IDE_SOURCE_PROPERTIES ("EmMpm/ConfiguredFiles" "${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.rc" "")
 ENDIF(Q_WS_WIN)
 
-IDE_SOURCE_PROPERTIES ("ConfiguredFiles" "${QEmMpm_BINARY_DIR}/EmMpm/Common/EmMpmVersion.h" "")  
+
+IDE_SOURCE_PROPERTIES( "EmMpm/Configured" "${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h" "${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h")                
+
 
 # ---------- Build the Viewer Application  ----------------------
 ADD_EXECUTABLE( ${PROJECT_NAME} ${GUI_TYPE} ${QEmMpm_PROJECT_SRCS} )

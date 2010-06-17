@@ -14,8 +14,8 @@
 INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/InstallMSVCLibraries.cmake)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GUI Application to run EmMpm segmentation Algorithm")
 SET(CPACK_PACKAGE_VENDOR "BlueQuartz Software, Michael A. Jackson")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${EmMpmGUI_BINARY_DIR}/ReadMe.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${EmMpmGUI_BINARY_DIR}/License.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_BINARY_DIR}/ReadMe.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_BINARY_DIR}/License.txt")
 SET(CPACK_PACKAGE_VERSION_MAJOR ${EmMpmGUI_VER_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${EmMpmGUI_VER_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${EmMpmGUI_VER_PATCH})
@@ -26,14 +26,14 @@ set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION  "The Gui Versions of the EmMpmGUI 
 set(CPACK_COMPONENT_APPLICATIONS_REQUIRED 1)
 
 set(CPACK_PACKAGE_EXECUTABLES
-    QEmMpm EmMpmGUI
+    QEmMpm QEmMpm
 )
 
 # Create an NSID based installer for Windows Systems
 IF(WIN32 AND NOT UNIX)
   # There is a bug in NSI that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
-# SET(CPACK_PACKAGE_ICON "${EmMpmGUI_SOURCE_DIR}/Resources/InstallerIcon.bmp")
+# SET(CPACK_PACKAGE_ICON "${EmMpmProj_SOURCE_DIR}/Resources/InstallerIcon.bmp")
 # SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\MyExecutable.exe")
   SET(CPACK_NSIS_DISPLAY_NAME "EmMpmGUI Software Tools")
   SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.bluequartz.net")

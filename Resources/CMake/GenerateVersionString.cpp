@@ -12,12 +12,12 @@
 
 #if defined (HAVE_SYS_TIME_GETTIMEOFDAY)
 #include <sys/time.h>
-#define MXA_GET_TIME_OF_DAY gettimeofday
+#define GET_TIME_OF_DAY gettimeofday
 #endif
 
 #if defined (HAVE_TIME_GETTIMEOFDAY) || defined (_MSC_VER)
 #include <time.h>
-#define MXA_GET_TIME_OF_DAY gettimeofday
+#define GET_TIME_OF_DAY gettimeofday
 #endif
 
 #ifndef HAVE_TIME_GETTIMEOFDAY
@@ -32,7 +32,7 @@
 #include <sys/time.h>
 void __stdcall GetSystemTimeAsFileTime(FILETIME*);
 
-inline void MXA_gettimeofday(struct timeval* p, void* tz /* IGNORED */)
+inline void gettimeofday(struct timeval* p, void* tz /* IGNORED */)
  {
   union {
      long long ns100; /*time since 1 Jan 1601 in 100ns units */
@@ -44,7 +44,7 @@ inline void MXA_gettimeofday(struct timeval* p, void* tz /* IGNORED */)
     p->tv_sec= (long)((now.ns100-(116444736000000000LL))/10000000LL);
  }
 
-#define MXA_GET_TIME_OF_DAY MXA_gettimeofday
+#define GET_TIME_OF_DAY gettimeofday
 #endif /*  GET_TIME_OF_DAY_WARNING */
 #else
 #error Your system does not have a gettimeofday() function. Please contact the author of this library for advice.
@@ -184,7 +184,7 @@ inline unsigned long long int getMilliSeconds()
   return (unsigned long long int)(::clock());
 #else
   struct timeval t1;
-  MXA_GET_TIME_OF_DAY(&t1, NULL);
+  GET_TIME_OF_DAY(&t1, NULL);
   unsigned long long int seconds ( t1.tv_sec );
   unsigned long long int microSec ( t1.tv_usec );
   seconds *= 1000;

@@ -9,10 +9,12 @@
 #define _@VERSION_GEN_NAME@_VERSION_H_
 
 /* Definition of version number for @VERSION_GEN_NAME@ */
-#define @VERSION_GEN_NAME@_VERSION     "@VERSION_GEN_COMPLETE@"
-#define @VERSION_GEN_NAME@_VER_MAJOR   "@VERSION_GEN_VER_MAJOR@"
-#define @VERSION_GEN_NAME@_VER_MINOR   "@VERSION_GEN_VER_MINOR@"
-#define @VERSION_GEN_NAME@_VER_PATCH   "@VERSION_GEN_VER_PATCH@"
+#define @VERSION_GEN_NAME@_PACKAGE_NAME     "@PROJECT_PREFIX@"
+#define @VERSION_GEN_NAME@_PACKAGE_COMPLETE "@PROJECT_PREFIX@ Version @VERSION_GEN_COMPLETE@"
+#define @VERSION_GEN_NAME@_COMPLETE         "@VERSION_GEN_COMPLETE@"
+#define @VERSION_GEN_NAME@_VER_MAJOR        "@VERSION_GEN_VER_MAJOR@"
+#define @VERSION_GEN_NAME@_VER_MINOR        "@VERSION_GEN_VER_MINOR@"
+#define @VERSION_GEN_NAME@_VER_PATCH        "@VERSION_GEN_VER_PATCH@"
 
 #if defined(__cplusplus)
 #include <string>
@@ -24,6 +26,8 @@ namespace @VERSION_GEN_NAMESPACE@
     const std::string Major   ("@VERSION_GEN_VER_MAJOR@");
     const std::string Minor   ("@VERSION_GEN_VER_MINOR@");
     const std::string Patch   ("@VERSION_GEN_VER_PATCH@");
+    const std::string Package ("@PROJECT_PREFIX@");
+    const std::string PackageComplete ("@PROJECT_PREFIX@ Version @VERSION_GEN_COMPLETE@");
   }
 }
 

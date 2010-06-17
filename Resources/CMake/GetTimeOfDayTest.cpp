@@ -19,5 +19,7 @@
 int main(int argc, char **argv) {
 	  struct timeval t1;
 	  gettimeofday(&t1, 0x00);
+
+	  tm *t = 0x0;
 	return 0;
 }

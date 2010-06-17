@@ -6,7 +6,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "AboutBox.h"
-#include <EmMpm/Common/EmMpmVersion.h>
+#include <EMMPM/Common/EMMPMVersion.h>
 
 #include <iostream>
 
@@ -36,8 +36,8 @@ void AboutBox::setApplicationName(QString applicationName)
   setWindowTitle(title);
 
   appName->setText(applicationName);
-  QString version("Version ");
-  version.append(EmMpmGUI_VERSION);
+  QString version("");
+  version.append(EMMPM::Version::PackageComplete.c_str());
   appVersion->setText( version );
 }
 
