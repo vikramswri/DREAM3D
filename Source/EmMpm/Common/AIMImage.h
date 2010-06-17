@@ -8,8 +8,8 @@
 #ifndef _AIM_IMAGE_H_
 #define _AIM_IMAGE_H_
 
-#include "EmMpm/Common/EmMpmTypes.h"
-#include "EmMpm/Common/MXASetGetMacros.h"
+#include "EMMPM/Common/EMMPMTypes.h"
+#include "EMMPM/Common/MXASetGetMacros.h"
 
 #include <iostream>
 

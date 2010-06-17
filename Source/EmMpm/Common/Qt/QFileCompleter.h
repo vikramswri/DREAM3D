@@ -1,7 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
-//  Copyright (c) 2009, Michael Groeber, US Air Force Research Laboratory
 //  All rights reserved.
 //  BSD License: http://www.opensource.org/licenses/bsd-license.html
 //
@@ -14,11 +13,11 @@
 #include <QtCore/QObject>
 #include <QtGui/QCompleter>
 
-class QR3DFileCompleter : public QCompleter
+class QFileCompleter : public QCompleter
 {
   Q_OBJECT
 public:
-  QR3DFileCompleter(QObject* o, bool dirs);
+  QFileCompleter(QObject* o, bool dirs);
   virtual QString pathFromIndex(const QModelIndex& idx) const;
 };
 

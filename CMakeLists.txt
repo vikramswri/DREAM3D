@@ -33,7 +33,7 @@ SET (EmMpmGUI_PROJECT_DIR ${EmMpmGUI_SOURCE_DIR})
 SET (PROJECT_RESOURCES_DIR ${EmMpmGUI_SOURCE_DIR}/Resources)
 SET (EmMpmGUI_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/CMake)
 SET (OSX_TOOLS_DIR ${PROJECT_RESOURCES_DIR}/OSX_Tools)
-SET (PROJECT_PREFIX "EmMpm" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
+SET (PROJECT_PREFIX "EMMPM" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
 SET (EXE_DEBUG_EXTENSION "_debug")
 
 INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/CMakeMacros.cmake )
@@ -69,7 +69,7 @@ include_directories(${PROJECT_BINARY_DIR})
 # --------------------------------------------------------------------
 # Generate a Header file with Compile Version variables
 # --------------------------------------------------------------------
-GenerateVersionString( ${PROJECT_NAME} "${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/EmMpmVersion.h" "EMMPM" )
+GenerateVersionString( ${PROJECT_NAME} "${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h" "${PROJECT_PREFIX}" )
 
 # ------------------------------------------------------------------------------
 #  Qt 4 Section
@@ -87,23 +87,24 @@ FIND_PACKAGE( Qt4 REQUIRED )
 # (QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that 
 # contains a path to CMake script)
 INCLUDE( ${QT_USE_FILE} )
-   
-# Add our Qt based GUI project to the list of targets
-ADD_SUBDIRECTORY( ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/GUI ${EmMpmGUI_BINARY_DIR}/GUI)
-   
+ 
 # --------------------------------------------------------------------
 # Generate our header files
 # --------------------------------------------------------------------
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/Configuration.h.in
                ${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h )
-
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/PrimitiveTypes.h.in
                ${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h )
+
 configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
                 ${PROJECT_BINARY_DIR}/License.txt )
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 ${PROJECT_BINARY_DIR}/ReadMe.txt )
-                
+IDE_SOURCE_PROPERTIES( "EmMpm/Configured" "${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${EmMpmGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
+
+   
+# Add our Qt based GUI project to the list of targets
+ADD_SUBDIRECTORY( ${EmMpmGUI_SOURCE_DIR}/Source/EmMpm/GUI ${EmMpmGUI_BINARY_DIR}/GUI)
 
 include(${PROJECT_RESOURCES_DIR}/CMake/InstallSupportLibraries.cmake)
 include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)
