@@ -5,19 +5,6 @@
 //  BSD License: http://www.opensource.org/licenses/bsd-license.html
 //
 ///////////////////////////////////////////////////////////////////////////////
-/* ****************************************************************************
- * Original Author:
- * [1] Comer, Mary L., and Delp, Edward J.,  ÒThe EM/MPM Algorithm for Segmentation
- * of Textured Images: Analysis and Further Experimental Results,Ó IEEE Transactions
- *  on Image Processing, Vol. 9, No. 10, October 2000, pp. 1731-1744.
- *
- *  Adapted to current toolkit by Michael A. Jackson (aka BlueQuartz Software)
- *  <mike.jackson@bluequartz.net> under the U.S. Air Force contrct F33615-03-C-5220.
- *
- *  Initial port from original research codes performed by John van der Zwaag
- *  (vanderz@gri.msstate.edu).
- *
- * *************************************************************************** */
 
 #ifndef _EMMPM_TASK_H_
 #define _EMMPM_TASK_H_

@@ -1,10 +1,3 @@
-#///////////////////////////////////////////////////////////////////////////////
-#
-#  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
-#  All rights reserved.
-#  BSD License: http://www.opensource.org/licenses/bsd-license.html
-#
-#///////////////////////////////////////////////////////////////////////////////
 # -------- Function to build OS X Stand Alone Bundles -----------------
 macro(MakeOSXBundleApp target binary_dir osx_tools_dir)
     set(target ${target})

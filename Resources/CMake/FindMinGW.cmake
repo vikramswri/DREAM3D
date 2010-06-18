@@ -1,10 +1,3 @@
-#///////////////////////////////////////////////////////////////////////////////
-#
-#  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
-#  All rights reserved.
-#  BSD License: http://www.opensource.org/licenses/bsd-license.html
-#
-#///////////////////////////////////////////////////////////////////////////////
 # - Find MINGW library
 # - Derived from the FindMINGW.cmake that is included with cmake
 # Find the native MINGW includes and library
