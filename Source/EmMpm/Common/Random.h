@@ -8,7 +8,7 @@
  *  <mike.jackson@bluequartz.net> under the U.S. Air Force contrct F33615-03-C-5220.
  *
  *  Initial port from original research codes performed by John van der Zwaag
- *  (vanderz@gri.msstate.edu) under US Air Force contract XXX_XXXX-XXXX
+ *  (vanderz@gri.msstate.edu).
  *
  * *************************************************************************** */
 
@@ -30,8 +30,8 @@ public:
   }
 
   void setSeed(long s)
-  { 
-    seed = s; 
+  {
+    seed = s;
     next(); next(); next();
   }
   long getSeed()
@@ -40,7 +40,7 @@ public:
   double next()
   {
     long hi, lo;
-    
+
     // Based on code in "Random Number Generators: Good Ones are Hard to Find,"
     // by Stephen K. Park and Keith W. Miller in Communications of the ACM,
     // 31, 10 (Oct. 1988) pp. 1192-1201.
@@ -51,7 +51,7 @@ public:
       seed += VTK_K_M;
     return static_cast<double>(seed)/VTK_K_M;
   }
-  
+
   double next(double min, double max)
   {
     return (min + next()*(max-min));
