@@ -30,10 +30,10 @@
 
 #include "ProcessQueueController.h"
 #include "ProcessQueueDialog.h"
-#include "EmMpm/Common/Qt/AboutBox.h"
-#include "EmMpm/Common/Qt/QRecentFileList.h"
-#include "EmMpm/Common/Qt/QFileCompleter.h"
-#include "EmMpm/Common/Qt/AIMImageGraphicsDelegate.h"
+#include "EMMPM/Common/Qt/AboutBox.h"
+#include "EMMPM/Common/Qt/QRecentFileList.h"
+#include "EMMPM/Common/Qt/QFileCompleter.h"
+#include "EMMPM/Common/Qt/AIMImageGraphicsDelegate.h"
 
 
 #define READ_STRING_SETTING(prefs, var, emptyValue)\
@@ -150,7 +150,7 @@ void QEmMpm::readSettings()
   READ_SETTING(prefs, m_EmIterations, ok, i, 5, Int);
   READ_SETTING(prefs, m_NumClasses, ok, i, 2, Int);
   READ_BOOL_SETTING(prefs, useSimulatedAnnealing, true);
-  READ_BOOL_SETTING(prefs, processFolder, true);
+  READ_BOOL_SETTING(prefs, processFolder, false);
   READ_STRING_SETTING(prefs, sourceDirectoryLE, "");
   READ_STRING_SETTING(prefs, outputDirectoryLE, "");
   READ_STRING_SETTING(prefs, outputPrefix, "");

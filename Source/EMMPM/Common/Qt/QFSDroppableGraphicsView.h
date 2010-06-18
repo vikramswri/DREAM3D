@@ -12,7 +12,7 @@
 #include <QtGui/QGraphicsView>
 
 /**
-* @class QFSDroppableGraphicsView QFSDroppableGraphicsView.h EmMpm/Common/Qt/QFSDroppableGraphicsView.h
+* @class QFSDroppableGraphicsView QFSDroppableGraphicsView.h EMMPM/Common/Qt/QFSDroppableGraphicsView.h
 * @brief
 * @author Michael A. Jackson for BlueQuartz Software
 * @date Apr 5, 2010
