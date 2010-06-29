@@ -9,7 +9,7 @@
 #ifndef IMAGEGRAPHICSDELEGATE_H_
 #define IMAGEGRAPHICSDELEGATE_H_
 
-#include <EMMPM/Common/MXASetGetMacros.h>
+#include <TO79/Common/MXASetGetMacros.h>
 
 //-- Qt Includes
 #include <QtCore/QObject>

@@ -18,8 +18,8 @@
 #include <QtCore/QString>
 #include <QtGui/QImage>
 
-#include "EMMPM/Common/AIMImage.h"
-#include "EMMPM/Common/Random.h"
+#include "TO79/Common/AIMImage.h"
+#include "TO79/Common/Random.h"
 
 #define PI  3.14159265358979323846
 #define MAX_CLASSES 15

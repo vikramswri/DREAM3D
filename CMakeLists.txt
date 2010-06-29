@@ -5,7 +5,7 @@
 #  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #
 #///////////////////////////////////////////////////////////////////////////////
-project (EMMPMGUI)
+project (TO79)
 cmake_minimum_required(VERSION 2.6)
 
 # ---------- Setup output Directories -------------------------
@@ -29,11 +29,11 @@ SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
   "Single Directory for all static libraries."
   )
 
-SET (EMMPMGUI_PROJECT_DIR ${EMMPMGUI_SOURCE_DIR})
-SET (PROJECT_RESOURCES_DIR ${EMMPMGUI_SOURCE_DIR}/Resources)
-SET (EMMPMGUI_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/CMake)
+SET (TO79_PROJECT_DIR ${TO79_SOURCE_DIR})
+SET (PROJECT_RESOURCES_DIR ${TO79_SOURCE_DIR}/Resources)
+SET (TO79_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/CMake)
 SET (OSX_TOOLS_DIR ${PROJECT_RESOURCES_DIR}/OSX_Tools)
-SET (PROJECT_PREFIX "EMMPM" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
+SET (PROJECT_PREFIX "TO79" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
 SET (EXE_DEBUG_EXTENSION "_debug")
 
 INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/CMakeMacros.cmake )
@@ -69,7 +69,7 @@ include_directories(${PROJECT_BINARY_DIR})
 # --------------------------------------------------------------------
 # Generate a Header file with Compile Version variables
 # --------------------------------------------------------------------
-GenerateVersionString( ${PROJECT_NAME} "${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h" "${PROJECT_PREFIX}" )
+GenerateVersionString( ${PROJECT_NAME} "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h" "${PROJECT_PREFIX}" )
 
 # ------------------------------------------------------------------------------
 #  Qt 4 Section
@@ -92,19 +92,19 @@ INCLUDE( ${QT_USE_FILE} )
 # Generate our header files
 # --------------------------------------------------------------------
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/Configuration.h.in
-               ${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h )
+               ${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h )
 configure_file(${PROJECT_RESOURCES_DIR}/CMake/PrimitiveTypes.h.in
-               ${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h )
+               ${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h )
 
 configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
                 ${PROJECT_BINARY_DIR}/License.txt )
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 ${PROJECT_BINARY_DIR}/ReadMe.txt )
-IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
+IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
 
    
 # Add our Qt based GUI project to the list of targets
-ADD_SUBDIRECTORY( ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/GUI ${EMMPMGUI_BINARY_DIR}/GUI)
+ADD_SUBDIRECTORY( ${TO79_SOURCE_DIR}/Source/EMMPM/GUI ${TO79_BINARY_DIR}/GUI)
 
 include(${PROJECT_RESOURCES_DIR}/CMake/InstallSupportLibraries.cmake)
 include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)

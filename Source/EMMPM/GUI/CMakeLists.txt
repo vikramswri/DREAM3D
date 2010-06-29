@@ -42,8 +42,8 @@ IF(WIN32)
 ENDIF(WIN32)
 
 # Set some include directories
-include_directories( ${EMMPMGUI_SOURCE_DIR}/Source )
-include_directories( ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt )
+include_directories( ${TO79_SOURCE_DIR}/Source )
+include_directories( ${TO79_SOURCE_DIR}/Source/TO79/Qt )
 include_directories( ${QEMMPM_BINARY_DIR} )
 
 
@@ -67,27 +67,27 @@ SET (QEMMPM_HDRS
 IDE_SOURCE_PROPERTIES( "EMMPM/GUI" "${QEMMPM_HDRS}" "${QEMMPM_SRCS}")
 
 set (EMMPM_COMMON_QT_SRCS
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/AboutBox.cpp
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/QRecentFileList.cpp
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/QFileCompleter.cpp
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/AIMImageGraphicsDelegate.cpp
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/QFSDroppableGraphicsView.cpp
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/AboutBox.cpp
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QRecentFileList.cpp
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QFileCompleter.cpp
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/AIMImageGraphicsDelegate.cpp
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QFSDroppableGraphicsView.cpp
 )
 set (EMMPM_COMMON_QT_HDRS
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/AboutBox.h
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/QRecentFileList.h
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/QFileCompleter.h
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/AIMImageGraphicsDelegate.h
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/QFSDroppableGraphicsView.h
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/AboutBox.h
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QRecentFileList.h
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QFileCompleter.h
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/AIMImageGraphicsDelegate.h
+    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QFSDroppableGraphicsView.h
 )
-IDE_SOURCE_PROPERTIES("EMMPM/Common/Qt" "${EMMPM_COMMON_QT_HDRS}" "${EMMPM_COMMON_QT_SRCS}")
+IDE_SOURCE_PROPERTIES("EMMPM/Qt" "${EMMPM_COMMON_QT_HDRS}" "${EMMPM_COMMON_QT_SRCS}")
 
 set (EMMPM_COMMON_SRCS
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/AIMImage.cpp
+    ${TO79_SOURCE_DIR}/Source/TO79/Common/AIMImage.cpp
 )
 set (EMMPM_COMMON_HDRS
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/AIMArray.hpp
-    ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/AIMImage.h   )
+    ${TO79_SOURCE_DIR}/Source/TO79/Common/AIMArray.hpp
+    ${TO79_SOURCE_DIR}/Source/TO79/Common/AIMImage.h   )
 IDE_SOURCE_PROPERTIES("EMMPM/Common" "${EMMPM_COMMON_HDRS}" "${EMMPM_COMMON_SRCS}")
 
 
@@ -105,7 +105,7 @@ SET( QEMMPM_MOC_HDRS
 SET( QEMMPM_UIS
   ${QEMMPM_SOURCE_DIR}/UI_Files/QEmMpm.ui
   ${QEMMPM_SOURCE_DIR}/UI_Files/ProcessQueueDialog.ui
-  ${EMMPMGUI_SOURCE_DIR}/Source/EMMPM/Common/Qt/UI_Files/AboutBox.ui
+  ${TO79_SOURCE_DIR}/Source/TO79/Qt/UI_Files/AboutBox.ui
 )
 
 # and finally any resource files
@@ -146,13 +146,13 @@ SET (QEMMPM_PROJECT_SRCS
 
 #-- Set up OS X Application Bundle properties
 #-- This file have tools for OS X Bunlde creation and configuration
-INCLUDE (${EMMPMGUI_SOURCE_DIR}/Resources/OSX_Tools/OSX_BundleTools.cmake)
+INCLUDE (${PROJECT_RESOURCES_DIR}/OSX_Tools/OSX_BundleTools.cmake)
 
 IF(APPLE)
  SET(GUI_TYPE MACOSX_BUNDLE)
  ConfigureMacOSXBundlePlist(${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} 
                             ${PROJECT_RESOURCES_DIR}/icons/icns/${PROJECT_NAME}.icns
-                            ${EMMPMGUI_VERSION} )
+                            ${TO79_VERSION} )
 ENDIF (APPLE)
 
 IF(Q_WS_WIN)
@@ -160,7 +160,7 @@ IF(Q_WS_WIN)
     configure_file(${PROJECT_RESOURCES_DIR}/icons/ico/IconResource.rc.in ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.rc)
     SET (${PROJECT_NAME}_PROJECT_SRCS ${${PROJECT_NAME}_PROJECT_SRCS} ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.rc) 
     IDE_SOURCE_PROPERTIES ("EMMPM/ConfiguredFiles" "${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}.rc" "")
-	IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h" "${EMMPMGUI_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h")                
+	IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h")                
 ENDIF(Q_WS_WIN)
 
 # ---------- Build the Viewer Application  ----------------------

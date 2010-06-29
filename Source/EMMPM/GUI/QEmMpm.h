@@ -22,7 +22,7 @@
 //-- UIC generated Header
 #include <ui_QEmMpm.h>
 
-#include "EMMPM/Common/AIMImage.h"
+#include "TO79/Common/AIMImage.h"
 
 
 class AIMImageGraphicsDelegate;

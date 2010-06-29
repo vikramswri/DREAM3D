@@ -6,7 +6,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 #include "AboutBox.h"
-#include <EMMPM/Common/EMMPMVersion.h>
+#include "TO79/Common/TO79Version.h"
 
 #include <iostream>
 
@@ -37,7 +37,7 @@ void AboutBox::setApplicationName(QString applicationName)
 
   appName->setText(applicationName);
   QString version("");
-  version.append(EMMPM::Version::PackageComplete.c_str());
+  version.append(TO79::Version::PackageComplete.c_str());
   appVersion->setText( version );
 }
 

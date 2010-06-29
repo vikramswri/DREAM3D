@@ -25,15 +25,18 @@
 #include <QtGui/QListWidget>
 #include <QtGui/QStringListModel>
 
+// Our Project wide includes
+#include "TO79/Qt/AboutBox.h"
+#include "TO79/Qt/QRecentFileList.h"
+#include "TO79/Qt/QFileCompleter.h"
+#include "TO79/Qt/AIMImageGraphicsDelegate.h"
+
+// Our Own Includes
 #include "QEmMpm.h"
 #include "EmMpmTask.h"
-
 #include "ProcessQueueController.h"
 #include "ProcessQueueDialog.h"
-#include "EMMPM/Common/Qt/AboutBox.h"
-#include "EMMPM/Common/Qt/QRecentFileList.h"
-#include "EMMPM/Common/Qt/QFileCompleter.h"
-#include "EMMPM/Common/Qt/AIMImageGraphicsDelegate.h"
+
 
 
 #define READ_STRING_SETTING(prefs, var, emptyValue)\

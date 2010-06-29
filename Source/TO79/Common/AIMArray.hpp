@@ -10,7 +10,7 @@
 #define AIMARRAY_HPP_
 
 
-#include <EMMPM/Common/MXASetGetMacros.h>
+#include <TO79/Common/MXASetGetMacros.h>
 #include <EMMPM/Common/AIMImage.h>
 
 #include <iostream>
