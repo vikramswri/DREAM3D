@@ -18,12 +18,12 @@
 
 /* Select an 8-bit integer type.  */
 #if @PROJECT_PREFIX@_SIZEOF_CHAR == 1
-#ifndef _UINT8_T
+#if !defined(_UINT8_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT8_T)
 #define _UINT8_T
 typedef unsigned char         uint8_t;
 #endif /*_UINT8_T */
 
-#ifndef _INT8_T
+#if !defined(_INT8_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT8_T)
 #define _INT8_T
 typedef signed char           int8_t;
 #endif /*_INT8_T */
@@ -40,12 +40,12 @@ typedef signed char           int8_t;
 
 /* Select a 16-bit integer type.  */
 #if @PROJECT_PREFIX@_SIZEOF_SHORT == 2
-#ifndef _UINT16_T
+#if !defined(_UINT16_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT16_T)
 #define _UINT16_T
 typedef unsigned short       uint16_t;
 #endif /* _UINT16_T */
 
-#ifndef _INT16_T
+#if !defined(_INT16_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT16_T)
 #define _INT16_T
 typedef short                int16_t;
 #endif /* _INT16_T */
@@ -53,12 +53,12 @@ typedef short                int16_t;
 # define @PROJECT_PREFIX@_TYPE_UINT16 @PROJECT_PREFIX@_UNSIGNED_SHORT
 # define @PROJECT_PREFIX@_TYPE_INT16 @PROJECT_PREFIX@_SHORT
 #elif @PROJECT_PREFIX@_SIZEOF_INT == 2
-#ifndef _UINT16_T
+#ifndef _UINT16_T && !defined @PROJECT_PREFIX@_SIZEOF_UINT16_T
 #define _UINT16_T
 typedef unsigned int       uint16_t;
 #endif /* _UINT16_T */
 
-#ifndef _INT16_T
+#if !defined(_INT16_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT16_T)
 #define _INT16_T
 typedef int                int16_t;
 #endif /* _INT16_T */
@@ -70,24 +70,24 @@ typedef int                int16_t;
 
 /* Select a 32-bit integer type.  */
 #if @PROJECT_PREFIX@_SIZEOF_INT == 4
-#ifndef _UINT32_T
+#if !defined(_UINT32_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT32_T)
 #define _UINT32_T
 typedef unsigned int         uint32_t;
 #endif /* _UINT32_T */
 
-#ifndef _INT32_T
+#if !defined(_INT32_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT32_T)
 #define _INT32_T
 typedef int                  int32_t;
 #endif /* _INT32_T */
 # define @PROJECT_PREFIX@_TYPE_UINT32 @PROJECT_PREFIX@_UNSIGNED_INT
 # define @PROJECT_PREFIX@_TYPE_INT32 @PROJECT_PREFIX@_INT
 #elif @PROJECT_PREFIX@_SIZEOF_LONG == 4
-#ifndef _UINT32_T
+#if !defined(_UINT32_T) && !defined @PROJECT_PREFIX@_SIZEOF_UINT32_T
 #define _UINT32_T
 typedef unsigned long         uint32_t;
 #endif /* _UINT32_T */
 
-#ifndef _INT32_T
+#if !defined(_INT32_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT32_T)
 #define _INT32_T
 typedef long                  int32_t;
 #endif /* _INT32_T */
@@ -99,12 +99,12 @@ typedef long                  int32_t;
 
 /* Select a 64-bit integer type.  */
 #if defined(@PROJECT_PREFIX@_TYPE_USE_LONG_LONG) && @PROJECT_PREFIX@_SIZEOF_LONG_LONG == 8
-  #ifndef _UINT64_T
+  #if !defined(_UINT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT64_T)
   #define _UINT64_T
   typedef unsigned long long   uint64_t;
   #endif /* _UINT64_T */
 
-  #ifndef _INT64_T
+  #if !defined(_INT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT64_T)
   #define _INT64_T
   typedef long long            int64_t;
   #endif /* _INT64_T */
@@ -113,12 +113,12 @@ typedef long                  int32_t;
   # define @PROJECT_PREFIX@_TYPE_INT64 @PROJECT_PREFIX@_LONG_LONG
 
 #elif @PROJECT_PREFIX@_SIZEOF_LONG == 8
-  #ifndef _UINT64_T
+  #if !defined(_UINT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT64_T)
   #define _UINT64_T
   typedef unsigned long   uint64_t;
   #endif /* _UINT64_T */
   
-  #ifndef _INT64_T
+  #if !defined(_INT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT64_T)
   #define _INT64_T
   typedef long            int64_t;
   #endif /* _INT64_T */
@@ -127,12 +127,12 @@ typedef long                  int32_t;
 
 #elif defined(@PROJECT_PREFIX@_TYPE_USE___INT64) && @PROJECT_PREFIX@_SIZEOF___INT64 == 8
 
-  #ifndef _UINT64_T
+  #if !defined(_UINT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT64_T)
   #define _UINT64_T
   typedef unsigned __int64 uint64;
   #endif /* _UINT64_T */
   
-  #ifndef _INT64_T
+  #if !defined(_INT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT64_T)
   #define _INT64_T
   typedef signed __int64   int64;
   #endif /* _INT64_T */
