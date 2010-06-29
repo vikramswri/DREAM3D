@@ -8,8 +8,8 @@
 #ifndef _AIM_IMAGE_H_
 #define _AIM_IMAGE_H_
 
-#include "TO79/Common/TO79Types.h"
-#include "TO79/Common/MXASetGetMacros.h"
+#include "MXA/Common/MXATypes.h"
+#include "MXA/Common/MXASetGetMacros.h"
 
 #include <iostream>
 

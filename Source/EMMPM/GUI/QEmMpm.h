@@ -22,10 +22,10 @@
 //-- UIC generated Header
 #include <ui_QEmMpm.h>
 
-#include "TO79/Common/AIMImage.h"
+#include "AIM/Common/AIMImage.h"
 
 
-class AIMImageGraphicsDelegate;
+class MXAImageGraphicsDelegate;
 class ProcessQueueDialog;
 class ProcessQueueController;
 class EmMpmTask;
@@ -200,8 +200,8 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     QGraphicsScene*             m_OriginalImageGScene;
     QGraphicsScene*             m_SegmentedImageGScene;
 
-    AIMImageGraphicsDelegate*      m_OriginalGDelegate;
-    AIMImageGraphicsDelegate*      m_SegmentedGDelegate;
+    MXAImageGraphicsDelegate*      m_OriginalGDelegate;
+    MXAImageGraphicsDelegate*      m_SegmentedGDelegate;
 
     ProcessQueueController*        m_QueueController;
     ProcessQueueDialog*            m_QueueDialog;

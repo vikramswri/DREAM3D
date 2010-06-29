@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AboutBox</class>
- <widget class="QDialog" name="AboutBox">
+ <class>ApplicationAboutBoxDialog</class>
+ <widget class="QDialog" name="ApplicationAboutBoxDialog">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -98,7 +98,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>AboutBox</receiver>
+   <receiver>ApplicationAboutBoxDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">

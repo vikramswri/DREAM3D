@@ -18,7 +18,7 @@
 #include <QtCore/QString>
 #include <QtGui/QImage>
 
-#include "TO79/Common/AIMImage.h"
+#include "AIM/Common/AIMImage.h"
 #include "TO79/Common/Random.h"
 
 #define PI  3.14159265358979323846

@@ -26,16 +26,17 @@
 #include <QtGui/QStringListModel>
 
 // Our Project wide includes
-#include "TO79/Qt/AboutBox.h"
-#include "TO79/Qt/QRecentFileList.h"
-#include "TO79/Qt/QFileCompleter.h"
-#include "TO79/Qt/AIMImageGraphicsDelegate.h"
+#include "MXA/Qt/ApplicationAboutBoxDialog.h"
+#include "MXA/Qt/QRecentFileList.h"
+#include "MXA/Qt/QFileCompleter.h"
+#include "MXA/Qt/MXAImageGraphicsDelegate.h"
 
 // Our Own Includes
 #include "QEmMpm.h"
 #include "EmMpmTask.h"
 #include "ProcessQueueController.h"
 #include "ProcessQueueDialog.h"
+#include "TO79/Common/TO79Version.h"
 
 
 
@@ -431,9 +432,11 @@ void QEmMpm::openFile(QString imageFile)
 // -----------------------------------------------------------------------------
 void QEmMpm::on_aboutBtn_clicked()
 {
-  AboutBox about(this);
+  ApplicationAboutBoxDialog about(this);
   QString an = QCoreApplication::applicationName();
-  about.setApplicationName(an);
+  QString version("");
+  version.append(TO79::Version::PackageComplete.c_str());
+  about.setApplicationInfo(an, version);
   about.exec();
 }
 
@@ -925,7 +928,7 @@ qint32 QEmMpm::initGraphicViews()
     // Create the QGraphicsScene Objects
     m_OriginalImageGScene = new QGraphicsScene(this);
     originalImageGView->setScene(m_OriginalImageGScene);
-    m_OriginalGDelegate = new AIMImageGraphicsDelegate(this);
+    m_OriginalGDelegate = new MXAImageGraphicsDelegate(this);
     m_OriginalGDelegate->setGraphicsView(originalImageGView);
     m_OriginalGDelegate->setGraphicsScene(m_OriginalImageGScene);
     m_OriginalGDelegate->setMainWindow(this);
@@ -991,7 +994,7 @@ qint32 QEmMpm::initGraphicViews()
     // Create the QGraphicsScene Objects
     m_SegmentedImageGScene = new QGraphicsScene(this);
     segmentedImageGView->setScene(m_SegmentedImageGScene);
-    m_SegmentedGDelegate = new AIMImageGraphicsDelegate(this);
+    m_SegmentedGDelegate = new MXAImageGraphicsDelegate(this);
     m_SegmentedGDelegate->setGraphicsView(segmentedImageGView);
     m_SegmentedGDelegate->setGraphicsScene(m_SegmentedImageGScene);
     m_SegmentedGDelegate->setMainWindow(this);

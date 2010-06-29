@@ -6,10 +6,10 @@
  * --------------------------------------------------------------------------*/
 
 
-#ifndef _@PROJECT_PREFIX@Types_h
-#define _@PROJECT_PREFIX@Types_h
+#ifndef _@MXA_PROJECT_PREFIX@Types_h
+#define _@MXA_PROJECT_PREFIX@Types_h
 
-#include "@PROJECT_PREFIX@Configuration.h"
+#include "@MXA_PROJECT_PREFIX@Configuration.h"
 
 
 /*--------------------------------------------------------------------------*/
@@ -17,145 +17,145 @@
  * and floating-point sizes and signedness.  */
 
 /* Select an 8-bit integer type.  */
-#if @PROJECT_PREFIX@_SIZEOF_CHAR == 1
-#if !defined(_UINT8_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT8_T)
+#if @MXA_PROJECT_PREFIX@_SIZEOF_CHAR == 1
+#if !defined(_UINT8_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_UINT8_T)
 #define _UINT8_T
 typedef unsigned char         uint8_t;
 #endif /*_UINT8_T */
 
-#if !defined(_INT8_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT8_T)
+#if !defined(_INT8_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_INT8_T)
 #define _INT8_T
 typedef signed char           int8_t;
 #endif /*_INT8_T */
 
-# define @PROJECT_PREFIX@_TYPE_UINT8 @PROJECT_PREFIX@_UNSIGNED_CHAR
-# if @PROJECT_PREFIX@_TYPE_CHAR_IS_SIGNED
-#  define @PROJECT_PREFIX@_TYPE_INT8 @PROJECT_PREFIX@_CHAR
+# define @MXA_PROJECT_PREFIX@_TYPE_UINT8 @MXA_PROJECT_PREFIX@_UNSIGNED_CHAR
+# if @MXA_PROJECT_PREFIX@_TYPE_CHAR_IS_SIGNED
+#  define @MXA_PROJECT_PREFIX@_TYPE_INT8 @MXA_PROJECT_PREFIX@_CHAR
 # else
-#  define @PROJECT_PREFIX@_TYPE_INT8 @PROJECT_PREFIX@_SIGNED_CHAR
+#  define @MXA_PROJECT_PREFIX@_TYPE_INT8 @MXA_PROJECT_PREFIX@_SIGNED_CHAR
 # endif
 #else
 # error "No native data type can represent an 8-bit integer."
 #endif
 
 /* Select a 16-bit integer type.  */
-#if @PROJECT_PREFIX@_SIZEOF_SHORT == 2
-#if !defined(_UINT16_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT16_T)
+#if @MXA_PROJECT_PREFIX@_SIZEOF_SHORT == 2
+#if !defined(_UINT16_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_UINT16_T)
 #define _UINT16_T
 typedef unsigned short       uint16_t;
 #endif /* _UINT16_T */
 
-#if !defined(_INT16_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT16_T)
+#if !defined(_INT16_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_INT16_T)
 #define _INT16_T
 typedef short                int16_t;
 #endif /* _INT16_T */
 
-# define @PROJECT_PREFIX@_TYPE_UINT16 @PROJECT_PREFIX@_UNSIGNED_SHORT
-# define @PROJECT_PREFIX@_TYPE_INT16 @PROJECT_PREFIX@_SHORT
-#elif @PROJECT_PREFIX@_SIZEOF_INT == 2
-#ifndef _UINT16_T && !defined @PROJECT_PREFIX@_SIZEOF_UINT16_T
+# define @MXA_PROJECT_PREFIX@_TYPE_UINT16 @MXA_PROJECT_PREFIX@_UNSIGNED_SHORT
+# define @MXA_PROJECT_PREFIX@_TYPE_INT16 @MXA_PROJECT_PREFIX@_SHORT
+#elif @MXA_PROJECT_PREFIX@_SIZEOF_INT == 2
+#ifndef _UINT16_T && !defined @MXA_PROJECT_PREFIX@_SIZEOF_UINT16_T
 #define _UINT16_T
 typedef unsigned int       uint16_t;
 #endif /* _UINT16_T */
 
-#if !defined(_INT16_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT16_T)
+#if !defined(_INT16_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_INT16_T)
 #define _INT16_T
 typedef int                int16_t;
 #endif /* _INT16_T */
-# define @PROJECT_PREFIX@_TYPE_UINT16 @PROJECT_PREFIX@_UNSIGNED_INT
-# define @PROJECT_PREFIX@_TYPE_INT16 @PROJECT_PREFIX@_INT
+# define @MXA_PROJECT_PREFIX@_TYPE_UINT16 @MXA_PROJECT_PREFIX@_UNSIGNED_INT
+# define @MXA_PROJECT_PREFIX@_TYPE_INT16 @MXA_PROJECT_PREFIX@_INT
 #else
 # error "No native data type can represent a 16-bit integer."
 #endif
 
 /* Select a 32-bit integer type.  */
-#if @PROJECT_PREFIX@_SIZEOF_INT == 4
-#if !defined(_UINT32_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT32_T)
+#if @MXA_PROJECT_PREFIX@_SIZEOF_INT == 4
+#if !defined(_UINT32_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_UINT32_T)
 #define _UINT32_T
 typedef unsigned int         uint32_t;
 #endif /* _UINT32_T */
 
-#if !defined(_INT32_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT32_T)
+#if !defined(_INT32_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_INT32_T)
 #define _INT32_T
 typedef int                  int32_t;
 #endif /* _INT32_T */
-# define @PROJECT_PREFIX@_TYPE_UINT32 @PROJECT_PREFIX@_UNSIGNED_INT
-# define @PROJECT_PREFIX@_TYPE_INT32 @PROJECT_PREFIX@_INT
-#elif @PROJECT_PREFIX@_SIZEOF_LONG == 4
-#if !defined(_UINT32_T) && !defined @PROJECT_PREFIX@_SIZEOF_UINT32_T
+# define @MXA_PROJECT_PREFIX@_TYPE_UINT32 @MXA_PROJECT_PREFIX@_UNSIGNED_INT
+# define @MXA_PROJECT_PREFIX@_TYPE_INT32 @MXA_PROJECT_PREFIX@_INT
+#elif @MXA_PROJECT_PREFIX@_SIZEOF_LONG == 4
+#if !defined(_UINT32_T) && !defined @MXA_PROJECT_PREFIX@_SIZEOF_UINT32_T
 #define _UINT32_T
 typedef unsigned long         uint32_t;
 #endif /* _UINT32_T */
 
-#if !defined(_INT32_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT32_T)
+#if !defined(_INT32_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_INT32_T)
 #define _INT32_T
 typedef long                  int32_t;
 #endif /* _INT32_T */
-# define @PROJECT_PREFIX@_TYPE_UINT32 @PROJECT_PREFIX@_UNSIGNED_LONG
-# define @PROJECT_PREFIX@_TYPE_INT32 @PROJECT_PREFIX@_LONG
+# define @MXA_PROJECT_PREFIX@_TYPE_UINT32 @MXA_PROJECT_PREFIX@_UNSIGNED_LONG
+# define @MXA_PROJECT_PREFIX@_TYPE_INT32 @MXA_PROJECT_PREFIX@_LONG
 #else
 # error "No native data type can represent a 32-bit integer."
 #endif
 
 /* Select a 64-bit integer type.  */
-#if defined(@PROJECT_PREFIX@_TYPE_USE_LONG_LONG) && @PROJECT_PREFIX@_SIZEOF_LONG_LONG == 8
-  #if !defined(_UINT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT64_T)
+#if defined(@MXA_PROJECT_PREFIX@_TYPE_USE_LONG_LONG) && @MXA_PROJECT_PREFIX@_SIZEOF_LONG_LONG == 8
+  #if !defined(_UINT64_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_UINT64_T)
   #define _UINT64_T
   typedef unsigned long long   uint64_t;
   #endif /* _UINT64_T */
 
-  #if !defined(_INT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT64_T)
+  #if !defined(_INT64_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_INT64_T)
   #define _INT64_T
   typedef long long            int64_t;
   #endif /* _INT64_T */
   
-  # define @PROJECT_PREFIX@_TYPE_UINT64 @PROJECT_PREFIX@_UNSIGNED_LONG_LONG
-  # define @PROJECT_PREFIX@_TYPE_INT64 @PROJECT_PREFIX@_LONG_LONG
+  # define @MXA_PROJECT_PREFIX@_TYPE_UINT64 @MXA_PROJECT_PREFIX@_UNSIGNED_LONG_LONG
+  # define @MXA_PROJECT_PREFIX@_TYPE_INT64 @MXA_PROJECT_PREFIX@_LONG_LONG
 
-#elif @PROJECT_PREFIX@_SIZEOF_LONG == 8
-  #if !defined(_UINT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT64_T)
+#elif @MXA_PROJECT_PREFIX@_SIZEOF_LONG == 8
+  #if !defined(_UINT64_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_UINT64_T)
   #define _UINT64_T
   typedef unsigned long   uint64_t;
   #endif /* _UINT64_T */
   
-  #if !defined(_INT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT64_T)
+  #if !defined(_INT64_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_INT64_T)
   #define _INT64_T
   typedef long            int64_t;
   #endif /* _INT64_T */
-  # define @PROJECT_PREFIX@_TYPE_UINT64 @PROJECT_PREFIX@_UNSIGNED_LONG
-  # define @PROJECT_PREFIX@_TYPE_INT64 @PROJECT_PREFIX@_LONG
+  # define @MXA_PROJECT_PREFIX@_TYPE_UINT64 @MXA_PROJECT_PREFIX@_UNSIGNED_LONG
+  # define @MXA_PROJECT_PREFIX@_TYPE_INT64 @MXA_PROJECT_PREFIX@_LONG
 
-#elif defined(@PROJECT_PREFIX@_TYPE_USE___INT64) && @PROJECT_PREFIX@_SIZEOF___INT64 == 8
+#elif defined(@MXA_PROJECT_PREFIX@_TYPE_USE___INT64) && @MXA_PROJECT_PREFIX@_SIZEOF___INT64 == 8
 
-  #if !defined(_UINT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_UINT64_T)
+  #if !defined(_UINT64_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_UINT64_T)
   #define _UINT64_T
   typedef unsigned __int64 uint64;
   #endif /* _UINT64_T */
   
-  #if !defined(_INT64_T) && !defined(@PROJECT_PREFIX@_SIZEOF_INT64_T)
+  #if !defined(_INT64_T) && !defined(@MXA_PROJECT_PREFIX@_SIZEOF_INT64_T)
   #define _INT64_T
   typedef signed __int64   int64;
   #endif /* _INT64_T */
 
-  # define @PROJECT_PREFIX@_TYPE_UINT64 @PROJECT_PREFIX@_UNSIGNED___INT64
-  # define @PROJECT_PREFIX@_TYPE_INT64 @PROJECT_PREFIX@___INT64
+  # define @MXA_PROJECT_PREFIX@_TYPE_UINT64 @MXA_PROJECT_PREFIX@_UNSIGNED___INT64
+  # define @MXA_PROJECT_PREFIX@_TYPE_INT64 @MXA_PROJECT_PREFIX@___INT64
 
 #else
 # error "No native data type can represent a 64-bit integer."
 #endif
 
 /* Select a 32-bit floating point type.  */
-#if @PROJECT_PREFIX@_SIZEOF_FLOAT == 4
+#if @MXA_PROJECT_PREFIX@_SIZEOF_FLOAT == 4
 typedef float float32;
-# define @PROJECT_PREFIX@_TYPE_FLOAT32 @PROJECT_PREFIX@_FLOAT
+# define @MXA_PROJECT_PREFIX@_TYPE_FLOAT32 @MXA_PROJECT_PREFIX@_FLOAT
 #else
 # error "No native data type can represent a 32-bit floating point value."
 #endif
 
 /* Select a 64-bit floating point type.  */
-#if @PROJECT_PREFIX@_SIZEOF_DOUBLE == 8
+#if @MXA_PROJECT_PREFIX@_SIZEOF_DOUBLE == 8
 typedef double float64;
-# define @PROJECT_PREFIX@_TYPE_FLOAT64 @PROJECT_PREFIX@_DOUBLE
+# define @MXA_PROJECT_PREFIX@_TYPE_FLOAT64 @MXA_PROJECT_PREFIX@_DOUBLE
 #else
 # error "No native data type can represent a 64-bit floating point value."
 #endif
@@ -164,7 +164,7 @@ typedef double float64;
  * is taken from an OS X stdint.h file and should work just fine with the include
  * guard.
  */
-#ifndef @PROJECT_PREFIX@_HAVE_STDINT_H
+#ifndef @MXA_PROJECT_PREFIX@_HAVE_STDINT_H
 /* 7.18.2 Limits of specified-width integer types:
  *   These #defines specify the minimum and maximum limits
  *   of each of the types declared above.

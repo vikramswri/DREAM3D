@@ -6,7 +6,7 @@
 //
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "AIMImageGraphicsDelegate.h"
+#include "MXAImageGraphicsDelegate.h"
 
 //-- STL includes
 #include <iostream>
@@ -30,7 +30,7 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImageGraphicsDelegate::AIMImageGraphicsDelegate(QObject* parent) :
+MXAImageGraphicsDelegate::MXAImageGraphicsDelegate(QObject* parent) :
   QObject(parent),
   m_MainWindow(NULL),
   m_GraphicsView(NULL),
@@ -60,7 +60,7 @@ AIMImageGraphicsDelegate::AIMImageGraphicsDelegate(QObject* parent) :
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImageGraphicsDelegate::~AIMImageGraphicsDelegate()
+MXAImageGraphicsDelegate::~MXAImageGraphicsDelegate()
 {
 }
 
@@ -68,7 +68,7 @@ AIMImageGraphicsDelegate::~AIMImageGraphicsDelegate()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::resetCaches()
+void MXAImageGraphicsDelegate::resetCaches()
 {
   this->m_CachedImage = QImage();
   this->m_OverlayImage = QImage();
@@ -78,7 +78,7 @@ void AIMImageGraphicsDelegate::resetCaches()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::displayTextMessage(QString message)
+void MXAImageGraphicsDelegate::displayTextMessage(QString message)
 {
   _displayTextMessage( message );
 }
@@ -86,7 +86,7 @@ void AIMImageGraphicsDelegate::displayTextMessage(QString message)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::increaseZoom()
+void MXAImageGraphicsDelegate::increaseZoom()
 {
   _shouldFitToWindow = false;
   if (m_CachedImage.isNull() == true) { return; }
@@ -125,7 +125,7 @@ void AIMImageGraphicsDelegate::increaseZoom()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::decreaseZoom()
+void MXAImageGraphicsDelegate::decreaseZoom()
 {
   _shouldFitToWindow = false;
   // Find the next scaling factor down
@@ -163,7 +163,7 @@ void AIMImageGraphicsDelegate::decreaseZoom()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::fitToWindow()
+void MXAImageGraphicsDelegate::fitToWindow()
 {
   if (m_CachedImage.isNull() == true) { return; }
   _shouldFitToWindow = true;
@@ -192,7 +192,7 @@ void AIMImageGraphicsDelegate::fitToWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::setZoomFactor(double zoomFactor)
+void MXAImageGraphicsDelegate::setZoomFactor(double zoomFactor)
 {
   this->_zoomFactor = zoomFactor;
 }
@@ -201,9 +201,9 @@ void AIMImageGraphicsDelegate::setZoomFactor(double zoomFactor)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QImage AIMImageGraphicsDelegate::_scaleImage()
+QImage MXAImageGraphicsDelegate::_scaleImage()
 {
-  //std::cout << "  AIMImageGraphicsDelegate::_scaleImage()" << std::endl;
+  //std::cout << "  MXAImageGraphicsDelegate::_scaleImage()" << std::endl;
   QSize imageSize = this->m_CachedImage.size();
  // std::cout << "    imageSize (W x H) :" << imageSize.width() << " x " << imageSize.height() << std::endl;
 //  int gvWidth = m_GraphicsView->size().width();
@@ -221,9 +221,9 @@ QImage AIMImageGraphicsDelegate::_scaleImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QImage AIMImageGraphicsDelegate::_scaleImage(QImage image)
+QImage MXAImageGraphicsDelegate::_scaleImage(QImage image)
 {
-  //std::cout << "  AIMImageGraphicsDelegate::_scaleImage()" << std::endl;
+  //std::cout << "  MXAImageGraphicsDelegate::_scaleImage()" << std::endl;
   QSize imageSize = image.size();
  // std::cout << "    imageSize (W x H) :" << imageSize.width() << " x " << imageSize.height() << std::endl;
 //  int gvWidth = m_GraphicsView->size().width();
@@ -241,9 +241,9 @@ QImage AIMImageGraphicsDelegate::_scaleImage(QImage image)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::on_parentResized()
+void MXAImageGraphicsDelegate::on_parentResized()
 {
-  //std::cout << "  AIMImageGraphicsDelegate::on_parentResized" << std::endl;
+  //std::cout << "  MXAImageGraphicsDelegate::on_parentResized" << std::endl;
 //  int gvWidth = m_GraphicsView->size().width();
 //  int gvHeight = m_GraphicsView->size().height();
  // std::cout << "    GV Size (W X H) :" << gvWidth << " x " << gvHeight << std::endl;
@@ -260,7 +260,7 @@ void AIMImageGraphicsDelegate::on_parentResized()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::updateGraphicsScene(bool update)
+void MXAImageGraphicsDelegate::updateGraphicsScene(bool update)
 {
 
   if (this->m_CachedImage.isNull() == true)
@@ -311,7 +311,7 @@ void AIMImageGraphicsDelegate::updateGraphicsScene(bool update)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AIMImageGraphicsDelegate::_displayTextMessage(QString message)
+void MXAImageGraphicsDelegate::_displayTextMessage(QString message)
 {
   if ( NULL != m_CurrentGraphicsItem )
   {

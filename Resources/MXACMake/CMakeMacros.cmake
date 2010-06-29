@@ -6,6 +6,18 @@
 #
 #///////////////////////////////////////////////////////////////////////////////
 
+
+function(MXA_ConfigureHeaderFiles BIN_DIR )
+# --------------------------------------------------------------------
+# Generate our header files
+# --------------------------------------------------------------------
+configure_file(${PROJECT_CMAKE_DIR}/ConfiguredFiles/Configuration.h.in
+               ${BIN_DIR}/MXA/Common/MXAConfiguration.h )
+configure_file(${PROJECT_CMAKE_DIR}/ConfiguredFiles/PrimitiveTypes.h.in
+               ${BIN_DIR}/MXA/Common/MXATypes.h )
+endfunction()
+
+
 #-------------------------------------------------------------------------------
 MACRO (IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
     STRING(REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
@@ -214,7 +226,7 @@ macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
     IF (NOT MSVC)
         TRY_COMPILE(HAVE_TIME_GETTIMEOFDAY
               ${CMAKE_BINARY_DIR}
-              ${PROJECT_RESOURCES_DIR}/CMake/GetTimeOfDayTest.cpp
+              ${PROJECT_CMAKE_DIR}/CoreTests/GetTimeOfDayTest.cpp
               COMPILE_DEFINITIONS -DTRY_TIME_H
               OUTPUT_VARIABLE OUTPUT)
         IF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
@@ -224,7 +236,7 @@ macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
     
         TRY_COMPILE(HAVE_SYS_TIME_GETTIMEOFDAY
               ${CMAKE_BINARY_DIR}
-              ${PROJECT_RESOURCES_DIR}/CMake/GetTimeOfDayTest.cpp
+              ${PROJECT_CMAKE_DIR}/CoreTests/GetTimeOfDayTest.cpp
               COMPILE_DEFINITIONS -DTRY_SYS_TIME_H
               OUTPUT_VARIABLE OUTPUT)
         IF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
@@ -244,7 +256,7 @@ macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
     
    if ( HAVE_SYS_TIME_GETTIMEOFDAY OR HAVE_TIME_GETTIMEOFDAY)
         try_run(RUN_RESULT_VAR COMPILE_RESULT_VAR 
-            ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_RESOURCES_DIR}/CMake/GenerateVersionString.cpp
+            ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_CMAKE_DIR}/CoreTests/GenerateVersionString.cpp
             COMPILE_DEFINITIONS ${VERSION_COMPILE_FLAGS}
             COMPILE_OUTPUT_VARIABLE VERSION_COMPILE_OUTPUT
             RUN_OUTPUT_VARIABLE VERSION_GEN_COMPLETE )
@@ -260,7 +272,7 @@ macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
         set (${PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
         set (${PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
         set (${PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
-        configure_file(${PROJECT_RESOURCES_DIR}/CMake/Version.h.in
+        configure_file(${PROJECT_CMAKE_DIR}/ConfiguredFiles/Version.h.in
                    ${GENERATED_FILE_PATH})
     endif()
     

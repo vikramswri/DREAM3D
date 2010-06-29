@@ -31,7 +31,6 @@ SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
   "Single Directory for all static libraries."
   )
 
-include ( ${PROJECT_RESOURCES_DIR}/CMake/CMakeMacros.cmake)
 
 # Set the GUI type for different platforms
 SET(GUI_TYPE )
@@ -43,7 +42,7 @@ ENDIF(WIN32)
 
 # Set some include directories
 include_directories( ${TO79_SOURCE_DIR}/Source )
-include_directories( ${TO79_SOURCE_DIR}/Source/TO79/Qt )
+include_directories( ${TO79_SOURCE_DIR}/Source/MXA/Qt )
 include_directories( ${QEMMPM_BINARY_DIR} )
 
 
@@ -67,27 +66,27 @@ SET (QEMMPM_HDRS
 IDE_SOURCE_PROPERTIES( "EMMPM/GUI" "${QEMMPM_HDRS}" "${QEMMPM_SRCS}")
 
 set (EMMPM_COMMON_QT_SRCS
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/AboutBox.cpp
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QRecentFileList.cpp
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QFileCompleter.cpp
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/AIMImageGraphicsDelegate.cpp
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QFSDroppableGraphicsView.cpp
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ApplicationAboutBoxDialog.cpp
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QRecentFileList.cpp
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFileCompleter.cpp
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/MXAImageGraphicsDelegate.cpp
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFSDroppableGraphicsView.cpp
 )
 set (EMMPM_COMMON_QT_HDRS
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/AboutBox.h
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QRecentFileList.h
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QFileCompleter.h
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/AIMImageGraphicsDelegate.h
-    ${TO79_SOURCE_DIR}/Source/TO79/Qt/QFSDroppableGraphicsView.h
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ApplicationAboutBoxDialog.h
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QRecentFileList.h
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFileCompleter.h
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/MXAImageGraphicsDelegate.h
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFSDroppableGraphicsView.h
 )
 IDE_SOURCE_PROPERTIES("EMMPM/Qt" "${EMMPM_COMMON_QT_HDRS}" "${EMMPM_COMMON_QT_SRCS}")
 
 set (EMMPM_COMMON_SRCS
-    ${TO79_SOURCE_DIR}/Source/TO79/Common/AIMImage.cpp
+    ${TO79_SOURCE_DIR}/Source/AIM/Common/AIMImage.cpp
 )
 set (EMMPM_COMMON_HDRS
-    ${TO79_SOURCE_DIR}/Source/TO79/Common/AIMArray.hpp
-    ${TO79_SOURCE_DIR}/Source/TO79/Common/AIMImage.h   )
+    ${TO79_SOURCE_DIR}/Source/AIM/Common/AIMArray.hpp
+    ${TO79_SOURCE_DIR}/Source/AIM/Common/AIMImage.h   )
 IDE_SOURCE_PROPERTIES("EMMPM/Common" "${EMMPM_COMMON_HDRS}" "${EMMPM_COMMON_SRCS}")
 
 
@@ -105,7 +104,7 @@ SET( QEMMPM_MOC_HDRS
 SET( QEMMPM_UIS
   ${QEMMPM_SOURCE_DIR}/UI_Files/QEmMpm.ui
   ${QEMMPM_SOURCE_DIR}/UI_Files/ProcessQueueDialog.ui
-  ${TO79_SOURCE_DIR}/Source/TO79/Qt/UI_Files/AboutBox.ui
+  ${TO79_SOURCE_DIR}/Source/MXA/Qt/UI_Files/ApplicationAboutBoxDialog.ui
 )
 
 # and finally any resource files

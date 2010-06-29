@@ -31,37 +31,16 @@ SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
 
 SET (TO79_PROJECT_DIR ${TO79_SOURCE_DIR})
 SET (PROJECT_RESOURCES_DIR ${TO79_SOURCE_DIR}/Resources)
-SET (TO79_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/CMake)
+SET (PROJECT_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/MXACMake)
 SET (OSX_TOOLS_DIR ${PROJECT_RESOURCES_DIR}/OSX_Tools)
 SET (PROJECT_PREFIX "TO79" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
 SET (EXE_DEBUG_EXTENSION "_debug")
 
-INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/CMakeMacros.cmake )
-INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/ConfigureChecks.cmake)
-
 # --------------------------------------------------------------------
-# Add in some compiler definitions
-# --------------------------------------------------------------------
-IF ( CMAKE_BUILD_TYPE MATCHES Debug )
-  ADD_DEFINITIONS(-DDEBUG)
-  IF (NOT WIN32)
-     #Doing this with NMake files will overwhelm the output
-    ADD_DEFINITIONS(-Wall)
-  ENDIF()
-ENDIF ( CMAKE_BUILD_TYPE MATCHES Debug )
+# including this file will kick off all the type, header and other configuration
+# checks that need to be performed in order to include all the MXA Files
+INCLUDE (${PROJECT_CMAKE_DIR}/MXACMakeCommon.cmake )
 
-# --------------------------------------------------------------------
-# If was are using GCC, make the compiler messages on a single line
-IF(CMAKE_COMPILER_IS_GNUCC)
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fmessage-length=0")
-ENDIF(CMAKE_COMPILER_IS_GNUCC)
-IF(CMAKE_COMPILER_IS_GNUCXX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
-
-IF (MSVC)
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-ENDIF()
 
 # Include some directories for the compiler
 include_directories(${PROJECT_BINARY_DIR})
@@ -87,15 +66,10 @@ FIND_PACKAGE( Qt4 REQUIRED )
 # (QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that 
 # contains a path to CMake script)
 INCLUDE( ${QT_USE_FILE} )
- 
-# --------------------------------------------------------------------
-# Generate our header files
-# --------------------------------------------------------------------
-configure_file(${PROJECT_RESOURCES_DIR}/CMake/Configuration.h.in
-               ${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h )
-configure_file(${PROJECT_RESOURCES_DIR}/CMake/PrimitiveTypes.h.in
-               ${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h )
 
+
+# --------------------------------------------------------------------
+# Generate our ReadMe and License Files
 configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
                 ${PROJECT_BINARY_DIR}/License.txt )
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
@@ -106,5 +80,5 @@ IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/
 # Add our Qt based GUI project to the list of targets
 ADD_SUBDIRECTORY( ${TO79_SOURCE_DIR}/Source/EMMPM/GUI ${TO79_BINARY_DIR}/GUI)
 
-include(${PROJECT_RESOURCES_DIR}/CMake/InstallSupportLibraries.cmake)
+include(${PROJECT_CMAKE_DIR}/InstallationSupport/InstallSupportLibraries.cmake)
 include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)

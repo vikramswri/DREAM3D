@@ -11,7 +11,7 @@
 # This CMake code sets up for CPack to be used to generate native installers
 # ------------------------------------------------------------------------------
 #INCLUDE (InstallRequiredSystemLibraries)
-INCLUDE (${PROJECT_RESOURCES_DIR}/CMake/InstallMSVCLibraries.cmake)
+INCLUDE (${PROJECT_CMAKE_DIR}/InstallationSupport/InstallMSVCLibraries.cmake)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GUI Application to run EmMpm segmentation Algorithm")
 SET(CPACK_PACKAGE_VENDOR "BlueQuartz Software, Michael A. Jackson")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_BINARY_DIR}/ReadMe.txt")

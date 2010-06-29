@@ -9,7 +9,7 @@
 #ifndef IMAGEGRAPHICSDELEGATE_H_
 #define IMAGEGRAPHICSDELEGATE_H_
 
-#include <TO79/Common/MXASetGetMacros.h>
+#include "MXA/Common/MXASetGetMacros.h"
 
 //-- Qt Includes
 #include <QtCore/QObject>
@@ -29,20 +29,20 @@ class QGraphicsScene;
 
 
 /**
- * @class AIMImageGraphicsDelegate AIMImageGraphicsDelegate.h AIMImageGraphicsDelegate.h
+ * @class MXAImageGraphicsDelegate MXAImageGraphicsDelegate.h MXAImageGraphicsDelegate.h
  * @brief A Delegate class that renders HDF5 Data to various outputs
  * @author Mike Jackson
  * @date May 29, 2007
  * @version $Revision: 1.5 $
  */
-class AIMImageGraphicsDelegate : public QObject
+class MXAImageGraphicsDelegate : public QObject
 {
   Q_OBJECT;
 
 
   public:
-  AIMImageGraphicsDelegate(QObject* parent = 0);
-  virtual ~AIMImageGraphicsDelegate();
+  MXAImageGraphicsDelegate(QObject* parent = 0);
+  virtual ~MXAImageGraphicsDelegate();
 
 
   MXA_INSTANCE_PROPERTY_m(QMainWindow*, MainWindow)
@@ -138,8 +138,8 @@ class AIMImageGraphicsDelegate : public QObject
   QImage _scaleImage();
   QImage _scaleImage(QImage image);
 
-  AIMImageGraphicsDelegate(const AIMImageGraphicsDelegate&); //Copy Constructor Not Implemented
-  void operator=(const AIMImageGraphicsDelegate&); //Copy Assignment Not Implemented
+  MXAImageGraphicsDelegate(const MXAImageGraphicsDelegate&); //Copy Constructor Not Implemented
+  void operator=(const MXAImageGraphicsDelegate&); //Copy Assignment Not Implemented
 };
 
 #endif /* IMAGEGRAPHICSDELEGATE_H_ */

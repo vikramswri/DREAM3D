@@ -5,7 +5,7 @@
 //  BSD License: http://www.opensource.org/licenses/bsd-license.html
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "AboutBox.h"
+#include "ApplicationAboutBoxDialog.h"
 #include "TO79/Common/TO79Version.h"
 
 #include <iostream>
@@ -13,7 +13,7 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AboutBox::AboutBox(QWidget *parent) :
+ApplicationAboutBoxDialog::ApplicationAboutBoxDialog(QWidget *parent) :
   QDialog(parent)
 {
   this->setupUi(this);
@@ -22,22 +22,22 @@ AboutBox::AboutBox(QWidget *parent) :
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AboutBox::~AboutBox()
+ApplicationAboutBoxDialog::~ApplicationAboutBoxDialog()
 {
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void AboutBox::setApplicationName(QString applicationName)
+void ApplicationAboutBoxDialog::setApplicationInfo(QString applicationName, QString version)
 {
   QString title("About ");
   title.append(applicationName);
   setWindowTitle(title);
 
   appName->setText(applicationName);
-  QString version("");
-  version.append(TO79::Version::PackageComplete.c_str());
+//  QString version("");
+//  version.append(TO79::Version::PackageComplete.c_str());
   appVersion->setText( version );
 }
 
