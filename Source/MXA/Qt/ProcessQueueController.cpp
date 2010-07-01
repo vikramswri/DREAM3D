@@ -75,11 +75,11 @@ void ProcessQueueController::processTask()
   {
     if (m_Tasks.count() > 0)
     {
-      QThread* t = m_Tasks.front();
+      QThread* task = m_Tasks.front();
       m_Tasks.pop_front(); // Remove the thread from the QVector
-      m_CompletedTasks.push_back(t);
-      connect(t, SIGNAL(finished()), this, SLOT(processTask()));
-      t->start();
+      m_CompletedTasks.push_back(task);
+      connect(task, SIGNAL(finished()), this, SLOT(processTask()));
+      task->start();
       m_ThreadCount++;
       //   std::cout << "m_ThreadCount: " << m_ThreadCount << std::endl;
     }

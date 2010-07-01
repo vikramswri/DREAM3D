@@ -11,7 +11,7 @@
 
 #include <ui_ProcessQueueDialog.h>
 
-#include "EmMpmTask.h"
+#include "ProcessQueueTask.h"
 #include <QtCore/QMap>
 #include <QtGui/QDialog>
 
@@ -26,7 +26,7 @@ class ProcessQueueDialog : public QDialog, private Ui::ProcessQueueDialog
     ProcessQueueDialog(QWidget *parent = 0);
     virtual ~ProcessQueueDialog();
 
-    void addProcess(EmMpmTask* task);
+    void addProcess(ProcessQueueTask* task);
 
     void clearTable();
 

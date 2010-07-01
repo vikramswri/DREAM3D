@@ -8,7 +8,7 @@
 #ifndef _AIM_IMAGE_H_
 #define _AIM_IMAGE_H_
 
-#include "MXA/Common/MXATypes.h"
+#include "MXA/MXATypes.h"
 #include "MXA/Common/MXASetGetMacros.h"
 
 #include <iostream>

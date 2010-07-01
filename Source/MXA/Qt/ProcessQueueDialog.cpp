@@ -42,7 +42,7 @@ void ProcessQueueDialog::clearTable()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void ProcessQueueDialog::addProcess(EmMpmTask* task)
+void ProcessQueueDialog::addProcess(ProcessQueueTask* task)
 {
   qint32 rowCount = this->processTableWidget->rowCount();
   QProgressBar* progBar = new QProgressBar(this);

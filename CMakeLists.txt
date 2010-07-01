@@ -35,6 +35,8 @@ SET (PROJECT_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/MXACMake)
 SET (OSX_TOOLS_DIR ${PROJECT_RESOURCES_DIR}/OSX_Tools)
 SET (PROJECT_PREFIX "TO79" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
 SET (EXE_DEBUG_EXTENSION "_debug")
+SET (MXA_INSTALL_FILES "0")
+SET (MXA_SOURCE_DIR ${TO79_PROJECT_DIR}/Source)
 
 # --------------------------------------------------------------------
 # including this file will kick off all the type, header and other configuration
@@ -78,7 +80,8 @@ IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/
 
    
 # Add our Qt based GUI project to the list of targets
-ADD_SUBDIRECTORY( ${TO79_SOURCE_DIR}/Source/EMMPM/GUI ${TO79_BINARY_DIR}/GUI)
+ADD_SUBDIRECTORY( ${TO79_SOURCE_DIR}/Source/EMMPM/GUI ${TO79_BINARY_DIR}/EMMPM)
+ADD_SUBDIRECTORY( ${TO79_SOURCE_DIR}/Source/CrossCorrelation/GUI ${TO79_BINARY_DIR}/CrossCorrelation)
 
 include(${PROJECT_CMAKE_DIR}/InstallationSupport/InstallSupportLibraries.cmake)
 include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)

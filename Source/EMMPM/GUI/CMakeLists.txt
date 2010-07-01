@@ -51,17 +51,11 @@ SET (QEMMPM_SRCS
     ${QEMMPM_SOURCE_DIR}/main.cpp
     ${QEMMPM_SOURCE_DIR}/QEmMpm.cpp
     ${QEMMPM_SOURCE_DIR}/EmMpmTask.cpp
-    ${QEMMPM_SOURCE_DIR}/EmMpmThread.cpp
-    ${QEMMPM_SOURCE_DIR}/ProcessQueueDialog.cpp
-    ${QEMMPM_SOURCE_DIR}/ProcessQueueController.cpp
 )
 
 SET (QEMMPM_HDRS
     ${QEMMPM_SOURCE_DIR}/QEmMpm.h
     ${QEMMPM_SOURCE_DIR}/EmMpmTask.h
-    ${QEMMPM_SOURCE_DIR}/EmMpmThread.h
-    ${QEMMPM_SOURCE_DIR}/ProcessQueueDialog.h
-    ${QEMMPM_SOURCE_DIR}/ProcessQueueController.h
 )
 IDE_SOURCE_PROPERTIES( "EMMPM/GUI" "${QEMMPM_HDRS}" "${QEMMPM_SRCS}")
 
@@ -71,6 +65,9 @@ set (EMMPM_COMMON_QT_SRCS
     ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFileCompleter.cpp
     ${TO79_SOURCE_DIR}/Source/MXA/Qt/MXAImageGraphicsDelegate.cpp
     ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFSDroppableGraphicsView.cpp
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueDialog.cpp
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueController.cpp
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueTask.cpp
 )
 set (EMMPM_COMMON_QT_HDRS
     ${TO79_SOURCE_DIR}/Source/MXA/Qt/ApplicationAboutBoxDialog.h
@@ -78,6 +75,9 @@ set (EMMPM_COMMON_QT_HDRS
     ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFileCompleter.h
     ${TO79_SOURCE_DIR}/Source/MXA/Qt/MXAImageGraphicsDelegate.h
     ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFSDroppableGraphicsView.h
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueDialog.h
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueController.h
+    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueTask.h
 )
 IDE_SOURCE_PROPERTIES("EMMPM/Qt" "${EMMPM_COMMON_QT_HDRS}" "${EMMPM_COMMON_QT_SRCS}")
 
@@ -103,8 +103,9 @@ SET( QEMMPM_MOC_HDRS
 # --------------------------------------------------------------------
 SET( QEMMPM_UIS
   ${QEMMPM_SOURCE_DIR}/UI_Files/QEmMpm.ui
-  ${QEMMPM_SOURCE_DIR}/UI_Files/ProcessQueueDialog.ui
+  ${TO79_SOURCE_DIR}/Source/MXA/Qt/UI_Files/ProcessQueueDialog.ui
   ${TO79_SOURCE_DIR}/Source/MXA/Qt/UI_Files/ApplicationAboutBoxDialog.ui
+
 )
 
 # and finally any resource files
@@ -135,8 +136,6 @@ SET (QEMMPM_PROJECT_SRCS
     ${EMMPM_COMMON_QT_SRCS}
     ${EMMPM_COMMON_HDRS}
     ${EMMPM_COMMON_SRCS}
-    ${Encoder_SRCS}
-    ${Encoder_HDRS}
     ${Generated_RC_SRCS} 
     ${Generated_UI_HDRS} 
     ${Generated_MOC_SRCS}

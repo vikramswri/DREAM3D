@@ -18,9 +18,7 @@
 //
 // -----------------------------------------------------------------------------
 EmMpmTask::EmMpmTask(QObject* parent) :
-  QThread(parent),
-  m_Debug(false),
-  m_Cancel(false),
+  ProcessQueueTask(parent),
   m_Beta(0.1f),
   m_Gamma(0.0f),
   m_EmIterations(5),
@@ -47,11 +45,11 @@ void EmMpmTask::run()
   UPDATE_PROGRESS(QString("Starting Segmentation"), 0);
 
   // Load the image from the input file
-  QImage image(m_InputFilePath);
+  QImage image(getInputFilePath());
   m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
   if (NULL == m_OriginalImage.data())
   {
-    std::cout << "Error loading image '" << m_InputFilePath.toStdString() << "'" << std::endl;
+    std::cout << "Error loading image '" << getInputFilePath().toStdString() << "'" << std::endl;
     emit finished();
     return;
   }
@@ -69,7 +67,7 @@ void EmMpmTask::run()
 
   execute<uint8_t, uint8_t>( m_OriginalImage->getImageBuffer(), m_SegmentedImage->getImageBuffer());
 
-  if (m_Cancel == false)
+  if (isCanceled() == false)
   {
     // Save the image to the output file:
     qint32 width = m_SegmentedImage->getImagePixelWidth();
@@ -91,10 +89,10 @@ void EmMpmTask::run()
         outImage.setPixel(i, j, dataPointer[index]);
       }
     }
-    bool ok = outImage.save(m_OutputFilePath);
+    bool ok = outImage.save(getOutputFilePath() );
     if (false == ok)
     {
-      std::cout << "Error saving segmented image to '" << m_OutputFilePath.toStdString() << "'" << std::endl;
+      std::cout << "Error saving segmented image to '" << getOutputFilePath().toStdString() << "'" << std::endl;
     }
     // Clean up memory usage
     m_SegmentedImage = AIMImage::NullPointer();
@@ -106,22 +104,6 @@ void EmMpmTask::run()
  // std::cout << "  EmMpm Task Finished." << std::endl;
 }
 
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void EmMpmTask::cancel()
-{
-  this->m_Cancel = true;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-bool EmMpmTask::isCanceled()
-{
-  return m_Cancel;
-}
 
 
 void EmMpmTask::setBeta(float beta)
@@ -148,34 +130,5 @@ void EmMpmTask::setNumberOfClasses(int numClasses)
 void EmMpmTask::useSimulatedAnnealing()
 {
   m_UseSimulatedAnnealing = true;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-AIMImage::Pointer EmMpmTask::convertQImageToGrayScaleAIMImage(QImage image)
-{
-  AIMImage::Pointer aimImage = AIMImage::New();
-  quint8* oImage = aimImage->allocateImageBuffer(image.width(), image.height(), true);
-  if (NULL == oImage)
-  {
-    return AIMImage::NullPointer();
-  }
-
-  // Copy the QImage into the AIMImage object, converting to gray scale as we go.
-  qint32 height = image.height();
-  qint32 width = image.width();
-  QRgb rgbPixel;
-  int gray;
-  qint32 index;
-  for (qint32 y=0; y<height; y++) {
-    for (qint32 x =0; x<width; x++) {
-      index = (y *  width) + x;
-      rgbPixel = image.pixel(x, y);
-      gray = qGray(rgbPixel);
-      oImage[index] = static_cast<unsigned char>(gray);
-    }
-  }
-  return aimImage;
 }
 

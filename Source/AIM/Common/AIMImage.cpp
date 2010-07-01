@@ -195,3 +195,4 @@ size_t AIMImage::getTotalPixels()
 {
   return static_cast<size_t> (_pixelSize[0] * _pixelSize[1]);
 }
+

@@ -12,9 +12,9 @@ function(MXA_ConfigureHeaderFiles BIN_DIR )
 # Generate our header files
 # --------------------------------------------------------------------
 configure_file(${PROJECT_CMAKE_DIR}/ConfiguredFiles/Configuration.h.in
-               ${BIN_DIR}/MXA/Common/MXAConfiguration.h )
+               ${BIN_DIR}/MXA/MXAConfiguration.h )
 configure_file(${PROJECT_CMAKE_DIR}/ConfiguredFiles/PrimitiveTypes.h.in
-               ${BIN_DIR}/MXA/Common/MXATypes.h )
+               ${BIN_DIR}/MXA/MXATypes.h )
 endfunction()
 
 

@@ -30,12 +30,13 @@
 #include "MXA/Qt/QRecentFileList.h"
 #include "MXA/Qt/QFileCompleter.h"
 #include "MXA/Qt/MXAImageGraphicsDelegate.h"
+#include "MXA/Qt/ProcessQueueController.h"
+#include "MXA/Qt/ProcessQueueDialog.h"
 
 // Our Own Includes
-#include "QEmMpm.h"
-#include "EmMpmTask.h"
-#include "ProcessQueueController.h"
-#include "ProcessQueueDialog.h"
+#include "QCrossCorrelation.h"
+#include "CrossCorrelationTask.h"
+
 #include "TO79/Common/TO79Version.h"
 
 
@@ -70,7 +71,7 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QEmMpm::QEmMpm(QWidget *parent) :
+QCrossCorrelation::QCrossCorrelation(QWidget *parent) :
   QMainWindow(parent),
   m_ProxyModel(NULL),
 #if defined(Q_WS_WIN)
@@ -82,7 +83,7 @@ m_OpenDialogLastDirectory("~/")
   setupUi(this);
   readSettings();
   setupGui();
-//  m_EmMpmThread = NULL;
+//  m_CrossCorrelationThread = NULL;
   m_QueueController = NULL;
   m_OutputExistsCheck = false;
   QRecentFileList* recentFileList = QRecentFileList::instance();
@@ -97,7 +98,7 @@ m_OpenDialogLastDirectory("~/")
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QEmMpm::~QEmMpm()
+QCrossCorrelation::~QCrossCorrelation()
 {
 
 }
@@ -105,7 +106,7 @@ QEmMpm::~QEmMpm()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_actionExit_triggered()
+void QCrossCorrelation::on_actionExit_triggered()
 {
   this->close();
 }
@@ -113,7 +114,7 @@ void QEmMpm::on_actionExit_triggered()
 // -----------------------------------------------------------------------------
 //  Called when the main window is closed.
 // -----------------------------------------------------------------------------
-void QEmMpm::closeEvent(QCloseEvent *event)
+void QCrossCorrelation::closeEvent(QCloseEvent *event)
 {
   qint32 err = checkDirtyDocument();
   if (err < 0)
@@ -130,7 +131,7 @@ void QEmMpm::closeEvent(QCloseEvent *event)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::resizeEvent ( QResizeEvent * event )
+void QCrossCorrelation::resizeEvent ( QResizeEvent * event )
 {
   emit parentResized();
 }
@@ -138,7 +139,7 @@ void QEmMpm::resizeEvent ( QResizeEvent * event )
 // -----------------------------------------------------------------------------
 //  Read the prefs from the local storage file
 // -----------------------------------------------------------------------------
-void QEmMpm::readSettings()
+void QCrossCorrelation::readSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
@@ -148,13 +149,10 @@ void QEmMpm::readSettings()
   QString val;
   bool ok;
   qint32 i;
-  READ_STRING_SETTING(prefs, m_Beta, "5.5");
-  READ_STRING_SETTING(prefs, m_Gamma, "0.1");
-  READ_SETTING(prefs, m_MpmIterations, ok, i, 5, Int);
-  READ_SETTING(prefs, m_EmIterations, ok, i, 5, Int);
-  READ_SETTING(prefs, m_NumClasses, ok, i, 2, Int);
-  READ_BOOL_SETTING(prefs, useSimulatedAnnealing, true);
+
   READ_BOOL_SETTING(prefs, processFolder, false);
+  READ_STRING_SETTING(prefs, fixedImageFile, "");
+  READ_STRING_SETTING(prefs, movingImageFile, "");
   READ_STRING_SETTING(prefs, sourceDirectoryLE, "");
   READ_STRING_SETTING(prefs, outputDirectoryLE, "");
   READ_STRING_SETTING(prefs, outputPrefix, "");
@@ -172,20 +170,17 @@ void QEmMpm::readSettings()
 // -----------------------------------------------------------------------------
 //  Write our prefs to file
 // -----------------------------------------------------------------------------
-void QEmMpm::writeSettings()
+void QCrossCorrelation::writeSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
 #else
   QSettings prefs(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
 #endif
-  WRITE_STRING_SETTING(prefs, m_Beta);
-  WRITE_STRING_SETTING(prefs, m_Gamma);
-  WRITE_SETTING(prefs, m_MpmIterations);
-  WRITE_SETTING(prefs, m_EmIterations);
-  WRITE_SETTING(prefs, m_NumClasses);
-  WRITE_BOOL_SETTING(prefs, useSimulatedAnnealing, useSimulatedAnnealing->isChecked());
+
   WRITE_BOOL_SETTING(prefs, processFolder, processFolder->isChecked());
+  WRITE_STRING_SETTING(prefs, fixedImageFile);
+  WRITE_STRING_SETTING(prefs, movingImageFile);
   WRITE_STRING_SETTING(prefs, sourceDirectoryLE);
   WRITE_STRING_SETTING(prefs, outputDirectoryLE);
   WRITE_STRING_SETTING(prefs, outputPrefix);
@@ -196,7 +191,7 @@ void QEmMpm::writeSettings()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::dragEnterEvent(QDragEnterEvent* e)
+void QCrossCorrelation::dragEnterEvent(QDragEnterEvent* e)
 {
   const QMimeData* dat = e->mimeData();
   QList<QUrl> urls = dat->urls();
@@ -218,7 +213,7 @@ void QEmMpm::dragEnterEvent(QDragEnterEvent* e)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::dropEvent(QDropEvent* e)
+void QCrossCorrelation::dropEvent(QDropEvent* e)
 {
   const QMimeData* dat = e->mimeData();
   QList<QUrl> urls = dat->urls();
@@ -230,7 +225,7 @@ void QEmMpm::dropEvent(QDropEvent* e)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::setupGui()
+void QCrossCorrelation::setupGui()
 {
 
 #ifdef Q_WS_MAC
@@ -290,7 +285,7 @@ void QEmMpm::setupGui()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::setWidgetListEnabled(bool b)
+void QCrossCorrelation::setWidgetListEnabled(bool b)
 {
   foreach (QWidget* w, m_WidgetList)
   {
@@ -302,7 +297,7 @@ void QEmMpm::setWidgetListEnabled(bool b)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_compositeWithOriginal_stateChanged(int state)
+void QCrossCorrelation::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
   m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
@@ -314,7 +309,7 @@ void QEmMpm::on_compositeWithOriginal_stateChanged(int state)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool QEmMpm::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
+bool QCrossCorrelation::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   QDir parent(fileinfo.dir());
@@ -324,7 +319,7 @@ bool QEmMpm::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEd
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool QEmMpm::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool QCrossCorrelation::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   if (false == fileinfo.exists())
@@ -341,7 +336,7 @@ bool QEmMpm::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QEmMpm::checkDirtyDocument()
+qint32 QCrossCorrelation::checkDirtyDocument()
 {
   qint32 err = -1;
 
@@ -373,9 +368,9 @@ qint32 QEmMpm::checkDirtyDocument()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::updateRecentFileList(const QString &file)
+void QCrossCorrelation::updateRecentFileList(const QString &file)
 {
-  // std::cout << "QEmMpm::updateRecentFileList" << std::endl;
+  // std::cout << "QCrossCorrelation::updateRecentFileList" << std::endl;
 
   // Clear the Recent Items Menu
   this->menu_RecentFiles->clear();
@@ -396,7 +391,7 @@ void QEmMpm::updateRecentFileList(const QString &file)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::openRecentFile()
+void QCrossCorrelation::openRecentFile()
 {
   //std::cout << "QRecentFileList::openRecentFile()" << std::endl;
 
@@ -413,7 +408,7 @@ void QEmMpm::openRecentFile()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::openFile(QString imageFile)
+void QCrossCorrelation::openFile(QString imageFile)
 {
   if ( true == imageFile.isEmpty() ) // User cancelled the operation
   {
@@ -430,7 +425,7 @@ void QEmMpm::openFile(QString imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_aboutBtn_clicked()
+void QCrossCorrelation::on_aboutBtn_clicked()
 {
   ApplicationAboutBoxDialog about(this);
   QString an = QCoreApplication::applicationName();
@@ -443,7 +438,7 @@ void QEmMpm::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_m_SegmentBtn_clicked()
+void QCrossCorrelation::on_registerButton_clicked()
 {
 //
 //  if (m_QueueController != NULL && m_QueueController->isFinished() == false)
@@ -459,7 +454,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
     QFile file (this->m_CurrentSegmentedFile );
     if (file.exists() == true)
     {
-     int ret = QMessageBox::warning(this, tr("QEmMpm"),
+     int ret = QMessageBox::warning(this, tr("QCrossCorrelation"),
                   tr("The Output File Already Exists\nDo you want to over write the existing file?"),
           QMessageBox::No | QMessageBox::Default,
           QMessageBox::Yes,
@@ -539,28 +534,30 @@ void QEmMpm::on_m_SegmentBtn_clicked()
   m_QueueDialog->clearTable();
 
   m_QueueController = new ProcessQueueController(this);
-  bool ok;
+//  bool ok;
   if (this->processFolder->isChecked() == false)
   {
-    if (m_CurrentImageFile.isEmpty() )
+    if (fixedImageFile->text().isEmpty() )
     {
       QMessageBox::critical(this, tr("Input File Error"),
-                                    tr("No image file is open in the viewer to segment. Use the File->Open menu itme to open an image first."),
+                                    tr("Fixed Image is not selected"),
                                     QMessageBox::Ok);
       m_QueueController->deleteLater();
       return;
     }
-    EmMpmTask* task = new EmMpmTask(NULL);
-    task->setBeta(m_Beta->text().toFloat(&ok));
-    task->setGamma(m_Gamma->text().toFloat(&ok));
-    task->setEmIterations(m_EmIterations->value() );
-    task->setMpmIterations(m_MpmIterations->value());
-    task->setNumberOfClasses(m_NumClasses->value() );
-    if (useSimulatedAnnealing->isChecked() )
+    if (movingImageFile->text().isEmpty() )
     {
-      task->useSimulatedAnnealing();
+      QMessageBox::critical(this, tr("Input File Error"),
+                                    tr("Moving Image is not selected"),
+                                    QMessageBox::Ok);
+      m_QueueController->deleteLater();
+      return;
     }
-    task->setInputFilePath(m_CurrentImageFile);
+
+    CrossCorrelationTask* task = new CrossCorrelationTask(NULL);
+
+    task->setInputFilePath(fixedImageFile->text());
+    task->setMovingImagePath(movingImageFile->text());
     QFileInfo fileInfo(m_CurrentImageFile);
     QString basename = fileInfo.completeBaseName();
     QString extension = fileInfo.suffix();
@@ -579,21 +576,14 @@ void QEmMpm::on_m_SegmentBtn_clicked()
   {
     QStringList fileList = generateInputFileList();
     int32_t count = fileList.count();
-    for (int32_t i = 0; i < count; ++i)
+    for (int32_t i = 0; i < count-1; ++i)
     {
     //  std::cout << "Adding input file:" << fileList.at(i).toStdString() << std::endl;
-      EmMpmTask* task  = new EmMpmTask(NULL);
-      task->setBeta(m_Beta->text().toFloat(&ok));
-      task->setGamma(m_Gamma->text().toFloat(&ok));
-      task->setEmIterations(m_EmIterations->value() );
-      task->setMpmIterations(m_MpmIterations->value());
-      task->setNumberOfClasses(m_NumClasses->value() );
-      if (useSimulatedAnnealing->isChecked() )
-      {
-        task->useSimulatedAnnealing();
-      }
+      CrossCorrelationTask* task  = new CrossCorrelationTask(NULL);
+
       task->setInputFilePath(sourceDirectoryLE->text() + QDir::separator() + fileList.at(i));
-      QFileInfo fileInfo(fileList.at(i));
+      task->setMovingImagePath(sourceDirectoryLE->text() + QDir::separator() + fileList.at(i+1));
+      QFileInfo fileInfo(fileList.at(i+1));
       QString basename = fileInfo.completeBaseName();
       QString extension = fileInfo.suffix();
       QString filepath = outputDirectoryLE->text();
@@ -613,11 +603,11 @@ void QEmMpm::on_m_SegmentBtn_clicked()
 
   // When the event loop of the controller starts it will signal the ProcessQueue to run
   connect(m_QueueController, SIGNAL(started()), m_QueueController, SLOT(processTask()));
-  // When the QueueController finishes it will signal the QueueController to 'quit', thus stopping the thread
+  // When the ProcessQueue finishes it will signal the QueueController to 'quit', thus stopping the thread
   connect(m_QueueController, SIGNAL(finished()), this, SLOT(queueControllerFinished()));
 
   this->m_QueueDialog->setVisible(true);
-  m_SegmentBtn->setEnabled(false);
+  registerButton->setEnabled(false);
 
   m_QueueController->start();
 }
@@ -625,15 +615,16 @@ void QEmMpm::on_m_SegmentBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::addProcess(EmMpmTask* task)
+void QCrossCorrelation::addProcess(CrossCorrelationTask* task)
 {
   this->m_QueueDialog->addProcess(task);
+
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QStringList QEmMpm::generateInputFileList()
+QStringList QCrossCorrelation::generateInputFileList()
 {
   QStringList list;
   int count = this->m_ProxyModel->rowCount();
@@ -651,7 +642,7 @@ QStringList QEmMpm::generateInputFileList()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_actionOpen_Segmented_Image_triggered()
+void QCrossCorrelation::on_actionOpen_Segmented_Image_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Segmented Image File"),
@@ -668,7 +659,7 @@ void QEmMpm::on_actionOpen_Segmented_Image_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_actionOpen_triggered()
+void QCrossCorrelation::on_actionOpen_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
@@ -686,7 +677,7 @@ void QEmMpm::on_actionOpen_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::loadImageFile(const QString &imageFile)
+void QCrossCorrelation::loadImageFile(const QString &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -699,7 +690,7 @@ void QEmMpm::loadImageFile(const QString &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::loadSegmentedImageFile(const QString  &imageFile)
+void QCrossCorrelation::loadSegmentedImageFile(const QString  &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -713,7 +704,7 @@ void QEmMpm::loadSegmentedImageFile(const QString  &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_actionSave_triggered()
+void QCrossCorrelation::on_actionSave_triggered()
 {
   saveSegmentedImage();
 }
@@ -722,7 +713,7 @@ void QEmMpm::on_actionSave_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_actionSave_As_triggered()
+void QCrossCorrelation::on_actionSave_As_triggered()
 {
   m_CurrentSegmentedFile = QString();
   saveSegmentedImage();
@@ -731,7 +722,7 @@ void QEmMpm::on_actionSave_As_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_actionClose_triggered() {
+void QCrossCorrelation::on_actionClose_triggered() {
   // std::cout << "AIMMountMaker::on_actionClose_triggered" << std::endl;
   qint32 err = -1;
   err = checkDirtyDocument();
@@ -753,7 +744,7 @@ void QEmMpm::on_actionClose_triggered() {
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_modeComboBox_currentIndexChanged()
+void QCrossCorrelation::on_modeComboBox_currentIndexChanged()
 {
   if (NULL == m_SegmentedGDelegate) { return; }
   int index = modeComboBox->currentIndex();
@@ -794,7 +785,7 @@ void QEmMpm::on_modeComboBox_currentIndexChanged()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::openSegmentedImage(QString mountImage)
+void QCrossCorrelation::openSegmentedImage(QString mountImage)
 {
   if ( true == mountImage.isEmpty() ) // User cancelled the operation
   {
@@ -808,7 +799,7 @@ void QEmMpm::openSegmentedImage(QString mountImage)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QEmMpm::saveSegmentedImage()
+qint32 QCrossCorrelation::saveSegmentedImage()
 {
   QImage image = m_SegmentedGDelegate->getCachedImage();
   int err = 0;
@@ -838,80 +829,23 @@ qint32 QEmMpm::saveSegmentedImage()
   return err;
 }
 
-#if 0
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskMessage(const QString &message)
-{
-  this->statusBar()->showMessage(message);
-}
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskProgress(int p)
+void QCrossCorrelation::queueControllerFinished()
 {
-  this->progressBar->setValue(p);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskFinished()
-{
-  m_SegmentBtn->setText("Segment");
-  // this->statusbar->showMessage("Ready To Encode");
-
-  m_EmMpmThread->deleteLater();
-  this->progressBar->setValue(0);
-
-  // Now put the image into the QGraphicsView
-  qint32 width = m_MovingImage->getImagePixelWidth();
-  qint32 height = m_MovingImage->getImagePixelHeight();
-  quint8* dataPointer = m_MovingImage->getImageBuffer();
-  QImage image(width, height, QImage::Format_Indexed8);
-  QVector<QRgb> colorTable(256);
-  for (quint32 i = 0; i < 256; ++i)
-  {
-    colorTable[i] = qRgb(i, i, i);
-  }
-  image.setColorTable(colorTable);
-  qint32 index;
-  for (qint32 j=0; j<height; j++)
-  {
-    for (qint32 i =0; i<width; i++)
-    {
-      index = (j * width) + i;
-      image.setPixel(i, j, dataPointer[index]);
-    }
-  }
-  m_SegmentedGDelegate->setCachedImage(image);
-  m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_SegmentedGDelegate->updateGraphicsScene();
-  this->setWindowModified(true);
-  setWidgetListEnabled(true);
-}
-#endif
-
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::queueControllerFinished()
-{
-  m_SegmentBtn->setEnabled(true);
+  registerButton->setEnabled(true);
   m_QueueController->deleteLater();
   m_QueueController = NULL;
- // std::cout << "QEmMpm::queueControllerFinished() --- Complete" << std::endl;
+ // std::cout << "QCrossCorrelation::queueControllerFinished() --- Complete" << std::endl;
   m_QueueDialog->setVisible(false);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QEmMpm::initGraphicViews()
+qint32 QCrossCorrelation::initGraphicViews()
 {
   qint32 err = 0;
   QImage image;
@@ -1026,7 +960,7 @@ qint32 QEmMpm::initGraphicViews()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::initWithFile(const QString imageFile, QString mountImage)
+void QCrossCorrelation::initWithFile(const QString imageFile, QString mountImage)
 {
   QFileInfo fileInfo(imageFile);
   this->m_OpenDialogLastDirectory = fileInfo.path();
@@ -1060,7 +994,7 @@ void QEmMpm::initWithFile(const QString imageFile, QString mountImage)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_filterPatternLineEdit_textChanged()
+void QCrossCorrelation::on_filterPatternLineEdit_textChanged()
 {
  // std::cout << "filterPattern: " << std::endl;
   m_ProxyModel->setFilterFixedString(filterPatternLineEdit->text());
@@ -1071,7 +1005,7 @@ void QEmMpm::on_filterPatternLineEdit_textChanged()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_processFolder_stateChanged(int state)
+void QCrossCorrelation::on_processFolder_stateChanged(int state)
 {
   bool enabled = true;
   if (state == Qt::Unchecked)
@@ -1095,7 +1029,7 @@ void QEmMpm::on_processFolder_stateChanged(int state)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_sourceDirectoryBtn_clicked() {
+void QCrossCorrelation::on_sourceDirectoryBtn_clicked() {
   this->m_OpenDialogLastDirectory = QFileDialog::getExistingDirectory(this, tr("Select Source Directory"),
                                                                this->m_OpenDialogLastDirectory,
                                                                QFileDialog::ShowDirsOnly
@@ -1111,7 +1045,7 @@ void QEmMpm::on_sourceDirectoryBtn_clicked() {
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_outputDirectoryBtn_clicked()
+void QCrossCorrelation::on_outputDirectoryBtn_clicked()
 {
   this->m_OpenDialogLastDirectory = QFileDialog::getExistingDirectory(this, tr("Select Output Directory"),
                                                                this->m_OpenDialogLastDirectory,
@@ -1126,7 +1060,7 @@ void QEmMpm::on_outputDirectoryBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::populateFileTable()
+void QCrossCorrelation::populateFileTable()
 {
   if ( NULL == m_ProxyModel)
   {
@@ -1148,7 +1082,7 @@ void QEmMpm::populateFileTable()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer QEmMpm::convertQImageToGrayScaleAIMImage(QImage image)
+AIMImage::Pointer QCrossCorrelation::convertQImageToGrayScaleAIMImage(QImage image)
 {
   AIMImage::Pointer aimImage = AIMImage::New();
   quint8* oImage = aimImage->allocateImageBuffer(image.width(), image.height(), true);
@@ -1174,3 +1108,36 @@ AIMImage::Pointer QEmMpm::convertQImageToGrayScaleAIMImage(QImage image)
   return aimImage;
 }
 
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QCrossCorrelation::on_movingImageButton_clicked()
+{
+  QString imageFile = QFileDialog::getOpenFileName(this, tr("Select Moving Image"),
+    m_OpenDialogLastDirectory,
+    tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)") );
+
+  if ( true == imageFile.isEmpty() )
+  {
+    return;
+  }
+  movingImageFile->setText(imageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QCrossCorrelation::on_fixedImageButton_clicked()
+{
+  //std::cout << "on_actionOpen_triggered" << std::endl;
+  QString imageFile = QFileDialog::getOpenFileName(this, tr("Select Fixed Image"),
+    m_OpenDialogLastDirectory,
+    tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)") );
+
+  if ( true == imageFile.isEmpty() )
+  {
+    return;
+  }
+  fixedImageFile->setText(imageFile);
+}

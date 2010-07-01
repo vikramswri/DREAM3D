@@ -18,7 +18,8 @@
 #include <QtCore/QString>
 #include <QtGui/QImage>
 
-#include "AIM/Common/AIMImage.h"
+#include "MXA/Qt/ProcessQueueTask.h"
+
 #include "TO79/Common/Random.h"
 
 #define PI  3.14159265358979323846
@@ -38,26 +39,17 @@
 * @date Dec 20, 2009
 * @version 1.0
 */
-class EmMpmTask : public QThread
+class EmMpmTask : public ProcessQueueTask
 {
 
-  Q_OBJECT
+  Q_OBJECT;
 
   public:
     EmMpmTask(QObject* parent = 0);
     virtual ~EmMpmTask();
 
 
-    /**
-     * @brief Is the task canceled
-     * @return
-     */
-    bool isCanceled();
 
-    MXA_INSTANCE_PROPERTY_m(bool, Debug);
-
-    MXA_INSTANCE_PROPERTY_m(QString, InputFilePath);
-    MXA_INSTANCE_PROPERTY_m(QString, OutputFilePath);
     void setBeta(float beta);
     void setGamma(float gamma);
     void setEmIterations(int emIterations);
@@ -96,40 +88,10 @@ class EmMpmTask : public QThread
                            Random &random);
 
 
-  signals:
-
-  /**
-   * @brief Signal sent when the encoder has a message to relay to the GUI or other output device.
-   */
-    void progressTextChanged ( const QString & progressText );
-
-    /**
-     * @brief Signal sent to the GUI to indicate progress of the encoder which is an integer value between 0 and 100.
-     * @param value
-     */
-    void progressValueChanged(int value);
-
-    /**
-     * @brief Signal sent when the encoding task is complete
-     */
-    void finished();
-    void finished(QObject *);
-
-  public slots:
-
-    /**
-     * @brief Slot to receive a signal to cancel the operation
-     */
-    void cancel();
-
     virtual void run();
 
-  protected:
-    AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
-
-
   private:
-    bool m_Cancel;
+
     float m_Beta;
     float m_Gamma;
     int m_EmIterations;
@@ -185,7 +147,7 @@ void EmMpmTask::mpm( T* imageData, S* segmentation,
 
   for (uint32_t k = 0; k < MPMIterations; ++k)
   {
-    if (m_Cancel == true) { break; }
+    if (isCanceled() == true) { break; }
     ++m_CurrentIteration;
     int progress = (float)m_CurrentIteration/(float)m_TotalIterations * 100.0f;
     emit progressValueChanged( progress );
@@ -245,7 +207,7 @@ void EmMpmTask::mpm( T* imageData, S* segmentation,
       }
     }
   }
-  if (m_Cancel == false)
+  if (isCanceled() == false)
   {
     // normalize probabilities
     for (uint32_t l = 0; l < NumberClasses; ++l)
@@ -299,6 +261,7 @@ void EmMpmTask::execute( T* imageData, S* outputData)
   local_mu = (double) s1 / s0;
   local_sigma = (s2 - s1*local_mu)/s0;
   local_sigma = sqrt(local_sigma);
+  printf("mu=%f sigma=%f\n",local_mu,local_sigma);
 
   // initialize variables on main thread
   double local_mean_estimate[MAX_CLASSES];
@@ -381,22 +344,28 @@ void EmMpmTask::execute( T* imageData, S* outputData)
  // int temp_index = 0;
   m_TotalIterations = m_EmIterations * m_MpmIterations;
   m_CurrentIteration = 0;
+
+  printf("Beta: %f\n", m_Beta);
+  printf("Gamma: %f\n", m_Gamma);
+
   // perform EM
   for (uint32_t k = 0; k < EMIterations; ++k)
   {
-    if (m_Cancel == true) { break; }
+    if (isCanceled() == true) { break; }
     double local_N[MAX_CLASSES];
 
     // perform MPM
     mpm<T>( imageData, xt, local_probs, local_yk, bt[k], gamma, local_mean_estimate, local_variance, idim, jdim, random);
     // reset model parameters to zero
-    if (m_Cancel == true) { break; }
+    if (isCanceled() == true) { break; }
+
+    /* Reset model parameters to zero */
     for (int l = 0; l < NumberClasses; ++l)
     {
       local_mean_estimate[l] = local_variance[l] = local_N[l] = 0.0;
     }
- //   millis = MXA::getMilliSeconds();
-    // update mean estimates
+
+    /* Update estimates for mean of each class */
     for (int l = 0; l < NumberClasses; ++l)
     {
       int temp_index = 0;
@@ -420,7 +389,7 @@ void EmMpmTask::execute( T* imageData, S* outputData)
       }
     }
 
-    // update variance estimates
+    /* Update estimates of variance of each class */
     for (int l = 0; l < NumberClasses; ++l)
     {
       int temp_index = 0;
@@ -443,11 +412,14 @@ void EmMpmTask::execute( T* imageData, S* outputData)
         local_variance[l] = local_variance[l] / local_N[l];
   //      std::cout << "local_variance[" << l << "]: " << local_variance[l] << std::endl;
       }
+      else
+      {
+        printf("local_N[%d] = %f\n", l, local_N[l]);
+      }
     }
-//    millis = MXA::getMilliSeconds() - millis;
-//    std::cout << "Time: " << millis << std::endl;
-    // monitor estimates of mean and variance
-    if (m_Debug)
+
+    /* Monitor estimates of mean and variance */
+    if (getDebug())
     {
       if (EMIterations < 10 || (k + 1) % (EMIterations / 10) == 0)
       {
@@ -458,9 +430,16 @@ void EmMpmTask::execute( T* imageData, S* outputData)
       }
     }
 
-  }
 
-  if (m_Cancel == false) {
+    for (int kk = 0; kk < NumberClasses; ++kk)
+    {
+
+
+    }
+
+  } /* End of EM Loop */
+
+  if (isCanceled() == false) {
     // scale range of classes to fit pixel depth
     for (size_t i = 0; i < ijdim; ++i)
     {

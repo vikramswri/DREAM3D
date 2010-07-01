@@ -12,20 +12,20 @@
 #ifndef _LOGTIME_H_
 #define _LOGTIME_H_
 
-#include <MXA/MXAConfiguration.h>
+#include <MXA/MXATypes.h>
 
-#if defined (HAVE_SYS_TIME_GETTIMEOFDAY)
+#if defined (MXA_HAVE_SYS_TIME_GETTIMEOFDAY)
 #include <sys/time.h>
 #define MXA_GET_TIME_OF_DAY gettimeofday
 #endif
 
-#if defined (HAVE_TIME_GETTIMEOFDAY) || defined (_MSC_VER)
+#if defined (MXA_HAVE_TIME_GETTIMEOFDAY) || defined (_MSC_VER)
 #include <time.h>
 #define MXA_GET_TIME_OF_DAY gettimeofday
 #endif
 
-#ifndef HAVE_TIME_GETTIMEOFDAY
-#ifndef HAVE_SYS_TIME_GETTIMEOFDAY
+#ifndef MXA_HAVE_TIME_GETTIMEOFDAY
+#ifndef MXA_HAVE_SYS_TIME_GETTIMEOFDAY
 #ifdef __MINGW32__
 #ifndef GET_TIME_OF_DAY_DEFINITION
 #define GET_TIME_OF_DAY_DEFINITION
