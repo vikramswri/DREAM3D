@@ -80,6 +80,10 @@ class CrossCorrelation
      */
     void run();
 
+    int writeOutputImage(AIMImage::Pointer image,
+                         CrossCorrelationData::Pointer ccData,
+                         const std::string &filename);
+
   protected:
     /**
      * @brief Constructor for this object.
@@ -95,6 +99,18 @@ class CrossCorrelation
      * @return Negative value on Error
      */
     int32_t registerAtFFTResolution(int fftDim );
+
+    /**
+     * @brief
+     * @param image
+     * @param importFilter
+     * @param ccData
+     * @param isFixedImage
+     */
+    void itkImportFilterFromAIMImage(AIMImage::Pointer image,
+                                     ImportFilterType::Pointer importFilter,
+                                     CrossCorrelationData::Pointer ccData,
+                                     bool isFixedImage);
 
 
     /**

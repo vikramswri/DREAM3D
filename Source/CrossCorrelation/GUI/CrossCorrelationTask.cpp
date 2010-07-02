@@ -40,12 +40,10 @@ CrossCorrelationTask::~CrossCorrelationTask()
 // -----------------------------------------------------------------------------
 void CrossCorrelationTask::run()
 {
-  std::cout << "  CrossCorrelationTask::run()" << std::endl;
-  std::cout << "    FixedImage: " << getInputFilePath().toStdString() << std::endl;
-  std::cout << "    MovingImage: " << getMovingImagePath().toStdString() << std::endl;
-  UPDATE_PROGRESS(QString("Starting Segmentation"), 0);
-
-
+//  std::cout << "  CrossCorrelationTask::run()" << std::endl;
+//  std::cout << "    FixedImage: " << getInputFilePath().toStdString() << std::endl;
+//  std::cout << "    MovingImage: " << getMovingImagePath().toStdString() << std::endl;
+  UPDATE_PROGRESS(QString("Starting Registration"), 0);
 
   // Load the fixed image into an AIMIMage object
   AIMImage::Pointer fixedImage = loadImage(getInputFilePath());
@@ -55,6 +53,7 @@ void CrossCorrelationTask::run()
     emit finished(this);
     return;
   }
+  UPDATE_PROGRESS(QString("Reading Fixed Image"), 10);
 
   // Load the moving image into an AIMImage Object
   AIMImage::Pointer movingImage = loadImage(getMovingImagePath());
@@ -64,9 +63,8 @@ void CrossCorrelationTask::run()
     emit finished(this);
     return;
   }
-
+  UPDATE_PROGRESS(QString("Reading Moving Image"), 20);
   // Create the CrossCorrelationData object and set all the fields
-  m_CrossCorrelationData = CrossCorrelationData::New();
   m_CrossCorrelationData->setFixedSlice(0);
   m_CrossCorrelationData->setMovingSlice(1);
   m_CrossCorrelationData->setImageWidth(fixedImage->getImagePixelWidth());
@@ -78,10 +76,11 @@ void CrossCorrelationTask::run()
   cc->setMovingImage(movingImage);
   cc->run();
 
+  UPDATE_PROGRESS(QString("Complete"), 100);
   // Notify observers that we are finished
   emit finished();
   emit finished(this);
-  std::cout << "  CrossCorrelation Task Finished." << std::endl;
+//  std::cout << "  CrossCorrelation Task Finished." << std::endl;
 }
 
 // -----------------------------------------------------------------------------

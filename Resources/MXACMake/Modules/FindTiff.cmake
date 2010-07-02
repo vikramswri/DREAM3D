@@ -109,7 +109,7 @@ ENDIF(TIFF_INCLUDE_DIR AND TIFF_LIBRARY)
 # Report the results.
 IF(NOT TIFF_FOUND)
   SET(TIFF_DIR_MESSAGE
-    "Tiff was not found. Make sure TIFF_LIBRARY and TIFF_INCLUDE_DIR are set or set the TIIF_INSTALL environment variable.")
+    "Tiff was not found. Make sure TIFF_LIBRARY and TIFF_INCLUDE_DIR are set or set the TIFF_INSTALL environment variable.")
   IF(NOT TIFF_FIND_QUIETLY)
     MESSAGE(STATUS "${TIFF_DIR_MESSAGE}")
   ELSE(NOT TIFF_FIND_QUIETLY)

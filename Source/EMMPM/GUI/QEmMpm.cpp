@@ -886,10 +886,10 @@ void QEmMpm::receiveTaskFinished()
       image.setPixel(i, j, dataPointer[index]);
     }
   }
-  m_SegmentedGDelegate->setCachedImage(image);
-  m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_SegmentedGDelegate->updateGraphicsScene();
+  m_ProcessedGDelegate->setCachedImage(image);
+  m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
+  m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+  m_ProcessedGDelegate->updateGraphicsScene();
   this->setWindowModified(true);
   setWidgetListEnabled(true);
 }

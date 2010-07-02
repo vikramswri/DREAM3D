@@ -80,8 +80,10 @@ IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/
 
    
 # Add our Qt based GUI project to the list of targets
-ADD_SUBDIRECTORY( ${TO79_SOURCE_DIR}/Source/EMMPM/GUI ${TO79_BINARY_DIR}/EMMPM)
-ADD_SUBDIRECTORY( ${TO79_SOURCE_DIR}/Source/CrossCorrelation/GUI ${TO79_BINARY_DIR}/CrossCorrelation)
+ADD_SUBDIRECTORY(${TO79_SOURCE_DIR}/Source/MXA ${TO79_BINARY_DIR}/MXA)
+ADD_SUBDIRECTORY(${TO79_SOURCE_DIR}/Source/EMMPM/GUI ${TO79_BINARY_DIR}/EMMPM)
+ADD_SUBDIRECTORY(${TO79_SOURCE_DIR}/Source/CrossCorrelation/GUI ${TO79_BINARY_DIR}/CrossCorrelation)
+
 
 include(${PROJECT_CMAKE_DIR}/InstallationSupport/InstallSupportLibraries.cmake)
 include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)

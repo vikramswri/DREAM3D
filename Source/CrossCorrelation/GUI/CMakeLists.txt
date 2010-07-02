@@ -77,6 +77,7 @@ IDE_SOURCE_PROPERTIES( "CrossCorrelation/GUI" "${QCrossCorrelation_HDRS}" "${QCr
 SET( CrossCorrelation_SRCS
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelation.cpp
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationData.cpp
+    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationTable.cpp
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImageFilter.cpp
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.cpp
 )
@@ -84,6 +85,7 @@ SET( CrossCorrelation_SRCS
 SET (CrossCorrelation_HDRS
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelation.h
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationData.h
+    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationTable.h
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImageFilter.h
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h
 )
@@ -129,9 +131,7 @@ QT4_WRAP_CPP( Generated_MOC_SRCS ${QCrossCorrelation_MOC_HDRS} )
 #-- Put the generated files into their own group for IDEs
 IDE_SOURCE_PROPERTIES( "Generated" "${Generated_UI_HDRS}" "${Generated_MOC_SRCS};${Generated_RC_SRCS}")
 
-include(${TO79_SOURCE_DIR}/Source/AIM/Common/Common_SourceList.cmake)
-include(${TO79_SOURCE_DIR}/Source/MXA/Common/Common_SourceList.cmake)
-include(${TO79_SOURCE_DIR}/Source/MXA/Utilities/Utilities_SourceList.cmake)
+include ( ${TO79_SOURCE_DIR}/Source/AIM/Common/Common_SourceList.cmake)
 
 # --------------------------------------------------------------------
 # -- Finally set the Project Sources to include all the sources
@@ -145,12 +145,8 @@ SET (QCrossCorrelation_PROJECT_SRCS
     ${Generated_RC_SRCS} 
     ${Generated_UI_HDRS} 
     ${Generated_MOC_SRCS}
-    ${MXA_COMMON_SRCS}
-    ${MXA_COMMON_HEADERS}
     ${MXA_QT_HDRS}
     ${MXA_QT_SRCS}
-    ${MXA_UTILITIES_SRCS}
-    ${MXA_UTILITIES_HDRS}
 )
 
 
@@ -177,7 +173,8 @@ ENDIF(Q_WS_WIN)
 ADD_EXECUTABLE( ${PROJECT_NAME} ${GUI_TYPE} ${QCrossCorrelation_PROJECT_SRCS} )
 TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
                         ${QT_LIBRARIES}
-                        ${ITK_LIBRARIES})
+                        ${ITK_LIBRARIES}
+                        MXADataModel)
 
 FindQtPlugins("qgif;qjpeg;qtiff")
 

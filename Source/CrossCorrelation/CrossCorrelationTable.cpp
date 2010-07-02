@@ -131,7 +131,7 @@ int32_t CrossCorrelationTable::writeToFile(const std::string &filename)
   for (RegistrationMap::iterator iter = this->_map.begin(); iter != this->_map.end(); ++iter )
   {
     data = (*iter).second;
-    if (data.get() != NULL) {
+    if (data.data() != NULL) {
      err = data->writeToFile(writer);
      data->PrintAsciiHeader(std::cout, "\t");
      data->print(std::cout, "\t");
@@ -167,7 +167,7 @@ void CrossCorrelationTable::printTable(std::ostream &out, const std::string &del
   for (RegistrationMap::iterator iter = this->_map.begin(); iter != this->_map.end(); ++iter )
   {
     data = (*iter).second;
-    if (data.get() != NULL) {
+    if (data.data() != NULL) {
       data->print(out, delimiter);
     }
   }

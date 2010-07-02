@@ -10,9 +10,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //-- Our Includes
 #include "CrossCorrelation.h"
-//#include <R3D/Common/R3DSliceInfo.h>
-//#include <R3D/Common/ZeissTileInfo.h>
-//#include <R3D/Registration/CommandIterationUpdate.h>
 
 //-- C++ Includes
 #include <iostream>
@@ -21,6 +18,7 @@
 // ITK Includes
 #include <itkCastImageFilter.h>
 #include <itkIndex.h>
+#include <itkResampleImageFilter.h>
 
 //-- MXA Includes
 #include "MXA/MXATypes.h"
@@ -43,6 +41,9 @@ typedef pcm::PhaseCorrelationImageRegistrationMethod<ImageType, ImageType>      
 typedef pcm::MaxPhaseCorrelationOptimizer<RegistrationType>                     OptimizerType;
 typedef itk::CastImageFilter<UCharImageType, FFTImageType>              CasterType;
 typedef itk::CastImageFilter<FFTImageType, UCharImageType>              InverseCasterType;
+
+typedef itk::ResampleImageFilter<ImageType, ImageType >                 ResampleFilterType;
+typedef itk::ImageFileWriter< UCharImageType >                          WriterType;
 
 
 // -----------------------------------------------------------------------------
@@ -130,7 +131,48 @@ void CrossCorrelation::run()
     this->m_CrossCorrelationData->setYTrans(0.0);
     setErrorCondition(-1);
   }
+}
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+int CrossCorrelation::writeOutputImage(AIMImage::Pointer image,
+                                       CrossCorrelationData::Pointer ccData,
+                                       const std::string &filename)
+{
+  //std::cout << "Transform complete - Writing tmp image" << std::endl;
+  ImportFilterType::Pointer movingImageFilter = ImportFilterType::New();
+  itkImportFilterFromAIMImage(image, movingImageFilter, ccData, false);
+
+  CasterType::Pointer castToFloat = CasterType::New();
+  castToFloat->SetInput(movingImageFilter->GetOutput());
+
+  RegistrationType::ParametersType parameters(2);
+  parameters[0] = ccData->getXTrans();
+  parameters[1] = ccData->getYTrans();
+
+  RegistrationType::TransformPointer transform = RegistrationType::TransformType::New();
+  transform->SetParameters(parameters);
+
+  ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+  resampler->SetInput( castToFloat->GetOutput() );
+  resampler->SetTransform(transform);
+
+  resampler->SetSize( movingImageFilter->GetRegion().GetSize());
+  resampler->SetOutputOrigin( movingImageFilter->GetOrigin() );
+  resampler->SetOutputSpacing( movingImageFilter->GetSpacing() );
+  resampler->SetDefaultPixelValue( 0 );
+
+  InverseCasterType::Pointer castToUChar = InverseCasterType::New();
+  castToUChar->SetInput(resampler->GetOutput());
+
+  WriterType::Pointer writer = WriterType::New();
+  writer->SetInput( castToUChar->GetOutput() );
+  writer->SetFileName(filename.c_str());
+  writer->Update();
+
+ // std::cout << "Writing complete" << std::endl;
+  return 1;
 }
 
 
@@ -160,8 +202,51 @@ int32_t CrossCorrelation::registerAtFFTResolution(int fftDim )
   return registerImages(fxImport, mvImport);
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void CrossCorrelation::itkImportFilterFromAIMImage(AIMImage::Pointer image,
+                                                   ImportFilterType::Pointer importFilter,
+                                                   CrossCorrelationData::Pointer ccData,
+                                                   bool isFixedImage)
+{
+  ImportFilterType::SizeType size;
+  size[0] = image->getImagePixelWidth(); // size along X
+  size[1] = image->getImagePixelHeight(); // size along Y
 
+  ImportFilterType::IndexType start;
+  start.Fill(0);
+  ImportFilterType::RegionType region;
+  region.SetIndex(start);
+  region.SetSize(size);
+  importFilter->SetRegion(region);
 
+  double origin[pcm::Dimension];
+  if ( true == isFixedImage)
+  {
+    origin[0] = ccData->getXFixedOrigin(); // X coordinate
+    origin[1] = ccData->getYFixedOrigin(); // Y coordinate
+  }
+  else
+  {
+    origin[0] = ccData->getXMovingOrigin(); // X coordinate
+    origin[1] = ccData->getYMovingOrigin(); // Y coordinate
+  }
+
+  //mxa_log << logTime() << "Slice: " << sliceInfo->getSliceNumber() << " origin: " << origin[0] << ", " << origin[1] << std::endl;
+
+  importFilter->SetOrigin(origin);
+
+  double spacing[pcm::Dimension];
+  spacing[0] = ccData->getScaling(); //  /xScale * 1000.0; // pixels per millimeter along X direction
+  spacing[1] = ccData->getScaling(); //  /yScale * 1000.0; // pixels per millimeter along Y direction
+  importFilter->SetSpacing(spacing);
+
+  const bool importImageFilterWillOwnTheBuffer = false;
+  importFilter->SetImportPointer(image->getImageBuffer(), size[0] * size[1], importImageFilterWillOwnTheBuffer);
+  image->setManageMemory(true);
+  importFilter->Update();
+}
 
 // -----------------------------------------------------------------------------
 //
@@ -303,7 +388,6 @@ void CrossCorrelation::createCorrelationImages(  ImportFilterType::Pointer fxImp
    typedef itk::ImageRegionIterator<FFTImageType>                       IFFTIteratorType;
    typedef itk::CastImageFilter<FFTImageType, UCharImageType>        InverseCasterType;
    typedef itk::RescaleIntensityImageFilter<FFTImageType, UCharImageType > RescaleFilterType;
-   typedef itk::ImageFileWriter< UCharImageType >                              WriterType;
    typedef itk::FFTShiftImageFilter< UCharImageType, UCharImageType >          FFTShiftImageFilterType;
 
     FFTFilterType::Pointer fxFFTFilter = FFTFilterType::New();

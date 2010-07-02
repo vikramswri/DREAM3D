@@ -36,6 +36,7 @@
 // Our Own Includes
 #include "QCrossCorrelation.h"
 #include "CrossCorrelationTask.h"
+#include "CrossCorrelation/CrossCorrelation.h"
 
 #include "TO79/Common/TO79Version.h"
 
@@ -93,6 +94,8 @@ m_OpenDialogLastDirectory("~/")
   //this->setAcceptDrops(true);
   m_QueueDialog = new ProcessQueueDialog(this);
   m_QueueDialog->setVisible(false);
+
+  m_CrossCorrelationTable = CrossCorrelationTable::New();
 }
 
 // -----------------------------------------------------------------------------
@@ -147,8 +150,8 @@ void QCrossCorrelation::readSettings()
   QSettings prefs(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
 #endif
   QString val;
-  bool ok;
-  qint32 i;
+//  bool ok;
+//  qint32 i;
 
   READ_BOOL_SETTING(prefs, processFolder, false);
   READ_STRING_SETTING(prefs, fixedImageFile, "");
@@ -238,7 +241,7 @@ void QCrossCorrelation::setupGui()
   resize(mySize);
 #endif
   m_OriginalImageGScene = NULL;
-  m_SegmentedImageGScene = NULL;
+  m_ProcessedImageGScene = NULL;
 
   modeComboBox->blockSignals(true);
 
@@ -268,7 +271,6 @@ void QCrossCorrelation::setupGui()
   modeComboBox->insertItem(20, "Overlay");
 #endif
 
-
   modeComboBox->setCurrentIndex(0);
   modeComboBox->blockSignals(false);
 
@@ -278,8 +280,70 @@ void QCrossCorrelation::setupGui()
            this, SLOT(loadImageFile(const QString &)), Qt::QueuedConnection);
 
   connect (segmentedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
-           this, SLOT(loadSegmentedImageFile(const QString &)));
+           this, SLOT(loadProcessedImageFile(const QString &)));
 
+  QFileCompleter* com = new QFileCompleter(this, false);
+  fixedImageFile->setCompleter(com);
+  QObject::connect( com, SIGNAL(activated(const QString &)),
+           this, SLOT(on_fixedImageFile_textChanged(const QString &)));
+
+  QFileCompleter* com1 = new QFileCompleter(this, false);
+  movingImageFile->setCompleter(com1);
+  QObject::connect( com1, SIGNAL(activated(const QString &)),
+           this, SLOT(on_movingImageFile_textChanged(const QString &)));
+
+
+  QFileCompleter* com2 = new QFileCompleter(this, true);
+  sourceDirectoryLE->setCompleter(com2);
+  QObject::connect( com2, SIGNAL(activated(const QString &)),
+           this, SLOT(on_sourceDirectoryLE_textChanged(const QString &)));
+
+  QFileCompleter* com3 = new QFileCompleter(this, true);
+  outputDirectoryLE->setCompleter(com3);
+  QObject::connect( com3, SIGNAL(activated(const QString &)),
+           this, SLOT(on_outputDirectoryLE_textChanged(const QString &)));
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QCrossCorrelation::on_modeComboBox_currentIndexChanged()
+{
+  if (NULL == m_ProcessedGDelegate) { return; }
+  int index = modeComboBox->currentIndex();
+  switch(index)
+  {
+  case 0: m_ProcessedGDelegate->setExclusionMode(); break;
+  case 1: m_ProcessedGDelegate->setDifferenceMode(); break;
+  case 2: m_ProcessedGDelegate->setPlusMode(); break;
+  case 3: m_ProcessedGDelegate->setMultiplyMode(); break;
+  case 4: m_ProcessedGDelegate->setScreenMode(); break;
+  case 5: m_ProcessedGDelegate->setDarkenMode(); break;
+  case 6: m_ProcessedGDelegate->setLightenMode(); break;
+  case 7: m_ProcessedGDelegate->setColorDodgeMode(); break;
+  case 8: m_ProcessedGDelegate->setColorBurnMode(); break;
+  case 9: m_ProcessedGDelegate->setHardLightMode(); break;
+  case 10: m_ProcessedGDelegate->setSoftLightMode(); break;
+
+  case 11: m_ProcessedGDelegate->setSourceMode(); break;
+  case 12: m_ProcessedGDelegate->setDestinationMode(); break;
+  case 13: m_ProcessedGDelegate->setSourceOverMode(); break;
+  case 14: m_ProcessedGDelegate->setDestinationOverMode(); break;
+  case 15: m_ProcessedGDelegate->setSourceInMode(); break;
+  case 16: m_ProcessedGDelegate->setDestInMode(); break;
+  case 17: m_ProcessedGDelegate->setDestOutMode(); break;
+  case 18: m_ProcessedGDelegate->setSourceAtopMode(); break;
+  case 19: m_ProcessedGDelegate->setDestAtopMode(); break;
+  case 20: m_ProcessedGDelegate->setOverlayMode(); break;
+
+  default:
+    m_ProcessedGDelegate->setExclusionMode(); break;
+  }
+
+  m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
+  m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+  m_ProcessedGDelegate->updateGraphicsScene();
 }
 
 // -----------------------------------------------------------------------------
@@ -300,9 +364,9 @@ void QCrossCorrelation::setWidgetListEnabled(bool b)
 void QCrossCorrelation::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
-  m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_SegmentedGDelegate->updateGraphicsScene();
+  m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
+  m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+  m_ProcessedGDelegate->updateGraphicsScene();
 }
 
 
@@ -414,7 +478,7 @@ void QCrossCorrelation::openFile(QString imageFile)
   {
     return;
   }
-  this->initWithFile(imageFile, m_CurrentSegmentedFile);
+  this->initWithFile(imageFile, m_CurrentProcessedFile);
 
   // Tell the RecentFileList to update itself then broadcast those changes.
   QRecentFileList::instance()->addFile(imageFile);
@@ -451,7 +515,7 @@ void QCrossCorrelation::on_registerButton_clicked()
 
   if (this->m_OutputExistsCheck == false)
   {
-    QFile file (this->m_CurrentSegmentedFile );
+    QFile file (this->m_CurrentProcessedFile );
     if (file.exists() == true)
     {
      int ret = QMessageBox::warning(this, tr("QCrossCorrelation"),
@@ -473,7 +537,7 @@ void QCrossCorrelation::on_registerButton_clicked()
         outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
         if (!outputFile.isNull())
         {
-          this->m_CurrentSegmentedFile = "";
+          this->m_CurrentProcessedFile = "";
           this->m_OutputExistsCheck = true;
         }
         else // The user clicked cancel from the save file dialog
@@ -530,6 +594,25 @@ void QCrossCorrelation::on_registerButton_clicked()
     }
 
   }
+  else
+  {
+   QFileInfo fi(fixedImageFile->text());
+   if (fi.exists() == false)
+   {
+     QMessageBox::critical(this, tr("Fixed Image File Error"),
+                                   tr("Fixed Image does not exist. Please check the path."),
+                                   QMessageBox::Ok);
+     return;
+   }
+   QFileInfo mfi(movingImageFile->text());
+   if (mfi.exists() == false)
+   {
+     QMessageBox::critical(this, tr("Moving Image File Error"),
+                                   tr("Moving Image does not exist. Please check the path."),
+                                   QMessageBox::Ok);
+     return;
+   }
+  }
 
   m_QueueDialog->clearTable();
 
@@ -558,7 +641,7 @@ void QCrossCorrelation::on_registerButton_clicked()
 
     task->setInputFilePath(fixedImageFile->text());
     task->setMovingImagePath(movingImageFile->text());
-    QFileInfo fileInfo(m_CurrentImageFile);
+    QFileInfo fileInfo(movingImageFile->text());
     QString basename = fileInfo.completeBaseName();
     QString extension = fileInfo.suffix();
     QString filepath = fileInfo.absolutePath();
@@ -568,6 +651,9 @@ void QCrossCorrelation::on_registerButton_clicked()
     filepath.append(".");
     filepath.append(extension);
     task->setOutputFilePath(filepath);
+    CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
+    task->setCrossCorrelationData(crossCorrelationData);
+    m_CrossCorrelationTable->addCrossCorrelationData(0, crossCorrelationData);
 
     m_QueueController->addTask(static_cast<QThread*>(task) );
     this->addProcess(task);
@@ -576,6 +662,8 @@ void QCrossCorrelation::on_registerButton_clicked()
   {
     QStringList fileList = generateInputFileList();
     int32_t count = fileList.count();
+    CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
+    m_CrossCorrelationTable->addCrossCorrelationData(0, crossCorrelationData);
     for (int32_t i = 0; i < count-1; ++i)
     {
     //  std::cout << "Adding input file:" << fileList.at(i).toStdString() << std::endl;
@@ -594,6 +682,9 @@ void QCrossCorrelation::on_registerButton_clicked()
       filepath.append(".");
       filepath.append(outputImageType->currentText());
       task->setOutputFilePath(filepath);
+      CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
+      task->setCrossCorrelationData(crossCorrelationData);
+      m_CrossCorrelationTable->addCrossCorrelationData(i+1, crossCorrelationData);
 
       m_QueueController->addTask(static_cast<QThread*>(task) );
       this->addProcess(task);
@@ -618,7 +709,6 @@ void QCrossCorrelation::on_registerButton_clicked()
 void QCrossCorrelation::addProcess(CrossCorrelationTask* task)
 {
   this->m_QueueDialog->addProcess(task);
-
 }
 
 // -----------------------------------------------------------------------------
@@ -642,7 +732,7 @@ QStringList QCrossCorrelation::generateInputFileList()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_actionOpen_Segmented_Image_triggered()
+void QCrossCorrelation::on_actionOpen_Processed_Image_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Segmented Image File"),
@@ -653,7 +743,7 @@ void QCrossCorrelation::on_actionOpen_Segmented_Image_triggered()
   {
     return;
   }
-  openSegmentedImage(imageFile);
+  openProcessedImage(imageFile);
 }
 
 // -----------------------------------------------------------------------------
@@ -690,13 +780,13 @@ void QCrossCorrelation::loadImageFile(const QString &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::loadSegmentedImageFile(const QString  &imageFile)
+void QCrossCorrelation::loadProcessedImageFile(const QString  &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
     return;
   }
-  openSegmentedImage(imageFile);
+  openProcessedImage(imageFile);
 }
 
 
@@ -706,7 +796,7 @@ void QCrossCorrelation::loadSegmentedImageFile(const QString  &imageFile)
 // -----------------------------------------------------------------------------
 void QCrossCorrelation::on_actionSave_triggered()
 {
-  saveSegmentedImage();
+  saveProcessedImage();
 }
 
 
@@ -715,8 +805,8 @@ void QCrossCorrelation::on_actionSave_triggered()
 // -----------------------------------------------------------------------------
 void QCrossCorrelation::on_actionSave_As_triggered()
 {
-  m_CurrentSegmentedFile = QString();
-  saveSegmentedImage();
+  m_CurrentProcessedFile = QString();
+  saveProcessedImage();
 }
 
 // -----------------------------------------------------------------------------
@@ -741,84 +831,45 @@ void QCrossCorrelation::on_actionClose_triggered() {
 }
 
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_modeComboBox_currentIndexChanged()
-{
-  if (NULL == m_SegmentedGDelegate) { return; }
-  int index = modeComboBox->currentIndex();
-  switch(index)
-  {
-  case 0: m_SegmentedGDelegate->setExclusionMode(); break;
-  case 1: m_SegmentedGDelegate->setSourceMode(); break;
-  case 2: m_SegmentedGDelegate->setDestinationMode(); break;
-  case 3: m_SegmentedGDelegate->setSourceOverMode(); break;
-  case 4: m_SegmentedGDelegate->setDestinationOverMode(); break;
-  case 5: m_SegmentedGDelegate->setSourceInMode(); break;
-  case 6: m_SegmentedGDelegate->setDestInMode(); break;
-  case 7: m_SegmentedGDelegate->setDifferenceMode(); break;
-  case 8: m_SegmentedGDelegate->setDestOutMode(); break;
-  case 9: m_SegmentedGDelegate->setSourceAtopMode(); break;
-  case 10: m_SegmentedGDelegate->setDestAtopMode(); break;
-  case 11: m_SegmentedGDelegate->setPlusMode(); break;
-  case 12: m_SegmentedGDelegate->setMultiplyMode(); break;
-  case 13: m_SegmentedGDelegate->setScreenMode(); break;
-  case 14: m_SegmentedGDelegate->setOverlayMode(); break;
-  case 15: m_SegmentedGDelegate->setDarkenMode(); break;
-  case 16: m_SegmentedGDelegate->setLightenMode(); break;
-  case 17: m_SegmentedGDelegate->setColorDodgeMode(); break;
-  case 18: m_SegmentedGDelegate->setColorBurnMode(); break;
-  case 19: m_SegmentedGDelegate->setHardLightMode(); break;
-  case 20: m_SegmentedGDelegate->setSoftLightMode(); break;
-
-
-  default:
-    m_SegmentedGDelegate->setExclusionMode(); break;
-  }
-
-  m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_SegmentedGDelegate->updateGraphicsScene();
-}
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::openSegmentedImage(QString mountImage)
+void QCrossCorrelation::openProcessedImage(QString processedImage)
 {
-  if ( true == mountImage.isEmpty() ) // User cancelled the operation
+  if ( true == processedImage.isEmpty() ) // User cancelled the operation
   {
     return;
   }
-  this->initWithFile(m_CurrentImageFile, mountImage);
+  this->initWithFile(m_CurrentImageFile, processedImage);
   setWidgetListEnabled(true);
+  on_modeComboBox_currentIndexChanged();
 }
 
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QCrossCorrelation::saveSegmentedImage()
+qint32 QCrossCorrelation::saveProcessedImage()
 {
-  QImage image = m_SegmentedGDelegate->getCachedImage();
+  QImage image = m_ProcessedGDelegate->getCachedImage();
   int err = 0;
-  if (m_CurrentSegmentedFile.isEmpty())
+  if (m_CurrentProcessedFile.isEmpty())
   {
     QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Segmented.tif";
     outputFile = QFileDialog::getSaveFileName(this, tr("Save Segmented Image As ..."), outputFile, tr("Images (*.tif *.bmp *.jpg *.png)"));
     if ( !outputFile.isEmpty() )
     {
-      m_CurrentSegmentedFile = outputFile;
+      m_CurrentProcessedFile = outputFile;
     }
     else {
       return -1;
     }
   }
 
-  bool ok = image.save(m_CurrentSegmentedFile);
+  bool ok = image.save(m_CurrentProcessedFile);
   if (ok == true) {
-    segmentedImageTitle->setText(m_CurrentSegmentedFile);
+    processedImageTitle->setText(m_CurrentProcessedFile);
   }
   else
   {
@@ -835,12 +886,125 @@ qint32 QCrossCorrelation::saveSegmentedImage()
 // -----------------------------------------------------------------------------
 void QCrossCorrelation::queueControllerFinished()
 {
+  this->statusBar()->showMessage("Accumulating Translations and writing final images");
+  m_QueueDialog->setVisible(false);
+
+  CrossCorrelation::Pointer cc = CrossCorrelation::New();
+  CrossCorrelationData::Pointer ccData = CrossCorrelationData::NullPointer();
+  if (this->processFolder->isChecked() == false)
+   {
+    AIMImage::Pointer image = loadImage(movingImageFile->text());
+    ccData = m_CrossCorrelationTable->getCrossCorrelationData(0);
+
+    QFileInfo fileInfo(movingImageFile->text());
+    QString basename = fileInfo.completeBaseName();
+    QString extension = fileInfo.suffix();
+    QString filepath = fileInfo.absolutePath();
+    filepath.append(QDir::separator());
+    filepath.append(basename);
+    filepath.append("_Registered");
+    filepath.append(".");
+    filepath.append(extension);
+
+    cc->writeOutputImage(image, ccData, filepath.toStdString());
+    loadImageFile(fixedImageFile->text());
+    loadProcessedImageFile(filepath);
+
+   }
+  else
+  {
+    QStringList fileList = generateInputFileList();
+    double xt = 0.0;
+    double yt = 0.0;
+    int32_t count = fileList.count();
+    for (int32_t i = 0; i < count; ++i)
+    {
+      writeRegisteredImage(fileList.at(i), i, xt, yt);
+    }
+  }
+
   registerButton->setEnabled(true);
   m_QueueController->deleteLater();
   m_QueueController = NULL;
- // std::cout << "QCrossCorrelation::queueControllerFinished() --- Complete" << std::endl;
-  m_QueueDialog->setVisible(false);
+  this->statusBar()->showMessage("Registration Complete");
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+int QCrossCorrelation::writeRegisteredImage(QString file, int i, double &xt, double &yt)
+{
+  QString inFile(sourceDirectoryLE->text() + QDir::separator() + file);
+  AIMImage::Pointer image = loadImage(inFile);
+  if (NULL == image)
+  {
+    qDebug("Error Loading image to translate.");
+    return -1;
+  }
+  CrossCorrelationData::Pointer ccData = m_CrossCorrelationTable->getCrossCorrelationData(i);
+  // Accumulate the translations
+  xt = xt + ccData->getXTrans();
+  yt = yt + ccData->getYTrans();
+  ccData->setXTrans(xt);
+  ccData->setYTrans(yt);
+
+  QFileInfo fileInfo(file);
+  QString basename = fileInfo.completeBaseName();
+  QString extension = fileInfo.suffix();
+  QString filepath = outputDirectoryLE->text();
+  filepath.append(QDir::separator());
+  filepath.append(outputPrefix->text());
+  filepath.append(basename);
+  filepath.append(outputSuffix->text());
+  filepath.append(".");
+  filepath.append(outputImageType->currentText());
+
+  CrossCorrelation::Pointer cc = CrossCorrelation::New();
+  cc->writeOutputImage(image, ccData, filepath.toStdString());
+  if (i == 0)
+  {
+    loadImageFile(filepath);
+  }
+  if ( i == 1)
+  {
+    loadProcessedImageFile(filepath);
+  }
+  return 1;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+AIMImage::Pointer QCrossCorrelation::loadImage(QString filePath)
+{
+//  std::cout << " loadImage(): filePath: " << filePath.toStdString() << std::endl;
+  QImage image;
+  AIMImage::Pointer aimImage = AIMImage::NullPointer();
+  if (filePath.isEmpty() == false)
+  {
+    image = QImage(filePath);
+    if (image.isNull() == true)
+    {
+      QString m("Error loading image from ");
+      m.append(filePath);
+      qDebug(m.toAscii());
+      return aimImage;
+    }
+    QVector<QRgb> colorTable(256);
+    for (quint32 i = 0; i < 256; ++i)
+    {
+      colorTable[i] = qRgb(i, i, i);
+    }
+    image.setColorTable(colorTable);
+    aimImage = convertQImageToGrayScaleAIMImage(image);
+    if (NULL == aimImage.data())
+    {
+      return aimImage;
+    }
+  }
+  return aimImage;
+}
+
 
 // -----------------------------------------------------------------------------
 //
@@ -901,56 +1065,56 @@ qint32 QCrossCorrelation::initGraphicViews()
   // If we have NOT loaded a segmented file AND we have a valid Original Image, then
   // create the Segmented image based on the input image.
   QImage segImage;
-  if (m_CurrentSegmentedFile.isEmpty() == true && NULL != m_OriginalImage.data() )
+  if (m_CurrentProcessedFile.isEmpty() == true && NULL != m_OriginalImage.data() )
   {
     segImage = image;
-    m_SegmentedImage = convertQImageToGrayScaleAIMImage(segImage);
-    if (NULL == m_SegmentedImage.data())
+    m_ProcessedImage = convertQImageToGrayScaleAIMImage(segImage);
+    if (NULL == m_ProcessedImage.data())
     {
       return -1;
     }
   }
   else // We have an actual segmented image file that the user wants us to read.
   {
-    segImage = QImage(m_CurrentSegmentedFile);
+    segImage = QImage(m_CurrentProcessedFile);
     if (segImage.isNull() == true)
     {
       this->statusbar->showMessage("Error loading Segmented image from file");
       return -1;
     }
     // Convert it to an AIMImage in GrayScale
-    m_SegmentedImage = convertQImageToGrayScaleAIMImage(segImage);
-    if (NULL == m_SegmentedImage.data() )
+    m_ProcessedImage = convertQImageToGrayScaleAIMImage(segImage);
+    if (NULL == m_ProcessedImage.data() )
     {
       std::cout << "Error loading Segmented image from file" << std::endl;
       return -1;
     }
   }
 
-  if (NULL != m_SegmentedImage.data() )
+  if (NULL != m_ProcessedImage.data() )
   {
 
 
     // Create the QGraphicsScene Objects
-    m_SegmentedImageGScene = new QGraphicsScene(this);
-    segmentedImageGView->setScene(m_SegmentedImageGScene);
-    m_SegmentedGDelegate = new MXAImageGraphicsDelegate(this);
-    m_SegmentedGDelegate->setGraphicsView(segmentedImageGView);
-    m_SegmentedGDelegate->setGraphicsScene(m_SegmentedImageGScene);
-    m_SegmentedGDelegate->setMainWindow(this);
-    m_SegmentedGDelegate->setCachedImage(segImage);
-    m_SegmentedGDelegate->fitToWindow();
+    m_ProcessedImageGScene = new QGraphicsScene(this);
+    segmentedImageGView->setScene(m_ProcessedImageGScene);
+    m_ProcessedGDelegate = new MXAImageGraphicsDelegate(this);
+    m_ProcessedGDelegate->setGraphicsView(segmentedImageGView);
+    m_ProcessedGDelegate->setGraphicsScene(m_ProcessedImageGScene);
+    m_ProcessedGDelegate->setMainWindow(this);
+    m_ProcessedGDelegate->setCachedImage(segImage);
+    m_ProcessedGDelegate->fitToWindow();
     connect(this, SIGNAL(parentResized () ),
-            m_SegmentedGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
+            m_ProcessedGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
 
     connect(zoomIn_mount, SIGNAL(clicked()),
-            m_SegmentedGDelegate, SLOT(increaseZoom() ));
+            m_ProcessedGDelegate, SLOT(increaseZoom() ));
 
     connect(zoomOut_mount, SIGNAL(clicked()),
-            m_SegmentedGDelegate, SLOT(decreaseZoom() ));
+            m_ProcessedGDelegate, SLOT(decreaseZoom() ));
 
     connect(fitToWindow_mount, SIGNAL(clicked()),
-            m_SegmentedGDelegate, SLOT(fitToWindow() ));
+            m_ProcessedGDelegate, SLOT(fitToWindow() ));
   }
   return err;
 }
@@ -960,15 +1124,16 @@ qint32 QCrossCorrelation::initGraphicViews()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::initWithFile(const QString imageFile, QString mountImage)
+void QCrossCorrelation::initWithFile(const QString imageFile, QString processedImage)
 {
   QFileInfo fileInfo(imageFile);
   this->m_OpenDialogLastDirectory = fileInfo.path();
 
   m_CurrentImageFile = imageFile;
-  m_CurrentSegmentedFile = mountImage;
+  m_CurrentProcessedFile = processedImage;
 
   qint32 err = initGraphicViews();
+
   if (err < 0)
   {
     this->statusBar()->showMessage("Error Loading Original Image");
@@ -977,15 +1142,15 @@ void QCrossCorrelation::initWithFile(const QString imageFile, QString mountImage
   this->originalImageTitle->setText(fileInfo.fileName());
   this->originalImageTitle->setToolTip(m_CurrentImageFile);
 
-  if (m_CurrentSegmentedFile.isEmpty())
+  if (m_CurrentProcessedFile.isEmpty())
   {
-    this->segmentedImageTitle->setText("Unsaved Segmented Image");
+    this->processedImageTitle->setText("Unsaved Segmented Image");
     this->setWindowModified(true);
   }
   else {
-    QFileInfo segInfo(m_CurrentSegmentedFile);
-    this->segmentedImageTitle->setText(segInfo.fileName());
-    this->segmentedImageTitle->setToolTip(m_CurrentSegmentedFile);
+    QFileInfo segInfo(m_CurrentProcessedFile);
+    this->processedImageTitle->setText(segInfo.fileName());
+    this->processedImageTitle->setToolTip(m_CurrentProcessedFile);
   }
   this->statusBar()->showMessage("Input Image Loaded");
 }
@@ -1141,3 +1306,36 @@ void QCrossCorrelation::on_fixedImageButton_clicked()
   }
   fixedImageFile->setText(imageFile);
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QCrossCorrelation::on_fixedImageFile_textChanged(const QString & text)
+{
+  verifyPathExists(fixedImageFile->text(), fixedImageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QCrossCorrelation::on_movingImageFile_textChanged(const QString & text)
+{
+  verifyPathExists(movingImageFile->text(), movingImageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QCrossCorrelation::on_sourceDirectoryLE_textChanged(const QString & text)
+{
+  verifyPathExists(sourceDirectoryLE->text(), sourceDirectoryLE);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QCrossCorrelation::on_outputDirectoryLE_textChanged(const QString & text)
+{
+  verifyPathExists(outputDirectoryLE->text(), outputDirectoryLE);
+}
+

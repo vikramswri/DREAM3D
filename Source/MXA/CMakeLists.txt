@@ -1,0 +1,42 @@
+project(MXADataModel)
+
+# Prepend our own "FindTiff" code in front of what CMake itself provides
+set(CMAKE_MODULE_PATH ${PROJECT_CMAKE_DIR}/Modules ${CMAKE_MODULE_PATH} )
+FIND_PACKAGE(Tiff)
+IF (NOT TIFF_FOUND)
+      MESSAGE (FATAL_ERROR " Tiff Library was NOT Found and is needed.")
+ENDIF (NOT TIFF_FOUND)
+INCLUDE_DIRECTORIES(${TIFF_INCLUDE_DIRS})
+
+
+set (Project_SRCS "")
+set (Project_HDRS "")
+
+Macro(MXACompileDir DirName)
+include(${MXACore_SOURCE_DIR}/${DirName}/${DirName}_SourceList.cmake)
+set (Project_SRCS ${Project_SRCS} ${MXA_${DirName}_SRCS})
+endMacro()
+
+MXACompileDir(Common)
+MXACompileDir(BMPIO)
+MXACompileDir(Utilities)
+MXACompileDir(BMPIO)
+
+INCLUDE (${PROJECT_CMAKE_DIR}/MXACMakeCommon.cmake )
+
+include_directories(${MXACore_SOURCE_DIR}/..)
+include_directories(${MXACore_BINARY_DIR}/..)
+add_definitions(-DQT_CORE_LIB)
+
+# - Check to see if any other project is redefining the library names
+IF ( NOT DEFINED  MXADATAMODEL_LIB_NAME)
+  SET (MXADATAMODEL_LIB_NAME MXADataModel)
+ENDIF ( NOT DEFINED MXADATAMODEL_LIB_NAME )
+
+
+add_library(${MXADATAMODEL_LIB_NAME} STATIC ${Project_SRCS})
+StaticLibraryProperties( ${MXADATAMODEL_LIB_NAME} ${EXE_DEBUG_EXTENSION})
+
+message(STATUS "MXADataModel_SOURCE_DIR: ${MXADataModel_SOURCE_DIR}/Utilities/BmpToTiff.cpp")
+add_executable(bmp2tiff Utilities/BmpToTiff.cpp)
+target_link_libraries(bmp2tiff ${MXADATAMODEL_LIB_NAME} ${TIFF_LIBRARY})

@@ -23,6 +23,7 @@
 #include <ui_QCrossCorrelation.h>
 
 #include "AIM/Common/AIMImage.h"
+#include "CrossCorrelation/CrossCorrelationTable.h"
 
 
 class MXAImageGraphicsDelegate;
@@ -48,12 +49,12 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
     void initWithFile(const QString imageFile, QString mountImage);
 
     MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, OriginalImage)
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, SegmentedImage)
+    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, ProcessedImage)
 
     MXA_INSTANCE_PROPERTY_m(QString, CurrentImageFile)
-    MXA_INSTANCE_PROPERTY_m(QString, CurrentSegmentedFile)
+    MXA_INSTANCE_PROPERTY_m(QString, CurrentProcessedFile)
 
-    qint32 saveSegmentedImage();
+    qint32 saveProcessedImage();
 
   signals:
     void cancelTask();
@@ -63,7 +64,7 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
   protected slots:
   //Manual Hookup Menu Actions
     void on_actionOpen_triggered(); // Open a Data File
-    void on_actionOpen_Segmented_Image_triggered();
+    void on_actionOpen_Processed_Image_triggered();
     void on_actionSave_triggered();
     void on_actionSave_As_triggered();
     void on_actionClose_triggered();
@@ -79,21 +80,21 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
     void on_fixedImageButton_clicked();
     void on_movingImageButton_clicked();
 
+
     void on_processFolder_stateChanged(int state  );
     void on_sourceDirectoryBtn_clicked();
     void on_outputDirectoryBtn_clicked();
 
+    void on_fixedImageFile_textChanged(const QString &string);
+    void on_movingImageFile_textChanged(const QString & text);
+    void on_sourceDirectoryLE_textChanged(const QString & text);
+    void on_outputDirectoryLE_textChanged(const QString & text);
 
     void on_filterPatternLineEdit_textChanged();
 
     /* Slots to receive events from the ProcessQueueController */
     void queueControllerFinished();
 
-    /* Slots to receive events from the Encoder task
-    void receiveTaskMessage(const QString &msg);
-    void receiveTaskProgress(int p);
-    void receiveTaskFinished();
-*/
 
     /**
      * @brief Updates the QMenu 'Recent Files' with the latest list of files. This
@@ -109,7 +110,7 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
 
     void loadImageFile(const QString &filename);
 
-    void loadSegmentedImageFile(const QString  &filename);
+    void loadProcessedImageFile(const QString  &filename);
 
     QStringList generateInputFileList();
 
@@ -182,7 +183,7 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
       */
      void openFile(QString imageFile);
 
-     void openSegmentedImage(QString mountImage);
+     void openProcessedImage(QString mountImage);
 
      AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
@@ -192,22 +193,28 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
 
      void addProcess(CrossCorrelationTask* name);
 
-  private:
-    QSortFilterProxyModel* m_ProxyModel;
-    QString m_OpenDialogLastDirectory;
-    QList<QWidget*> m_WidgetList;
+     AIMImage::Pointer loadImage(QString filePath);
 
-  //  CrossCorrelationThread*      m_CrossCorrelationThread;
-    bool            m_OutputExistsCheck;
+     int writeRegisteredImage(QString file, int i, double &xt, double &yt);
+
+
+  private:
+    QSortFilterProxyModel*  m_ProxyModel;
+    QString                 m_OpenDialogLastDirectory;
+    QList<QWidget*>         m_WidgetList;
+
+    bool                        m_OutputExistsCheck;
 
     QGraphicsScene*             m_OriginalImageGScene;
-    QGraphicsScene*             m_SegmentedImageGScene;
+    QGraphicsScene*             m_ProcessedImageGScene;
 
     MXAImageGraphicsDelegate*      m_OriginalGDelegate;
-    MXAImageGraphicsDelegate*      m_SegmentedGDelegate;
+    MXAImageGraphicsDelegate*      m_ProcessedGDelegate;
 
     ProcessQueueController*        m_QueueController;
     ProcessQueueDialog*            m_QueueDialog;
+
+    CrossCorrelationTable::Pointer  m_CrossCorrelationTable;
 
     QCrossCorrelation(const QCrossCorrelation&); // Copy Constructor Not Implemented
     void operator=(const QCrossCorrelation&); // Operator '=' Not Implemented

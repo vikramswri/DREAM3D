@@ -14,7 +14,6 @@
 
 //-- MXA includes
 #include <MXA/MXATypes.h>
-#include <MXA/Common/MXATypeDefs.h>
 #include <MXA/Common/MXASetGetMacros.h>
 #include <MXA/Common/IO/MXAFileWriter64.h>
 
