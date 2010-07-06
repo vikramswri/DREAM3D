@@ -86,7 +86,7 @@ IDE_SOURCE_PROPERTIES( "CrossCorrelation/GUI" "${QCrossCorrelation_HDRS}" "${QCr
 
 # --------------------------------------------------------------------
 # include this so the source files can have moc and uic run on them
-include(${TO79_SOURCE_DIR}/Source/MXA/Qt/Qt_SourceList.cmake)
+include(${TO79_SOURCE_DIR}/Source/MXA/Qt/SourceList.cmake)
 
 # --------------------------------------------------------------------
 #  Get a list of the header to run 'moc' on 

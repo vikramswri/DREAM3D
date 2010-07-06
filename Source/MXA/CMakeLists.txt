@@ -5,7 +5,7 @@ set (Project_SRCS "")
 set (Project_HDRS "")
 
 Macro(MXACompileDir DirName)
-include(${MXADataModel_SOURCE_DIR}/${DirName}/${DirName}_SourceList.cmake)
+include(${MXADataModel_SOURCE_DIR}/${DirName}/SourceList.cmake)
 set (Project_SRCS ${Project_SRCS} ${MXA_${DirName}_SRCS})
 endMacro()
 
@@ -25,10 +25,11 @@ IF ( NOT DEFINED  MXADATAMODEL_LIB_NAME)
   SET (MXADATAMODEL_LIB_NAME MXADataModel)
 ENDIF ( NOT DEFINED MXADATAMODEL_LIB_NAME )
 
-
 add_library(${MXADATAMODEL_LIB_NAME} STATIC ${Project_SRCS})
 StaticLibraryProperties( ${MXADATAMODEL_LIB_NAME} ${EXE_DEBUG_EXTENSION})
 
+# --------------------------------------------------------------------
+# Option to enable the BMP to TIFF utility
 option(MXA_COMPILE_BMP2GRAYSCALETIFF "Compile a utility Application that will convert the BMP to a GrayScale TIFF with 72 DPI resolution" OFF)
 if (MXA_COMPILE_BMP2GRAYSCALETIFF)
     # Prepend our own "FindTiff" code in front of what CMake itself provides
