@@ -17,7 +17,7 @@
 #include <MXA/Common/IO/MXAFileReader64.h>
 
 /**
-* @class CrossCorrelationData CrossCorrelationData.h R3D/CrossCorrelation/CrossCorrelationData.h
+* @class CrossCorrelationData CrossCorrelationData.h CrossCorrelation/CrossCorrelationData.h
 * @brief This class encapsulates the data needed as inputs and outputs from a run of the PCM Registration class. This
 * class knows how to read and write itself from a binary file and can print itself to any std::ostream as binary or
 * ascii data.

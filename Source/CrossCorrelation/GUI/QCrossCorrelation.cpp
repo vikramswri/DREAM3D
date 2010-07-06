@@ -906,7 +906,7 @@ void QCrossCorrelation::queueControllerFinished()
     filepath.append(".");
     filepath.append(extension);
 
-    cc->writeOutputImage(image, ccData, filepath.toStdString());
+    cc->writeRegisteredImage(image, ccData, filepath.toStdString());
     loadImageFile(fixedImageFile->text());
     loadProcessedImageFile(filepath);
 
@@ -960,7 +960,7 @@ int QCrossCorrelation::writeRegisteredImage(QString file, int i, double &xt, dou
   filepath.append(outputImageType->currentText());
 
   CrossCorrelation::Pointer cc = CrossCorrelation::New();
-  cc->writeOutputImage(image, ccData, filepath.toStdString());
+  cc->writeRegisteredImage(image, ccData, filepath.toStdString());
   if (i == 0)
   {
     loadImageFile(filepath);

@@ -49,8 +49,14 @@ typedef itk::ImportImageFilter<UCharPixelType, pcm::Dimension>     ImportFilterT
 
 
 /**
-* @class CrossCorrelation CrossCorrelation.h R3D/CrossCorrelation/CrossCorrelation.h
-* @brief Thread of execution that uses the PCM classes to register 2 images
+* @class CrossCorrelation CrossCorrelation.h CrossCorrelation/CrossCorrelation.h
+* @brief Higher level class that utilizes the itk::PCM classes to register 2 images
+* relative to each other. The input and output data (translations) are stored in
+* the 'CrossCorrelationData' class. Input images are fed to the class as 'AIMImage'
+* class instances (shared pointer classes). Use the 'run' method to execute the
+* filter when all the inputs have beed set correctly. Use the 'getErrorCondition'
+* method after the 'run' method returns in order to figure out if there was an
+* error during the registration.
 * @author Michael Jackson For Bluequartz Software
 * @date June 2009
 * @version 1.0
@@ -63,14 +69,33 @@ class CrossCorrelation
     MXA_STATIC_NEW_MACRO(CrossCorrelation);
     MXA_TYPE_MACRO(CrossCorrelation)
 
-
     virtual ~CrossCorrelation();
 
+    /**
+     * @brief Sets the 'CrossCorrelationData' object.
+     */
     MXA_INSTANCE_PROPERTY_m(CrossCorrelationData::Pointer, CrossCorrelationData)
+
+    /**
+     * @brief Sets the debug property. Setting this to true will make this class
+     * write more verbose output to the standard out.
+     */
     MXA_INSTANCE_PROPERTY_m(bool, Debug)
+
+    /**
+     * @brief Sets and Gets the Error condition variable. Values < 0 indicate that
+     * and error occurred during the registration process.
+     */
     MXA_INSTANCE_PROPERTY_m(int, ErrorCondition)
 
+    /**
+     * @brief Sets/Gets the Fixed Image object of the registration pair
+     */
     MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, FixedImage)
+
+    /**
+     * @brief Sets/Gets the Moving Image object of the registration pair.
+     */
     MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, MovingImage)
 
 
@@ -80,7 +105,17 @@ class CrossCorrelation
      */
     void run();
 
-    int writeOutputImage(AIMImage::Pointer image,
+    /**
+     * @brief Writes the given Image to a file using the translations stored in the
+     * CrossCorrelationData object. This may result in the image being clipped or
+     * shifted resulting in some of the original input image NOT being within the
+     * writable region of the image.
+     * @param image The input image
+     * @param ccData The CrossCorrelationData object that stores the translations
+     * @param filename The path & name to the output file.
+     * @return Error condition. Negative values represent an error.
+     */
+    int writeRegisteredImage(AIMImage::Pointer image,
                          CrossCorrelationData::Pointer ccData,
                          const std::string &filename);
 
@@ -90,8 +125,6 @@ class CrossCorrelation
      * @return
      */
     CrossCorrelation();
-
-//    ImportFilterType::Pointer loadImageData(int fftDim, R3DSliceInfo::Pointer sliceInfo);
 
     /**
      * @brief Registers the fixed and moving images using the supplied FFT dimension.
@@ -158,8 +191,8 @@ class CrossCorrelation
                                    ImportFilterType::Pointer mvImport);
   private:
 
-    int                          _fftResolutions[R3D::PCM::FFTResolutionSize];
-    float                        _allowableError;
+    int                          m_FFTResolutions[R3D::PCM::FFTResolutionSize];
+    float                        m_AllowableError;
 
     CrossCorrelation(const CrossCorrelation&); // Copy Constructor Not Implemented
     void operator=(const CrossCorrelation&); // Operator '=' Not Implemented

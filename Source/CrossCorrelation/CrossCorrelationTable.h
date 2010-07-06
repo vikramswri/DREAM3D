@@ -23,7 +23,7 @@
 
 
 /**
-* @class CrossCorrelationTable CrossCorrelationTable.h R3D/CrossCorrelation/CrossCorrelationTable.h
+* @class CrossCorrelationTable CrossCorrelationTable.h CrossCorrelation/CrossCorrelationTable.h
 * @brief Holds a list of the CrossCorrelationData objects
 * @author Michael A. Jackson for BlueQuartz Software
 * @date May 8, 2009

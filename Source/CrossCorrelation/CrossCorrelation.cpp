@@ -23,7 +23,6 @@
 //-- MXA Includes
 #include "MXA/MXATypes.h"
 #include "MXA/Utilities/MXALogger.h"
-//#include "MXA/Utilities/StringUtils.h"
 
 //-- Our Includes
 #include "CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h"
@@ -31,10 +30,7 @@
 #include "CrossCorrelation/pcm/itkMaxPhaseCorrelationOptimizer.h"
 #include "itkFFTShiftImageFilter.h"
 
-
-
-
-
+// Typedefs for the itk classes which make the code a bit easier to read
 typedef itk::Image< pcm::PixelType, pcm::Dimension >                            ImageType;
 typedef pcm::PhaseCorrelationOperator< ImageType, ImageType>                    OperatorType;
 typedef pcm::PhaseCorrelationImageRegistrationMethod<ImageType, ImageType>      RegistrationType;
@@ -51,22 +47,21 @@ typedef itk::ImageFileWriter< UCharImageType >                          WriterTy
 // -----------------------------------------------------------------------------
 CrossCorrelation::CrossCorrelation()
 {
-  _fftResolutions[0] = 256;
-  _fftResolutions[1] = 512;
-  _fftResolutions[2] = 1024;
-  _fftResolutions[3] = 1500;
-  _fftResolutions[4] = 2048;
-  _fftResolutions[5] = 2500;
-  _fftResolutions[6] = 3000;
-  _fftResolutions[7] = 3456;
-  _fftResolutions[8] = 4096;
-  _fftResolutions[9] = 4500;
-  _fftResolutions[10] = 5000;
-  _fftResolutions[11] = 5625;
-  _fftResolutions[12] = 6000;
-  _fftResolutions[13] = 6480;
- // _fftResolutions[13] = 6912;
-  _allowableError = 0.005f;  // 0.5% allowable error
+  m_FFTResolutions[0] = 256;
+  m_FFTResolutions[1] = 512;
+  m_FFTResolutions[2] = 1024;
+  m_FFTResolutions[3] = 1500;
+  m_FFTResolutions[4] = 2048;
+  m_FFTResolutions[5] = 2500;
+  m_FFTResolutions[6] = 3000;
+  m_FFTResolutions[7] = 3456;
+  m_FFTResolutions[8] = 4096;
+  m_FFTResolutions[9] = 4500;
+  m_FFTResolutions[10] = 5000;
+  m_FFTResolutions[11] = 5625;
+  m_FFTResolutions[12] = 6000;
+  m_FFTResolutions[13] = 6480;
+  m_AllowableError = 0.005f;  // 0.5% allowable error
 }
 
 // -----------------------------------------------------------------------------
@@ -87,28 +82,43 @@ void CrossCorrelation::run()
   double diff[2];
   bool didConverge = false;
 
+  if (NULL == m_FixedImage)
+  {
+    setErrorCondition(-2);
+    return;
+  }
+  if (NULL == m_MovingImage)
+  {
+    setErrorCondition(-3);
+    return;
+  }
+  if (NULL == m_CrossCorrelationData)
+  {
+    setErrorCondition(-4);
+    return;
+  }
+
 // Cache the loaded mosaic for each run
-  err = registerAtFFTResolution(_fftResolutions[0]);
+  err = registerAtFFTResolution(m_FFTResolutions[0]);
+  if (err < 0)
+  {
+    setErrorCondition(err);
+    return;
+  }
   m_CrossCorrelationData->getTranslations(trans0);
-//  std::cout << m_CrossCorrelationData->getFixedSlice() << "/" << m_CrossCorrelationData->getMovingSlice()
-//      << "  " << _fftResolutions[0] << " Translation found: " << trans0[0] << ", " << trans0[1] << std::endl;
 
   float absDiff = R3D::PCM::PCMAbsolutePixelOffset * this->m_CrossCorrelationData->getScaling();
-  //std::cout << "Largest Micron difference to be considered a match: " << absDiff << std::endl;
 
   for(uint32_t i = 1; i < R3D::PCM::FFTResolutionSize; ++i)
   {
-
-    err = registerAtFFTResolution(_fftResolutions[i]);
+    err = registerAtFFTResolution(m_FFTResolutions[i]);
     m_CrossCorrelationData->getTranslations(trans1);
-//    std::cout << m_CrossCorrelationData->getFixedSlice() << "/" << m_CrossCorrelationData->getMovingSlice()
-//        << "  " << _fftResolutions[i] << " Translation found: " << trans1[0] << ", " << trans1[1] << std::endl;
     diff[0] = trans0[0] - trans1[0];
     diff[1] = trans0[1] - trans1[1];
     if (diff[0] < 0.0f) { diff[0] *= -1.0f;}
     if (diff[1] < 0.0f) { diff[1] *= -1.0f;}
 
-    if ( diff[0] < absDiff && diff[1] < absDiff) // 5 microns difference
+    if ( diff[0] < absDiff && diff[1] < absDiff)
     {
       didConverge = true;
       break;
@@ -136,7 +146,7 @@ void CrossCorrelation::run()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int CrossCorrelation::writeOutputImage(AIMImage::Pointer image,
+int CrossCorrelation::writeRegisteredImage(AIMImage::Pointer image,
                                        CrossCorrelationData::Pointer ccData,
                                        const std::string &filename)
 {
