@@ -40,7 +40,7 @@ class CrossCorrelationTask;
 */
 class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
 {
-  Q_OBJECT;
+  Q_OBJECT
 
   public:
     QCrossCorrelation(QWidget *parent = 0);

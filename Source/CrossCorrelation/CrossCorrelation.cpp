@@ -243,8 +243,6 @@ void CrossCorrelation::itkImportFilterFromAIMImage(AIMImage::Pointer image,
     origin[1] = ccData->getYMovingOrigin(); // Y coordinate
   }
 
-  //mxa_log << logTime() << "Slice: " << sliceInfo->getSliceNumber() << " origin: " << origin[0] << ", " << origin[1] << std::endl;
-
   importFilter->SetOrigin(origin);
 
   double spacing[pcm::Dimension];

@@ -65,43 +65,27 @@ class CrossCorrelation
 {
   public:
 
-    MXA_SHARED_POINTERS(CrossCorrelation)
+    MXA_SHARED_POINTERS(CrossCorrelation);
+
     MXA_STATIC_NEW_MACRO(CrossCorrelation);
-    MXA_TYPE_MACRO(CrossCorrelation)
+    MXA_TYPE_MACRO(CrossCorrelation);
 
     virtual ~CrossCorrelation();
 
-    /**
-     * @brief Sets the 'CrossCorrelationData' object.
-     */
-    MXA_INSTANCE_PROPERTY_m(CrossCorrelationData::Pointer, CrossCorrelationData)
+
+    MXA_INSTANCE_PROPERTY_m(CrossCorrelationData::Pointer, CrossCorrelationData);
+
+    MXA_INSTANCE_PROPERTY_m(bool, Debug);
+
+    MXA_INSTANCE_PROPERTY_m(int, ErrorCondition);
+
+    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, FixedImage);
+
+    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, MovingImage);
 
     /**
-     * @brief Sets the debug property. Setting this to true will make this class
-     * write more verbose output to the standard out.
-     */
-    MXA_INSTANCE_PROPERTY_m(bool, Debug)
-
-    /**
-     * @brief Sets and Gets the Error condition variable. Values < 0 indicate that
-     * and error occurred during the registration process.
-     */
-    MXA_INSTANCE_PROPERTY_m(int, ErrorCondition)
-
-    /**
-     * @brief Sets/Gets the Fixed Image object of the registration pair
-     */
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, FixedImage)
-
-    /**
-     * @brief Sets/Gets the Moving Image object of the registration pair.
-     */
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, MovingImage)
-
-
-    /**
-     * @brief main entry point to register the 2 images
-     * @return Negative value on error.
+     * @brief main entry point to register the 2 images. Use the getErrorCondition()
+     * to evaluate the success of the filter.
      */
     void run();
 
@@ -135,10 +119,10 @@ class CrossCorrelation
 
     /**
      * @brief
-     * @param image
-     * @param importFilter
-     * @param ccData
-     * @param isFixedImage
+     * @param image The AIMImage to be initialized into an itkImportFilter
+     * @param importFilter The ImportFilterType object to be initialized
+     * @param ccData The CrossCorrelationData smart pointer
+     * @param isFixedImage Is this the fixed or moving image
      */
     void itkImportFilterFromAIMImage(AIMImage::Pointer image,
                                      ImportFilterType::Pointer importFilter,
@@ -149,8 +133,9 @@ class CrossCorrelation
     /**
      * @brief Initializes the itkImportFilter object with the correct size, spacing and origin information
      * @param importFilter The ImportFilterType object to be initialized
+     * @param fftDim The Dimensions of the FFT filter
      * @param imageData A pointer to the raw image data
-     * @param sliceInfo A Shared Pointer to the R3DSliceInfo Object
+     * @param isFixedImage Is this the fixed or moving image
      */
     void initializeImportFilter(ImportFilterType::Pointer importFilter,
                                 int fftDim,
@@ -160,9 +145,7 @@ class CrossCorrelation
     /**
      * @brief This will actually register 2 images
      * @param fxImageImport The itkImportFilter representing the fixed image
-     * @param fixedSliceInfo The Zeiss Slice Info for the fixed image
      * @param mvImageImport The itkImportFilter representing the moving image
-     * @param movingSliceInfo The Zeiss Slice Info for the moving image
      * @return
      */
     int registerImages(ImportFilterType::Pointer fxImageImport,

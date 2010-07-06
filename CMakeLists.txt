@@ -84,6 +84,18 @@ ADD_SUBDIRECTORY(${TO79_SOURCE_DIR}/Source/MXA ${TO79_BINARY_DIR}/MXA)
 ADD_SUBDIRECTORY(${TO79_SOURCE_DIR}/Source/EMMPM/GUI ${TO79_BINARY_DIR}/EMMPM)
 ADD_SUBDIRECTORY(${TO79_SOURCE_DIR}/Source/CrossCorrelation/GUI ${TO79_BINARY_DIR}/CrossCorrelation)
 
+option(TO79_BUILD_API_DOCS "Use Doxygen to create the HTML based API documentation" OFF)
+if(TO79_BUILD_API_DOCS)
+  FIND_PACKAGE(Doxygen)
+  if (NOT DOXYGEN_FOUND)
+    message(FATAL_ERROR "Doxygen is needed to build the documentation. Please install it correctly")
+  endif()
+  configure_file(${PROJECT_RESOURCES_DIR}/TO79.doxyfile.in 
+                 ${TO79_BINARY_DIR}/Doxyfile  @ONLY IMMEDIATE)
+  add_custom_target(docs COMMAND ${DOXYGEN_EXECUTABLE} ${TO79_BINARY_DIR}/Doxyfile)
+
+endif()
+
 
 include(${PROJECT_CMAKE_DIR}/InstallationSupport/InstallSupportLibraries.cmake)
 include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)

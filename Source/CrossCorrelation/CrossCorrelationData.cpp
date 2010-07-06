@@ -32,9 +32,7 @@ CrossCorrelationData::CrossCorrelationData() :
   imageHeight(0),
  // imageColorChannels(0),
   complete(0)
-
 {
-
 }
 
 // -----------------------------------------------------------------------------

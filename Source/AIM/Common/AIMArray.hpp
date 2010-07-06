@@ -23,7 +23,7 @@
 
 
 /**
-* @class AIMArray AIMArray.h AIM/Common/AIMArray.h
+* @class AIMArray AIMArray.hpp AIM/Common/AIMArray.hpp
 * @brief This class represents and array of primitives in a contiguous section of memory. If the compile flag
 * AIM_USE_SSE is used and SSE is found on the system then SSE specific malloc and free will be used in order
 * to allocated properly aligned memory.

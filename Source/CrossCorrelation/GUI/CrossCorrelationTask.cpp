@@ -24,7 +24,6 @@
 CrossCorrelationTask::CrossCorrelationTask(QObject* parent) :
   ProcessQueueTask(parent)
 {
-
 }
 
 // -----------------------------------------------------------------------------
@@ -70,6 +69,7 @@ void CrossCorrelationTask::run()
   m_CrossCorrelationData->setImageWidth(fixedImage->getImagePixelWidth());
   m_CrossCorrelationData->setImageHeight(fixedImage->getImagePixelHeight());
 
+  UPDATE_PROGRESS(QString("Registering Images"), 50);
   CrossCorrelation::Pointer cc = CrossCorrelation::New();
   cc->setCrossCorrelationData(m_CrossCorrelationData);
   cc->setFixedImage(fixedImage);
