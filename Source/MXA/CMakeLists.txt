@@ -37,6 +37,5 @@ ENDIF ( NOT DEFINED MXADATAMODEL_LIB_NAME )
 add_library(${MXADATAMODEL_LIB_NAME} STATIC ${Project_SRCS})
 StaticLibraryProperties( ${MXADATAMODEL_LIB_NAME} ${EXE_DEBUG_EXTENSION})
 
-message(STATUS "MXADataModel_SOURCE_DIR: ${MXADataModel_SOURCE_DIR}/Utilities/BmpToTiff.cpp")
 add_executable(bmp2tiff Utilities/BmpToTiff.cpp)
 target_link_libraries(bmp2tiff ${MXADATAMODEL_LIB_NAME} ${TIFF_LIBRARY})

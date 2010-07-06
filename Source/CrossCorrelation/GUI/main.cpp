@@ -4,9 +4,6 @@
 //  All rights reserved.
 //  BSD License: http://www.opensource.org/licenses/bsd-license.html
 //
-//  This code was written under United States Air Force Contract number
-//                           F33615-03-C-5220
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "QCrossCorrelation.h"
