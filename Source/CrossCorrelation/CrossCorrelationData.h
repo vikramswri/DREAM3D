@@ -49,6 +49,11 @@ class CrossCorrelationData
      * @brief The Moving Slice Number
      */
     MXA_INSTANCE_PROPERTY(int32_t, MovingSlice, movingSlice);
+
+    MXA_INSTANCE_STRING_PROPERTY_m(FixedImagePath);
+    MXA_INSTANCE_STRING_PROPERTY_m(MovingImagePath);
+
+
     /*
      * @brief The const function value
      */

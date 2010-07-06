@@ -43,7 +43,8 @@ void CrossCorrelationTask::run()
 //  std::cout << "    FixedImage: " << getInputFilePath().toStdString() << std::endl;
 //  std::cout << "    MovingImage: " << getMovingImagePath().toStdString() << std::endl;
   UPDATE_PROGRESS(QString("Starting Registration"), 0);
-
+  fxImage = getInputFilePath().toStdString();
+  mvImage = getMovingImagePath().toStdString();
   // Load the fixed image into an AIMIMage object
   AIMImage::Pointer fixedImage = loadImage(getInputFilePath());
   if (NULL == fixedImage.data() )
@@ -64,8 +65,10 @@ void CrossCorrelationTask::run()
   }
   UPDATE_PROGRESS(QString("Reading Moving Image"), 20);
   // Create the CrossCorrelationData object and set all the fields
-  m_CrossCorrelationData->setFixedSlice(0);
-  m_CrossCorrelationData->setMovingSlice(1);
+//  m_CrossCorrelationData->setFixedSlice(0);
+//  m_CrossCorrelationData->setMovingSlice(1);
+  m_CrossCorrelationData->setFixedImagePath(getInputFilePath().toStdString());
+  m_CrossCorrelationData->setMovingImagePath(getMovingImagePath().toStdString());
   m_CrossCorrelationData->setImageWidth(fixedImage->getImagePixelWidth());
   m_CrossCorrelationData->setImageHeight(fixedImage->getImagePixelHeight());
 
@@ -74,7 +77,15 @@ void CrossCorrelationTask::run()
   cc->setCrossCorrelationData(m_CrossCorrelationData);
   cc->setFixedImage(fixedImage);
   cc->setMovingImage(movingImage);
+  cc->setErrorCondition(1000);
   cc->run();
+  if (cc->getErrorCondition() < 0)
+  {
+    QString msg("Error Registering Image ");
+    msg.append(getInputFilePath() + " with image " + getMovingImagePath());
+    std::cout << logTime() << msg.toStdString() << std::endl;
+    UPDATE_PROGRESS(msg, 75)
+  }
 
   UPDATE_PROGRESS(QString("Complete"), 100);
   // Notify observers that we are finished

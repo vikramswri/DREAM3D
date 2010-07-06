@@ -47,20 +47,20 @@ typedef itk::ImageFileWriter< UCharImageType >                          WriterTy
 // -----------------------------------------------------------------------------
 CrossCorrelation::CrossCorrelation()
 {
-  m_FFTResolutions[0] = 256;
-  m_FFTResolutions[1] = 512;
-  m_FFTResolutions[2] = 1024;
-  m_FFTResolutions[3] = 1500;
-  m_FFTResolutions[4] = 2048;
-  m_FFTResolutions[5] = 2500;
-  m_FFTResolutions[6] = 3000;
-  m_FFTResolutions[7] = 3456;
-  m_FFTResolutions[8] = 4096;
-  m_FFTResolutions[9] = 4500;
-  m_FFTResolutions[10] = 5000;
-  m_FFTResolutions[11] = 5625;
-  m_FFTResolutions[12] = 6000;
-  m_FFTResolutions[13] = 6480;
+  m_FFTResolutions[0] = 128;
+  m_FFTResolutions[1] = 256;
+  m_FFTResolutions[2] = 512;
+  m_FFTResolutions[3] = 1024;
+  m_FFTResolutions[4] = 1500;
+  m_FFTResolutions[5] = 2048;
+  m_FFTResolutions[6] = 2500;
+  m_FFTResolutions[7] = 3000;
+  m_FFTResolutions[8] = 3456;
+  m_FFTResolutions[9] = 4096;
+  m_FFTResolutions[10] = 4500;
+  m_FFTResolutions[11] = 5000;
+  m_FFTResolutions[12] = 5625;
+  m_FFTResolutions[13] = 6000;
   m_AllowableError = 0.005f;  // 0.5% allowable error
 }
 
@@ -81,6 +81,7 @@ void CrossCorrelation::run()
   double trans1[2];
   double diff[2];
   bool didConverge = false;
+  MXALOGGER_METHOD_VARIABLE_INSTANCE
 
   if (NULL == m_FixedImage)
   {
@@ -111,18 +112,32 @@ void CrossCorrelation::run()
 
   for(uint32_t i = 1; i < R3D::PCM::FFTResolutionSize; ++i)
   {
+//    if (i == 3)
+//    {
+//      mxa_log << logTime() << "CrossCorrelation::run() break point. Should have registered in last iteration" << std::endl;
+//    }
+    setErrorCondition(0);
     err = registerAtFFTResolution(m_FFTResolutions[i]);
+    if (err < 0)
+    {
+      mxa_log << logTime() << "CrossCorrelation::run() Error returned from CrossCorrelation::registerAtFFTResolution(" << m_FFTResolutions[i] << ");" << std::endl;
+      break;
+    }
     m_CrossCorrelationData->getTranslations(trans1);
     diff[0] = trans0[0] - trans1[0];
     diff[1] = trans0[1] - trans1[1];
     if (diff[0] < 0.0f) { diff[0] *= -1.0f;}
     if (diff[1] < 0.0f) { diff[1] *= -1.0f;}
 
-    if ( diff[0] < absDiff && diff[1] < absDiff)
+    if ( diff[0] <= absDiff && diff[1] <= absDiff)
     {
       didConverge = true;
       break;
     }
+//    else
+//    {
+//      mxa_log << logTime() << "CrossCorrelation::run() break point. Should have registered in last iteration" << std::endl;
+//    }
 
     // Did not match good enough so increment our resolution and try again.
     trans0[0] = trans1[0];
@@ -139,8 +154,9 @@ void CrossCorrelation::run()
   {
     this->m_CrossCorrelationData->setXTrans(0.0);
     this->m_CrossCorrelationData->setYTrans(0.0);
-    setErrorCondition(-1);
+    setErrorCondition(-100);
   }
+
 }
 
 // -----------------------------------------------------------------------------
@@ -191,12 +207,17 @@ int CrossCorrelation::writeRegisteredImage(AIMImage::Pointer image,
 // -----------------------------------------------------------------------------
 int32_t CrossCorrelation::registerAtFFTResolution(int fftDim )
 {
+  MXALOGGER_METHOD_VARIABLE_INSTANCE
   // Load up the fixed image
   ImportFilterType::Pointer fxImport;
   fxImport = ImportFilterType::New();
   initializeImportFilter(fxImport, fftDim,
                          m_FixedImage,
                          true);
+  if (getErrorCondition() < 0)
+  {
+    return getErrorCondition();
+  }
 
   // Load up the moving image
   ImportFilterType::Pointer mvImport;
@@ -205,8 +226,12 @@ int32_t CrossCorrelation::registerAtFFTResolution(int fftDim )
                          m_MovingImage,
                          false);
 
+  if (getErrorCondition() < 0)
+  {
+    return getErrorCondition();
+  }
   // Create a Correlation Image if wanted
-//  createCorrelationImages(fxImport, mvImport);
+  createCorrelationImages(fxImport, mvImport);
 
   // Register the images using the FFT Correlation Method
   return registerImages(fxImport, mvImport);
@@ -277,6 +302,12 @@ void CrossCorrelation::initializeImportFilter(ImportFilterType::Pointer importFi
   R3DCropGrayScaleImage crop(imageData, insets);
   crop.run();
   AIMImage::Pointer croppedImage = crop.getOutputImage();
+  if (NULL == croppedImage)
+  {
+    mxa_log << logTime() << "Cross Correlation::initializeImportFilter() with FFT Dim of " << fftDim << " threw an error.";
+    setErrorCondition(-10);
+    return;
+  }
   m_CrossCorrelationData->setImageWidth(fftDim);
   m_CrossCorrelationData->setImageHeight(fftDim);
 
@@ -490,8 +521,8 @@ void CrossCorrelation::createCorrelationImages(  ImportFilterType::Pointer fxImp
     }
 
     avg /= samples;
-    std::cout << imageSize[0] << "_" << this->m_CrossCorrelationData->getFixedSlice() << "_" << m_CrossCorrelationData->getMovingSlice()
-    << "min: " << min << "\tmax: " << max << "\tavg: " << avg << "\tDelta: " << (max-min) << "\tHalfRange: " << ((max-min)/2 + min) << "\tAvg-HalfRange: " << (avg - ((max-min)/2 + min)) << std::endl;
+//    std::cout << imageSize[0] << "_" << this->m_CrossCorrelationData->getFixedSlice() << "_" << m_CrossCorrelationData->getMovingSlice()
+//    << "min: " << min << "\tmax: " << max << "\tavg: " << avg << "\tDelta: " << (max-min) << "\tHalfRange: " << ((max-min)/2 + min) << "\tAvg-HalfRange: " << (avg - ((max-min)/2 + min)) << std::endl;
 
     RescaleFilterType::Pointer intensityRescaler = RescaleFilterType::New();
     intensityRescaler->SetOutputMinimum(  0  );

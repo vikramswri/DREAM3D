@@ -652,6 +652,8 @@ void QCrossCorrelation::on_registerButton_clicked()
     filepath.append(extension);
     task->setOutputFilePath(filepath);
     CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
+    crossCorrelationData->setFixedSlice(0);
+    crossCorrelationData->setMovingSlice(1);
     task->setCrossCorrelationData(crossCorrelationData);
     m_CrossCorrelationTable->addCrossCorrelationData(0, crossCorrelationData);
 
@@ -683,6 +685,8 @@ void QCrossCorrelation::on_registerButton_clicked()
       filepath.append(outputImageType->currentText());
       task->setOutputFilePath(filepath);
       CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
+      crossCorrelationData->setFixedSlice(i);
+      crossCorrelationData->setMovingSlice(i+1);
       task->setCrossCorrelationData(crossCorrelationData);
       m_CrossCorrelationTable->addCrossCorrelationData(i+1, crossCorrelationData);
 

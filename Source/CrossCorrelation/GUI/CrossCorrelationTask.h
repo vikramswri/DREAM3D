@@ -57,7 +57,8 @@ protected:
     AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
   private:
-
+    std::string fxImage;
+    std::string mvImage;
 
     AIMImage::Pointer m_FixedImage;
     AIMImage::Pointer m_MovingImage;
