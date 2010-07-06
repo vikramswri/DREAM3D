@@ -16,8 +16,6 @@ QThread(parent),
 m_Debug(true),
 m_Cancel(false)
 {
-  // TODO Auto-generated constructor stub
-
 }
 
 // -----------------------------------------------------------------------------
@@ -25,7 +23,6 @@ m_Cancel(false)
 // -----------------------------------------------------------------------------
 ProcessQueueTask::~ProcessQueueTask()
 {
-  // TODO Auto-generated destructor stub
 }
 
 

@@ -279,7 +279,7 @@ void QCrossCorrelation::setupGui()
   connect (originalImageGView, SIGNAL(loadImageFileRequested(const QString &)),
            this, SLOT(loadImageFile(const QString &)), Qt::QueuedConnection);
 
-  connect (segmentedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
+  connect (processedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
            this, SLOT(loadProcessedImageFile(const QString &)));
 
   QFileCompleter* com = new QFileCompleter(this, false);
@@ -647,7 +647,7 @@ void QCrossCorrelation::on_registerButton_clicked()
     QString filepath = fileInfo.absolutePath();
     filepath.append(QDir::separator());
     filepath.append(basename);
-    filepath.append("_Segmented");
+    filepath.append("_Registered");
     filepath.append(".");
     filepath.append(extension);
     task->setOutputFilePath(filepath);
@@ -735,7 +735,7 @@ QStringList QCrossCorrelation::generateInputFileList()
 void QCrossCorrelation::on_actionOpen_Processed_Image_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
-  QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Segmented Image File"),
+  QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Processed Image File"),
     m_OpenDialogLastDirectory,
     tr("Images (*.tif *.bmp *.jpg *.png)") );
 
@@ -856,8 +856,8 @@ qint32 QCrossCorrelation::saveProcessedImage()
   int err = 0;
   if (m_CurrentProcessedFile.isEmpty())
   {
-    QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Segmented.tif";
-    outputFile = QFileDialog::getSaveFileName(this, tr("Save Segmented Image As ..."), outputFile, tr("Images (*.tif *.bmp *.jpg *.png)"));
+    QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Processed.tif";
+    outputFile = QFileDialog::getSaveFileName(this, tr("Save Processed Image As ..."), outputFile, tr("Images (*.tif *.bmp *.jpg *.png)"));
     if ( !outputFile.isEmpty() )
     {
       m_CurrentProcessedFile = outputFile;
@@ -1050,7 +1050,7 @@ qint32 QCrossCorrelation::initGraphicViews()
     connect(fitToWindow, SIGNAL(clicked()),
             m_OriginalGDelegate, SLOT(fitToWindow() ));
 
-    // Create the m_OriginalImage and m_Segmented Image Objects
+    // Create the m_OriginalImage and m_Processed Image Objects
 
 
     m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
@@ -1062,8 +1062,8 @@ qint32 QCrossCorrelation::initGraphicViews()
   }
 
 
-  // If we have NOT loaded a segmented file AND we have a valid Original Image, then
-  // create the Segmented image based on the input image.
+  // If we have NOT loaded a processed file AND we have a valid Original Image, then
+  // create the Processed image based on the input image.
   QImage segImage;
   if (m_CurrentProcessedFile.isEmpty() == true && NULL != m_OriginalImage.data() )
   {
@@ -1074,19 +1074,19 @@ qint32 QCrossCorrelation::initGraphicViews()
       return -1;
     }
   }
-  else // We have an actual segmented image file that the user wants us to read.
+  else // We have an actual processed image file that the user wants us to read.
   {
     segImage = QImage(m_CurrentProcessedFile);
     if (segImage.isNull() == true)
     {
-      this->statusbar->showMessage("Error loading Segmented image from file");
+      this->statusbar->showMessage("Error loading Processed image from file");
       return -1;
     }
     // Convert it to an AIMImage in GrayScale
     m_ProcessedImage = convertQImageToGrayScaleAIMImage(segImage);
     if (NULL == m_ProcessedImage.data() )
     {
-      std::cout << "Error loading Segmented image from file" << std::endl;
+      std::cout << "Error loading Processed image from file" << std::endl;
       return -1;
     }
   }
@@ -1097,9 +1097,9 @@ qint32 QCrossCorrelation::initGraphicViews()
 
     // Create the QGraphicsScene Objects
     m_ProcessedImageGScene = new QGraphicsScene(this);
-    segmentedImageGView->setScene(m_ProcessedImageGScene);
+    processedImageGView->setScene(m_ProcessedImageGScene);
     m_ProcessedGDelegate = new MXAImageGraphicsDelegate(this);
-    m_ProcessedGDelegate->setGraphicsView(segmentedImageGView);
+    m_ProcessedGDelegate->setGraphicsView(processedImageGView);
     m_ProcessedGDelegate->setGraphicsScene(m_ProcessedImageGScene);
     m_ProcessedGDelegate->setMainWindow(this);
     m_ProcessedGDelegate->setCachedImage(segImage);
@@ -1144,7 +1144,7 @@ void QCrossCorrelation::initWithFile(const QString imageFile, QString processedI
 
   if (m_CurrentProcessedFile.isEmpty())
   {
-    this->processedImageTitle->setText("Unsaved Segmented Image");
+    this->processedImageTitle->setText("Unsaved Processed Image");
     this->setWindowModified(true);
   }
   else {
