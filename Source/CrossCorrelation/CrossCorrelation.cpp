@@ -20,12 +20,14 @@
 #include <itkIndex.h>
 #include <itkResampleImageFilter.h>
 
+
 //-- MXA Includes
 #include "MXA/MXATypes.h"
 #include "MXA/Utilities/MXALogger.h"
 
 //-- Our Includes
 #include "CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h"
+#include "CrossCorrelation/ImageFilters/R3DImagePadFilter.h"
 #include "CrossCorrelation/pcm/itkPhaseCorrelationOperator.h"
 #include "CrossCorrelation/pcm/itkMaxPhaseCorrelationOptimizer.h"
 #include "itkFFTShiftImageFilter.h"
@@ -40,6 +42,8 @@ typedef itk::CastImageFilter<FFTImageType, UCharImageType>              InverseC
 
 typedef itk::ResampleImageFilter<ImageType, ImageType >                 ResampleFilterType;
 typedef itk::ImageFileWriter< UCharImageType >                          WriterType;
+
+
 
 
 // -----------------------------------------------------------------------------
@@ -99,6 +103,7 @@ void CrossCorrelation::run()
     return;
   }
 
+
 // Cache the loaded mosaic for each run
   err = registerAtFFTResolution(m_FFTResolutions[0]);
   if (err < 0)
@@ -123,6 +128,7 @@ void CrossCorrelation::run()
       mxa_log << logTime() << "CrossCorrelation::run() Error returned from CrossCorrelation::registerAtFFTResolution(" << m_FFTResolutions[i] << ");" << std::endl;
       break;
     }
+
     m_CrossCorrelationData->getTranslations(trans1);
     diff[0] = trans0[0] - trans1[0];
     diff[1] = trans0[1] - trans1[1];
@@ -134,10 +140,6 @@ void CrossCorrelation::run()
       didConverge = true;
       break;
     }
-//    else
-//    {
-//      mxa_log << logTime() << "CrossCorrelation::run() break point. Should have registered in last iteration" << std::endl;
-//    }
 
     // Did not match good enough so increment our resolution and try again.
     trans0[0] = trans1[0];
@@ -208,6 +210,7 @@ int CrossCorrelation::writeRegisteredImage(AIMImage::Pointer image,
 int32_t CrossCorrelation::registerAtFFTResolution(int fftDim )
 {
   MXALOGGER_METHOD_VARIABLE_INSTANCE
+
   // Load up the fixed image
   ImportFilterType::Pointer fxImport;
   fxImport = ImportFilterType::New();
@@ -290,27 +293,61 @@ void CrossCorrelation::initializeImportFilter(ImportFilterType::Pointer importFi
                                               bool isFixedImage)
 {
   MXALOGGER_METHOD_VARIABLE_INSTANCE
+  AIMImage::Pointer fftImageRegion = AIMImage::NullPointer();
 
-  // Extract the ROI from the center of the image
-  int32_t insets[4];
+  // Can we crop out a fftDim size image or do we pad
+  if ( imageData->getImagePixelWidth() >= fftDim
+      && imageData->getImagePixelHeight() >= fftDim)
+  {
+    // Extract the ROI from the center of the image
+    int32_t insets[4]; // Left Right Top Bottom
+    // Compute the insets on each side of the image
+    insets[0] = (imageData->getImagePixelWidth() / 2) - (fftDim / 2);
+    insets[1] = imageData->getImagePixelWidth() - (insets[0] + fftDim);
+    insets[2] = (imageData->getImagePixelHeight() / 2) - (fftDim / 2);
+    insets[3] = imageData->getImagePixelHeight() - (insets[2] + fftDim);
+    // Instantiate our "Cropper" object
+    R3DCropGrayScaleImage crop(imageData, insets);
+    crop.run();  // Crop the fftDim sized region from the input image
+    fftImageRegion = crop.getOutputImage();
+  }
+  else
+  {
+    // Pad the image to the size of the FFT Dimension
+    int32_t pad[4] = {0, 0, 0, 0}; // Left Right top bottom
+    int32_t extra[4] = {0, 0, 0, 0};
+    int32_t dims[2] = {imageData->getImagePixelWidth(), imageData->getImagePixelHeight() };
 
-  insets[0] = (imageData->getImagePixelWidth() / 2) - (fftDim / 2);
-  insets[1] = imageData->getImagePixelWidth() - (insets[0] + fftDim);
-  insets[2] = (imageData->getImagePixelHeight() / 2) - (fftDim / 2);
-  insets[3] = imageData->getImagePixelHeight() - (insets[2] + fftDim);
+    if (dims[0] % 2 != 0)
+    {
+      extra[0] = 1;
+    }
+    if (dims[1] % 2 != 0)
+    {
+      extra[2] = 1;
+    }
 
-  R3DCropGrayScaleImage crop(imageData, insets);
-  crop.run();
-  AIMImage::Pointer croppedImage = crop.getOutputImage();
-  if (NULL == croppedImage)
+    pad[0] = (fftDim - imageData->getImagePixelWidth() - extra[0])/2 + extra[0];
+    pad[1] = (fftDim - imageData->getImagePixelWidth() - extra[1])/2 + extra[1];
+
+    pad[2] = (fftDim - imageData->getImagePixelHeight() - extra[2])/2 + extra[2];
+    pad[3] = (fftDim - imageData->getImagePixelHeight() - extra[3])/2 + extra[3];
+
+    R3DImagePadFilter padFilter(imageData, pad, 0);
+    padFilter.run();
+    fftImageRegion = padFilter.getOutputImage();
+  }
+
+  if (NULL == fftImageRegion)
   {
     mxa_log << logTime() << "Cross Correlation::initializeImportFilter() with FFT Dim of " << fftDim << " threw an error.";
     setErrorCondition(-10);
     return;
   }
+
+
   m_CrossCorrelationData->setImageWidth(fftDim);
   m_CrossCorrelationData->setImageHeight(fftDim);
-
 
   ImportFilterType::SizeType size;
   size[0] = m_CrossCorrelationData->getImageWidth(); // size along X
@@ -345,8 +382,8 @@ void CrossCorrelation::initializeImportFilter(ImportFilterType::Pointer importFi
   importFilter->SetSpacing(spacing);
 
   const bool importImageFilterWillOwnTheBuffer = true;
-  importFilter->SetImportPointer(croppedImage->getImageBuffer(), size[0] * size[1], importImageFilterWillOwnTheBuffer);
-  croppedImage->setManageMemory(false);
+  importFilter->SetImportPointer(fftImageRegion->getImageBuffer(), size[0] * size[1], importImageFilterWillOwnTheBuffer);
+  fftImageRegion->setManageMemory(false);
   importFilter->Update();
 
 }

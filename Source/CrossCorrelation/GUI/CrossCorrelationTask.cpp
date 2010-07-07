@@ -42,6 +42,12 @@ void CrossCorrelationTask::run()
 //  std::cout << "  CrossCorrelationTask::run()" << std::endl;
 //  std::cout << "    FixedImage: " << getInputFilePath().toStdString() << std::endl;
 //  std::cout << "    MovingImage: " << getMovingImagePath().toStdString() << std::endl;
+  if (isCanceled() )
+  {
+    emit finished();
+    emit finished(this);
+    return;
+  }
   UPDATE_PROGRESS(QString("Starting Registration"), 0);
   fxImage = getInputFilePath().toStdString();
   mvImage = getMovingImagePath().toStdString();

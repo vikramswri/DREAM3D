@@ -15,7 +15,7 @@
 #include <CrossCorrelation/ImageFilters/R3DImageFilter.h>
 
 /**
-* @class R3DCropGrayScaleImage R3DCropGrayScaleImage.h R3D/ImageFilters/R3DCropGrayScaleImage.h
+* @class R3DCropGrayScaleImage R3DCropGrayScaleImage.h CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h
 * @brief This class will crop an existing image using the supplied insets.
 * @author Michael A. Jackson for BlueQuartz Software
 * @date Mar 19, 2009

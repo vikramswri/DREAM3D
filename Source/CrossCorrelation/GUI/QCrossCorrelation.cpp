@@ -156,6 +156,7 @@ void QCrossCorrelation::readSettings()
   READ_BOOL_SETTING(prefs, processFolder, false);
   READ_STRING_SETTING(prefs, fixedImageFile, "");
   READ_STRING_SETTING(prefs, movingImageFile, "");
+  READ_STRING_SETTING(prefs, outputImageFile, "");
   READ_STRING_SETTING(prefs, sourceDirectoryLE, "");
   READ_STRING_SETTING(prefs, outputDirectoryLE, "");
   READ_STRING_SETTING(prefs, outputPrefix, "");
@@ -184,6 +185,7 @@ void QCrossCorrelation::writeSettings()
   WRITE_BOOL_SETTING(prefs, processFolder, processFolder->isChecked());
   WRITE_STRING_SETTING(prefs, fixedImageFile);
   WRITE_STRING_SETTING(prefs, movingImageFile);
+  WRITE_STRING_SETTING(prefs, outputImageFile);
   WRITE_STRING_SETTING(prefs, sourceDirectoryLE);
   WRITE_STRING_SETTING(prefs, outputDirectoryLE);
   WRITE_STRING_SETTING(prefs, outputPrefix);
@@ -292,6 +294,11 @@ void QCrossCorrelation::setupGui()
   QObject::connect( com1, SIGNAL(activated(const QString &)),
            this, SLOT(on_movingImageFile_textChanged(const QString &)));
 
+  QFileCompleter* com4 = new QFileCompleter(this, false);
+  outputImageFile->setCompleter(com4);
+  QObject::connect( com4, SIGNAL(activated(const QString &)),
+           this, SLOT(on_outputImageFile_textChanged(const QString &)));
+
 
   QFileCompleter* com2 = new QFileCompleter(this, true);
   sourceDirectoryLE->setCompleter(com2);
@@ -302,6 +309,7 @@ void QCrossCorrelation::setupGui()
   outputDirectoryLE->setCompleter(com3);
   QObject::connect( com3, SIGNAL(activated(const QString &)),
            this, SLOT(on_outputDirectoryLE_textChanged(const QString &)));
+
 }
 
 
@@ -404,6 +412,7 @@ qint32 QCrossCorrelation::checkDirtyDocument()
 {
   qint32 err = -1;
 
+#if 0
   if (this->isWindowModified() == true)
   {
     int r = QMessageBox::warning(this, tr("EM-MPM"), tr("The Image has been modified.\nDo you want to save your changes?"), QMessageBox::Save
@@ -422,6 +431,9 @@ qint32 QCrossCorrelation::checkDirtyDocument()
     }
   }
   else
+#endif
+
+
   {
     err = 1;
   }
@@ -513,25 +525,26 @@ void QCrossCorrelation::on_registerButton_clicked()
 
 
 
+#if 0
   if (this->m_OutputExistsCheck == false)
   {
     QFile file (this->m_CurrentProcessedFile );
     if (file.exists() == true)
     {
-     int ret = QMessageBox::warning(this, tr("QCrossCorrelation"),
-                  tr("The Output File Already Exists\nDo you want to over write the existing file?"),
+      int ret = QMessageBox::warning(this, tr("QCrossCorrelation"),
+          tr("The Output File Already Exists\nDo you want to over write the existing file?"),
           QMessageBox::No | QMessageBox::Default,
           QMessageBox::Yes,
-                  QMessageBox::Cancel);
-     if (ret == QMessageBox::Cancel)
-     {
-       return;
-     }
-     else if (ret == QMessageBox::Yes)
-     {
-       this->m_OutputExistsCheck = true;
-     }
-     else
+          QMessageBox::Cancel);
+      if (ret == QMessageBox::Cancel)
+      {
+        return;
+      }
+      else if (ret == QMessageBox::Yes)
+      {
+        this->m_OutputExistsCheck = true;
+      }
+      else
       {
         QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
         outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
@@ -541,12 +554,15 @@ void QCrossCorrelation::on_registerButton_clicked()
           this->m_OutputExistsCheck = true;
         }
         else // The user clicked cancel from the save file dialog
+
         {
           return;
         }
       }
     }
   }
+#endif
+
 
   /* If the 'processFolder' checkbox is checked then we need to check for some
    * additional inputs
@@ -612,6 +628,46 @@ void QCrossCorrelation::on_registerButton_clicked()
                                    QMessageBox::Ok);
      return;
    }
+   if (outputImageFile->text().isEmpty() == true)
+   {
+     QMessageBox::critical(this, tr("Output Image File Error"),
+                                   tr("Please select a file name for the registered image to be saved as."),
+                                   QMessageBox::Ok);
+     return;
+   }
+   QFile file (outputImageFile->text() );
+   if (file.exists() == true)
+   {
+     int ret = QMessageBox::warning(this, tr("QCrossCorrelation"),
+         tr("The Output File Already Exists\nDo you want to over write the existing file?"),
+         QMessageBox::No | QMessageBox::Default,
+         QMessageBox::Yes,
+         QMessageBox::Cancel);
+     if (ret == QMessageBox::Cancel)
+     {
+       return;
+     }
+     else if (ret == QMessageBox::Yes)
+     {
+       this->m_OutputExistsCheck = true;
+     }
+     else
+     {
+       QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
+       outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
+       if (!outputFile.isNull())
+       {
+         this->m_CurrentProcessedFile = "";
+         this->m_OutputExistsCheck = true;
+       }
+       else // The user clicked cancel from the save file dialog
+
+       {
+         return;
+       }
+     }
+   }
+
   }
 
   m_QueueDialog->clearTable();
@@ -641,16 +697,16 @@ void QCrossCorrelation::on_registerButton_clicked()
 
     task->setInputFilePath(fixedImageFile->text());
     task->setMovingImagePath(movingImageFile->text());
-    QFileInfo fileInfo(movingImageFile->text());
-    QString basename = fileInfo.completeBaseName();
-    QString extension = fileInfo.suffix();
-    QString filepath = fileInfo.absolutePath();
-    filepath.append(QDir::separator());
-    filepath.append(basename);
-    filepath.append("_Registered");
-    filepath.append(".");
-    filepath.append(extension);
-    task->setOutputFilePath(filepath);
+//    QFileInfo fileInfo(movingImageFile->text());
+//    QString basename = fileInfo.completeBaseName();
+//    QString extension = fileInfo.suffix();
+//    QString filepath = fileInfo.absolutePath();
+//    filepath.append(QDir::separator());
+//    filepath.append(basename);
+//    filepath.append("_Registered");
+//    filepath.append(".");
+//    filepath.append(extension);
+    task->setOutputFilePath(outputImageFile->text());
     CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
     crossCorrelationData->setFixedSlice(0);
     crossCorrelationData->setMovingSlice(1);
@@ -900,20 +956,12 @@ void QCrossCorrelation::queueControllerFinished()
     AIMImage::Pointer image = loadImage(movingImageFile->text());
     ccData = m_CrossCorrelationTable->getCrossCorrelationData(0);
 
-    QFileInfo fileInfo(movingImageFile->text());
-    QString basename = fileInfo.completeBaseName();
-    QString extension = fileInfo.suffix();
-    QString filepath = fileInfo.absolutePath();
-    filepath.append(QDir::separator());
-    filepath.append(basename);
-    filepath.append("_Registered");
-    filepath.append(".");
-    filepath.append(extension);
+    cc->writeRegisteredImage(image, ccData, outputImageFile->text().toStdString());
+//    loadImageFile(fixedImageFile->text());
+//    loadProcessedImageFile(outputImageFile->text());
 
-    cc->writeRegisteredImage(image, ccData, filepath.toStdString());
-    loadImageFile(fixedImageFile->text());
-    loadProcessedImageFile(filepath);
-
+    m_CurrentImageFile = fixedImageFile->text();
+    m_CurrentProcessedFile = outputImageFile->text();
    }
   else
   {
@@ -926,6 +974,12 @@ void QCrossCorrelation::queueControllerFinished()
       writeRegisteredImage(fileList.at(i), i, xt, yt);
     }
   }
+
+  initWithFile(m_CurrentImageFile, m_CurrentProcessedFile);
+  // Tell the RecentFileList to update itself then broadcast those changes.
+  QRecentFileList::instance()->addFile(m_CurrentImageFile);
+  QRecentFileList::instance()->addFile(m_CurrentProcessedFile);
+  setWidgetListEnabled(true);
 
   registerButton->setEnabled(true);
   m_QueueController->deleteLater();
@@ -967,11 +1021,11 @@ int QCrossCorrelation::writeRegisteredImage(QString file, int i, double &xt, dou
   cc->writeRegisteredImage(image, ccData, filepath.toStdString());
   if (i == 0)
   {
-    loadImageFile(filepath);
+    m_CurrentImageFile = filepath;
   }
   if ( i == 1)
   {
-    loadProcessedImageFile(filepath);
+    m_CurrentProcessedFile = filepath;
   }
   return 1;
 }
@@ -1035,12 +1089,24 @@ qint32 QCrossCorrelation::initGraphicViews()
 
     // Create the QGraphicsScene Objects
     m_OriginalImageGScene = new QGraphicsScene(this);
+    m_OriginalImageGScene->setSceneRect(image.rect());
+    m_OriginalImageGScene->update(image.rect());
     originalImageGView->setScene(m_OriginalImageGScene);
+
     m_OriginalGDelegate = new MXAImageGraphicsDelegate(this);
     m_OriginalGDelegate->setGraphicsView(originalImageGView);
     m_OriginalGDelegate->setGraphicsScene(m_OriginalImageGScene);
     m_OriginalGDelegate->setMainWindow(this);
     m_OriginalGDelegate->setCachedImage(image);
+    originalImageGView->adjustSize();
+
+//    QRectF sceneRect = m_OriginalImageGScene->sceneRect();
+//    QSize gViewSize = originalImageGView->size();
+//    QSize frameSize = OriginalImageFrame->size();
+
+//    originalImageGView->setStyleSheet("border: 1px solid red;");
+//    OriginalImageFrame->setStyleSheet("border: 1px solid blue;");
+
     m_OriginalGDelegate->fitToWindow();
     connect(this, SIGNAL(parentResized () ),
             m_OriginalGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
@@ -1097,8 +1163,6 @@ qint32 QCrossCorrelation::initGraphicViews()
 
   if (NULL != m_ProcessedImage.data() )
   {
-
-
     // Create the QGraphicsScene Objects
     m_ProcessedImageGScene = new QGraphicsScene(this);
     processedImageGView->setScene(m_ProcessedImageGScene);
@@ -1193,6 +1257,14 @@ void QCrossCorrelation::on_processFolder_stateChanged(int state)
   fileListView->setEnabled(enabled);
   outputImageTypeLabel->setEnabled(enabled);
   outputImageType->setEnabled(enabled);
+
+  fixedImageFile->setEnabled(!enabled);
+  fixedImageButton->setEnabled(!enabled);
+  movingImageFile->setEnabled(!enabled);
+  movingImageButton->setEnabled(!enabled);
+
+  outputImageFile->setEnabled(!enabled);
+  outputImageButton->setEnabled(!enabled);
 }
 
 // -----------------------------------------------------------------------------
@@ -1277,23 +1349,6 @@ AIMImage::Pointer QCrossCorrelation::convertQImageToGrayScaleAIMImage(QImage ima
   return aimImage;
 }
 
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_movingImageButton_clicked()
-{
-  QString imageFile = QFileDialog::getOpenFileName(this, tr("Select Moving Image"),
-    m_OpenDialogLastDirectory,
-    tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)") );
-
-  if ( true == imageFile.isEmpty() )
-  {
-    return;
-  }
-  movingImageFile->setText(imageFile);
-}
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -1314,6 +1369,38 @@ void QCrossCorrelation::on_fixedImageButton_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void QCrossCorrelation::on_movingImageButton_clicked()
+{
+  QString imageFile = QFileDialog::getOpenFileName(this, tr("Select Moving Image"),
+    m_OpenDialogLastDirectory,
+    tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)") );
+
+  if ( true == imageFile.isEmpty() )
+  {
+    return;
+  }
+  movingImageFile->setText(imageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QCrossCorrelation::on_outputImageButton_clicked()
+{
+  QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
+  outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)"));
+  if (outputFile.isEmpty() )
+  {
+    return;
+  }
+  outputImageFile->setText(outputFile);
+}
+
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void QCrossCorrelation::on_fixedImageFile_textChanged(const QString & text)
 {
   verifyPathExists(fixedImageFile->text(), fixedImageFile);
@@ -1330,9 +1417,18 @@ void QCrossCorrelation::on_movingImageFile_textChanged(const QString & text)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void QCrossCorrelation::on_outputImageFile_textChanged(const QString & text)
+{
+//  verifyPathExists(outputImageFile->text(), movingImageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void QCrossCorrelation::on_sourceDirectoryLE_textChanged(const QString & text)
 {
   verifyPathExists(sourceDirectoryLE->text(), sourceDirectoryLE);
+  this->populateFileTable();
 }
 
 // -----------------------------------------------------------------------------

@@ -34,7 +34,7 @@ namespace R3D
   namespace PCM
   {
     const unsigned int FFTResolutionSize = 14;
-    const float        PCMAbsolutePixelOffset = 5.1f;
+    const float        PCMAbsolutePixelOffset = 2.1f;
   }
 }
 //typedef unsigned char PixelType;

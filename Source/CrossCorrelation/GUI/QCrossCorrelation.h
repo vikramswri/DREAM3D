@@ -79,6 +79,7 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
 
     void on_fixedImageButton_clicked();
     void on_movingImageButton_clicked();
+    void on_outputImageButton_clicked();
 
 
     void on_processFolder_stateChanged(int state  );
@@ -87,6 +88,7 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
 
     void on_fixedImageFile_textChanged(const QString &string);
     void on_movingImageFile_textChanged(const QString & text);
+    void on_outputImageFile_textChanged(const QString & text);
     void on_sourceDirectoryLE_textChanged(const QString & text);
     void on_outputDirectoryLE_textChanged(const QString & text);
 

@@ -173,18 +173,29 @@ void MXAImageGraphicsDelegate::fitToWindow()
   QSize imageSize = this->m_CachedImage.size();
   int gvWidth = m_GraphicsView->size().width();
   int gvHeight = m_GraphicsView->size().height();
-  gvWidth -= 4;
-  gvHeight -= 4;
-  if (imageSize.width() > imageSize.height() )
-  {
-    double zf = (double)(gvWidth)/(double)(imageSize.width());
-    this->setZoomFactor(zf);
+  gvWidth -= 15;
+  gvHeight -= 15;
+
+  double zfW = (double)(gvWidth)/(double)(imageSize.width());
+  double zfH = (double)(gvHeight)/(double)(imageSize.height());
+  if (zfW < zfH) {
+    this->setZoomFactor(zfW);
   }
   else
   {
-    double zf = (double)(gvHeight)/(double)(imageSize.height());
-    this->setZoomFactor(zf);
+    this->setZoomFactor(zfH);
   }
+//
+//  if (imageSize.width() > imageSize.height() )
+//  {
+//    double zf = (double)(gvWidth)/(double)(imageSize.width());
+//    this->setZoomFactor(zf);
+//  }
+//  else
+//  {
+//    double zf = (double)(gvHeight)/(double)(imageSize.height());
+//    this->setZoomFactor(zf);
+//  }
   updateGraphicsScene();
 }
 

@@ -72,6 +72,7 @@ SET( CrossCorrelation_SRCS
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationTable.cpp
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImageFilter.cpp
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.cpp
+    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImagePadFilter.cpp
 )
 
 SET (CrossCorrelation_HDRS
@@ -80,6 +81,8 @@ SET (CrossCorrelation_HDRS
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationTable.h
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImageFilter.h
     ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h
+    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImagePadFilter.h
+
 )
 IDE_SOURCE_PROPERTIES( "CrossCorrelation/GUI" "${QCrossCorrelation_HDRS}" "${QCrossCorrelation_SRCS}")
 

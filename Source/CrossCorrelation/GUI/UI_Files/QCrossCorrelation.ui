@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="inputsTab">
        <attribute name="title">
@@ -78,6 +78,27 @@
           </item>
           <item row="1" column="3">
            <widget class="QPushButton" name="movingImageButton">
+            <property name="text">
+             <string>Select...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Output Image</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLineEdit" name="outputImageFile">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QPushButton" name="outputImageButton">
             <property name="text">
              <string>Select...</string>
             </property>
@@ -324,6 +345,12 @@
         </item>
         <item>
          <widget class="QFrame" name="OriginalImageFrame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
@@ -331,14 +358,27 @@
            <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
+           <enum>QFrame::Raised</enum>
+          </property>
+          <property name="lineWidth">
+           <number>1</number>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
            <property name="margin">
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QFSDroppableGraphicsView" name="originalImageGView"/>
+            <widget class="QFSDroppableGraphicsView" name="originalImageGView">
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="lineWidth">
+              <number>2</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "R3DCropGrayScaleImage.h"
 
-#include "itkRegionOfInterestImageFilter.h"
+#include <itkRegionOfInterestImageFilter.h>
 
 // -----------------------------------------------------------------------------
 //
