@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>648</width>
+    <width>677</width>
     <height>665</height>
    </rect>
   </property>
@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="inputsTab">
        <attribute name="title">
@@ -292,20 +292,11 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>2</number>
+          </property>
           <item>
-           <widget class="QToolButton" name="fitToWindow">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normalon>:/fitToWindow.png</normalon>
-             </iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="zoomIn">
+           <widget class="QToolButton" name="fixedZoomInBtn">
             <property name="text">
              <string>...</string>
             </property>
@@ -317,13 +308,25 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="zoomOut">
+           <widget class="QToolButton" name="fixedZoomOutBtn">
             <property name="text">
              <string>...</string>
             </property>
             <property name="icon">
              <iconset>
               <normalon>:/zoomOut.png</normalon>
+             </iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="fixedFitToWindowBtn">
+            <property name="text">
+             <string>Fit To Window</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normalon>:/fitToWindow.png</normalon>
              </iconset>
             </property>
            </widget>
@@ -344,12 +347,18 @@
          </layout>
         </item>
         <item>
-         <widget class="QFrame" name="OriginalImageFrame">
+         <widget class="QFrame" name="originalImageFrame">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>622</width>
+            <height>475</height>
+           </size>
           </property>
           <property name="acceptDrops">
            <bool>true</bool>
@@ -369,6 +378,18 @@
            </property>
            <item row="0" column="0">
             <widget class="QFSDroppableGraphicsView" name="originalImageGView">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="baseSize">
+              <size>
+               <width>622</width>
+               <height>475</height>
+              </size>
+             </property>
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -421,19 +442,7 @@
            <number>2</number>
           </property>
           <item>
-           <widget class="QToolButton" name="fitToWindow_mount">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normalon>:/fitToWindow.png</normalon>
-             </iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="zoomIn_mount">
+           <widget class="QToolButton" name="processedZoomInBtn">
             <property name="text">
              <string>...</string>
             </property>
@@ -445,7 +454,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="zoomOut_mount">
+           <widget class="QToolButton" name="processedZoomOutBtn">
             <property name="text">
              <string>...</string>
             </property>
@@ -457,12 +466,30 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="processedFitToWindowBtn">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Fit To Window</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normalon>:/fitToWindow.png</normalon>
+             </iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
+             <enum>QSizePolicy::Preferred</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -501,7 +528,13 @@
          </layout>
         </item>
         <item>
-         <widget class="QFrame" name="SegmentedImageFrame">
+         <widget class="QFrame" name="processedImageFrame">
+          <property name="baseSize">
+           <size>
+            <width>622</width>
+            <height>475</height>
+           </size>
+          </property>
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
@@ -578,7 +611,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>648</width>
+     <width>677</width>
      <height>22</height>
     </rect>
    </property>

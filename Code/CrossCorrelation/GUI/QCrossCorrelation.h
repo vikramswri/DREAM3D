@@ -117,6 +117,11 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
     QStringList generateInputFileList();
 
   protected:
+    /**
+     *
+     * @param event
+     */
+    void resizeEvent ( QResizeEvent * event );
 
     /**
      * @brief Implements the CloseEvent to Quit the application and write settings
@@ -124,37 +129,6 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
      */
     void closeEvent(QCloseEvent *event);
 
-#if 0
-    /**
-     * @brief Drag and drop implementation
-     */
-    void dragEnterEvent(QDragEnterEvent*);
-
-    /**
-     * @brief Drag and drop implementation
-     */
-    void dropEvent(QDropEvent*);
-#endif
-
-    /**
-     * @brief Enables or Disables all the widgets in a list
-     * @param b
-     */
-    void setWidgetListEnabled(bool b);
-
-    /**
-     * @brief Verifies that a path exists on the file system.
-     * @param outFilePath The file path to check
-     * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
-     */
-    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
-
-    /**
-     * @brief Verifies that a parent path exists on the file system.
-     * @param outFilePath The parent file path to check
-     * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
-     */
-    bool verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit);
 
     /**
      * @brief Reads the Preferences from the users pref file
@@ -177,7 +151,26 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
      */
     qint32 checkDirtyDocument();
 
-    void resizeEvent ( QResizeEvent * event );
+    /**
+     * @brief Enables or Disables all the widgets in a list
+     * @param b
+     */
+    void setWidgetListEnabled(bool b);
+
+    /**
+     * @brief Verifies that a path exists on the file system.
+     * @param outFilePath The file path to check
+     * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
+     */
+    bool verifyPathExists(QString outFilePath, QLineEdit* lineEdit);
+
+    /**
+     * @brief Verifies that a parent path exists on the file system.
+     * @param outFilePath The parent file path to check
+     * @param lineEdit The QLineEdit object to modify visuals of (Usually by placing a red line around the QLineEdit widget)
+     */
+    bool verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit);
+
 
      /**
       * @brief Opens an Image file
@@ -189,7 +182,7 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
 
      AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
-     qint32 initGraphicViews();
+     qint32 initImageViews();
 
      void populateFileTable();
 

@@ -22,8 +22,6 @@
 #include <QtGui/QHeaderView>
 #include <QtGui/QGraphicsPixmapItem>
 
-
-
 #define ZOOM_INDEX_MAX 9
 #define ZOOM_INDEX_MIN 0
 
@@ -31,16 +29,9 @@
 //
 // -----------------------------------------------------------------------------
 MXAImageGraphicsDelegate::MXAImageGraphicsDelegate(QObject* parent) :
-  QObject(parent),
-  m_MainWindow(NULL),
-  m_GraphicsView(NULL),
-  m_GraphicsScene(NULL),
-  m_CompositeImages(false),
-  m_CurrentGraphicsItem(NULL),
-  _zoomFactor(1.0),
-  _shouldFitToWindow(false)
+  QObject(parent), m_MainWindow(NULL), m_GraphicsView(NULL), m_GraphicsScene(NULL), m_CompositeImages(false), m_CurrentGraphicsItem(NULL), _zoomFactor(1.0),
+      _shouldFitToWindow(false)
 {
-
 
   _zoomFactors[0] = 0.05;
   _zoomFactors[1] = 0.1;
@@ -64,7 +55,6 @@ MXAImageGraphicsDelegate::~MXAImageGraphicsDelegate()
 {
 }
 
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -74,13 +64,12 @@ void MXAImageGraphicsDelegate::resetCaches()
   this->m_OverlayImage = QImage();
 }
 
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
 void MXAImageGraphicsDelegate::displayTextMessage(QString message)
 {
-  _displayTextMessage( message );
+  _displayTextMessage(message);
 }
 
 // -----------------------------------------------------------------------------
@@ -89,32 +78,35 @@ void MXAImageGraphicsDelegate::displayTextMessage(QString message)
 void MXAImageGraphicsDelegate::increaseZoom()
 {
   _shouldFitToWindow = false;
-  if (m_CachedImage.isNull() == true) { return; }
+  if (m_CachedImage.isNull() == true)
+  {
+    return;
+  }
   // Find the next scaling factor up from where we are currently
   QSize imageSize = this->m_CachedImage.size();
   int gvWidth = m_GraphicsView->size().width();
   int gvHeight = m_GraphicsView->size().height();
   gvWidth -= 4;
   gvHeight -= 4;
-  if (imageSize.width() > imageSize.height() )
+  if (imageSize.width() > imageSize.height())
   {
-    for (int i = 0; i < ZOOM_INDEX_MAX - 1; ++i )
+    for (int i = 0; i < ZOOM_INDEX_MAX - 1; ++i)
     {
       if (_zoomFactor < this->_zoomFactors[i] && i > 0)
       {
         this->_zoomIndex = i;
-        this->_zoomFactor = this->_zoomFactors[this->_zoomIndex ];
+        this->_zoomFactor = this->_zoomFactors[this->_zoomIndex];
         break;
       }
     }
   }
 
-  for (int i = 0; i < ZOOM_INDEX_MAX - 1; ++i )
+  for (int i = 0; i < ZOOM_INDEX_MAX - 1; ++i)
   {
     if (_zoomFactor < this->_zoomFactors[i] && i > 0)
     {
       this->_zoomIndex = i;
-      this->_zoomFactor = this->_zoomFactors[this->_zoomIndex ];
+      this->_zoomFactor = this->_zoomFactors[this->_zoomIndex];
       break;
     }
   }
@@ -129,31 +121,34 @@ void MXAImageGraphicsDelegate::decreaseZoom()
 {
   _shouldFitToWindow = false;
   // Find the next scaling factor down
-  if (m_CachedImage.isNull() == true) { return; }
+  if (m_CachedImage.isNull() == true)
+  {
+    return;
+  }
   QSize imageSize = this->m_CachedImage.size();
   int gvWidth = m_GraphicsView->size().width();
   int gvHeight = m_GraphicsView->size().height();
   gvWidth -= 4;
   gvHeight -= 4;
-  if (imageSize.width() > imageSize.height() )
+  if (imageSize.width() > imageSize.height())
   {
-    for (int i = 0; i < ZOOM_INDEX_MAX - 1; ++i )
+    for (int i = 0; i < ZOOM_INDEX_MAX - 1; ++i)
     {
       if (_zoomFactor < this->_zoomFactors[i] && i > 0)
       {
         this->_zoomIndex = i - 1;
-        this->_zoomFactor = this->_zoomFactors[this->_zoomIndex ];
+        this->_zoomFactor = this->_zoomFactors[this->_zoomIndex];
         break;
       }
     }
   }
 
-  for (int i = ZOOM_INDEX_MAX - 1; i >= 0; --i )
+  for (int i = ZOOM_INDEX_MAX - 1; i >= 0; --i)
   {
     if (_zoomFactor > this->_zoomFactors[i] && i > 0)
     {
       this->_zoomIndex = i;
-      this->_zoomFactor = this->_zoomFactors[this->_zoomIndex ];
+      this->_zoomFactor = this->_zoomFactors[this->_zoomIndex];
       break;
     }
   }
@@ -163,42 +158,45 @@ void MXAImageGraphicsDelegate::decreaseZoom()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void MXAImageGraphicsDelegate::fitToWindow()
+void MXAImageGraphicsDelegate::fitToWindow(int state)
 {
-  if (m_CachedImage.isNull() == true) { return; }
-  _shouldFitToWindow = true;
+  if (m_CachedImage.isNull() == true)
+  {
+    std::cout << "MXAImageGraphicsDelegate::fitToWindow  m_CachedImage.isNull() == true" << std::endl;
+    return;
+  }
+  if (state == Qt::Checked)
+  {
+    _shouldFitToWindow = true;
+  }
+  else
+  {
+    _shouldFitToWindow = false;
+    return;
+  }
+  //  std::cout << m_DelegateName.toStdString() << " fitToWindow." << std::endl;
   _zoomIndex = ZOOM_INDEX_MAX;
   this->setZoomFactor(_zoomFactors[_zoomIndex]);
 
   QSize imageSize = this->m_CachedImage.size();
   int gvWidth = m_GraphicsView->size().width();
   int gvHeight = m_GraphicsView->size().height();
-  gvWidth -= 15;
-  gvHeight -= 15;
+  //   std::cout << "    imageSize (W x H) :" << m_CachedImage.width() << " x " << m_CachedImage.height() << std::endl;
+  //   std::cout << "    GV Size (W X H) :" << gvWidth << " x " << gvHeight << std::endl;
 
-  double zfW = (double)(gvWidth)/(double)(imageSize.width());
-  double zfH = (double)(gvHeight)/(double)(imageSize.height());
-  if (zfW < zfH) {
+  double zfW = (double)(gvWidth) / (double)(imageSize.width());
+  double zfH = (double)(gvHeight) / (double)(imageSize.height());
+  if (zfW < zfH)
+  {
     this->setZoomFactor(zfW);
   }
   else
   {
     this->setZoomFactor(zfH);
   }
-//
-//  if (imageSize.width() > imageSize.height() )
-//  {
-//    double zf = (double)(gvWidth)/(double)(imageSize.width());
-//    this->setZoomFactor(zf);
-//  }
-//  else
-//  {
-//    double zf = (double)(gvHeight)/(double)(imageSize.height());
-//    this->setZoomFactor(zf);
-//  }
+
   updateGraphicsScene();
 }
-
 
 // -----------------------------------------------------------------------------
 //
@@ -208,7 +206,6 @@ void MXAImageGraphicsDelegate::setZoomFactor(double zoomFactor)
   this->_zoomFactor = zoomFactor;
 }
 
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -216,17 +213,17 @@ QImage MXAImageGraphicsDelegate::_scaleImage()
 {
   //std::cout << "  MXAImageGraphicsDelegate::_scaleImage()" << std::endl;
   QSize imageSize = this->m_CachedImage.size();
- // std::cout << "    imageSize (W x H) :" << imageSize.width() << " x " << imageSize.height() << std::endl;
-//  int gvWidth = m_GraphicsView->size().width();
-//  int gvHeight = m_GraphicsView->size().height();
- // std::cout << "    GV Size (W X H) :" << gvWidth << " x " << gvHeight << std::endl;
+  // std::cout << "    imageSize (W x H) :" << imageSize.width() << " x " << imageSize.height() << std::endl;
+  //  int gvWidth = m_GraphicsView->size().width();
+  //  int gvHeight = m_GraphicsView->size().height();
+  // std::cout << "    GV Size (W X H) :" << gvWidth << " x " << gvHeight << std::endl;
   if (_zoomFactor > -1.0)
   {
-   // std::cout << "  _zoomFactor: " << _zoomFactor << std::endl;
+    // std::cout << "  _zoomFactor: " << _zoomFactor << std::endl;
     imageSize *= _zoomFactor;
   }
 
-  return this->m_CachedImage.scaled(imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+  return this->m_CachedImage.scaled(imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 // -----------------------------------------------------------------------------
@@ -236,17 +233,17 @@ QImage MXAImageGraphicsDelegate::_scaleImage(QImage image)
 {
   //std::cout << "  MXAImageGraphicsDelegate::_scaleImage()" << std::endl;
   QSize imageSize = image.size();
- // std::cout << "    imageSize (W x H) :" << imageSize.width() << " x " << imageSize.height() << std::endl;
-//  int gvWidth = m_GraphicsView->size().width();
-//  int gvHeight = m_GraphicsView->size().height();
- // std::cout << "    GV Size (W X H) :" << gvWidth << " x " << gvHeight << std::endl;
+  // std::cout << "    imageSize (W x H) :" << imageSize.width() << " x " << imageSize.height() << std::endl;
+  //  int gvWidth = m_GraphicsView->size().width();
+  //  int gvHeight = m_GraphicsView->size().height();
+  // std::cout << "    GV Size (W X H) :" << gvWidth << " x " << gvHeight << std::endl;
   if (_zoomFactor > -1.0)
   {
-   // std::cout << "  _zoomFactor: " << _zoomFactor << std::endl;
+    // std::cout << "  _zoomFactor: " << _zoomFactor << std::endl;
     imageSize *= _zoomFactor;
   }
 
-  return image.scaled(imageSize, Qt::KeepAspectRatio );
+  return image.scaled(imageSize, Qt::KeepAspectRatio);
 }
 
 // -----------------------------------------------------------------------------
@@ -254,13 +251,13 @@ QImage MXAImageGraphicsDelegate::_scaleImage(QImage image)
 // -----------------------------------------------------------------------------
 void MXAImageGraphicsDelegate::on_parentResized()
 {
-  //std::cout << "  MXAImageGraphicsDelegate::on_parentResized" << std::endl;
-//  int gvWidth = m_GraphicsView->size().width();
-//  int gvHeight = m_GraphicsView->size().height();
- // std::cout << "    GV Size (W X H) :" << gvWidth << " x " << gvHeight << std::endl;
+  //  std::cout << "  MXAImageGraphicsDelegate::on_parentResized" << std::endl;
+  //  int gvWidth = m_GraphicsView->size().width();
+  //  int gvHeight = m_GraphicsView->size().height();
+  //  std::cout << "    GV Size (W X H) :" << gvWidth << " x " << gvHeight << std::endl;
   if (_shouldFitToWindow == true)
   {
-    fitToWindow();
+    fitToWindow(Qt::Checked);
   }
   else
   {
@@ -296,7 +293,7 @@ void MXAImageGraphicsDelegate::updateGraphicsScene(bool update)
     painter.begin(&paintImage);
     // Draw the fixed Image first
     painter.setPen(Qt::NoPen);
-    painter.drawImage(point, topImage );
+    painter.drawImage(point, topImage);
     // Draw the moving image next
     painter.setCompositionMode(m_composition_mode);
     painter.drawImage(point, dataImage);
@@ -314,7 +311,8 @@ void MXAImageGraphicsDelegate::updateGraphicsScene(bool update)
   m_GraphicsScene->setSceneRect(rect);
   m_GraphicsView->setScene(m_GraphicsScene);
   m_GraphicsView->centerOn(m_CurrentGraphicsItem);
-  if (update) {
+  if (update)
+  {
     m_GraphicsScene->update(rect);
   }
 }
@@ -324,7 +322,7 @@ void MXAImageGraphicsDelegate::updateGraphicsScene(bool update)
 // -----------------------------------------------------------------------------
 void MXAImageGraphicsDelegate::_displayTextMessage(QString message)
 {
-  if ( NULL != m_CurrentGraphicsItem )
+  if (NULL != m_CurrentGraphicsItem)
   {
     m_GraphicsScene->removeItem(m_CurrentGraphicsItem); //Remove the image that is displaying
     m_CurrentGraphicsItem->setParentItem(NULL); // Set the parent to NULL

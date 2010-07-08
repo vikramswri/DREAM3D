@@ -44,7 +44,7 @@ class MXAImageGraphicsDelegate : public QObject
   MXAImageGraphicsDelegate(QObject* parent = 0);
   virtual ~MXAImageGraphicsDelegate();
 
-
+  MXA_INSTANCE_PROPERTY_m(QString, DelegateName)
   MXA_INSTANCE_PROPERTY_m(QMainWindow*, MainWindow)
   MXA_INSTANCE_PROPERTY_m(QGraphicsView*, GraphicsView)
   MXA_INSTANCE_PROPERTY_m(QGraphicsScene*, GraphicsScene)
@@ -83,7 +83,7 @@ class MXAImageGraphicsDelegate : public QObject
 
     void decreaseZoom();
 
-    void fitToWindow();
+    void fitToWindow(int state);
 
     void updateGraphicsScene(bool update = true);
 

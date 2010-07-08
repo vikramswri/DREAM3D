@@ -939,7 +939,7 @@ qint32 QEmMpm::initGraphicViews()
     m_OriginalGDelegate->setGraphicsScene(m_OriginalImageGScene);
     m_OriginalGDelegate->setMainWindow(this);
     m_OriginalGDelegate->setCachedImage(image);
-    m_OriginalGDelegate->fitToWindow();
+    m_OriginalGDelegate->fitToWindow(1);
     connect(this, SIGNAL(parentResized () ),
             m_OriginalGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
 
@@ -1005,7 +1005,7 @@ qint32 QEmMpm::initGraphicViews()
     m_SegmentedGDelegate->setGraphicsScene(m_SegmentedImageGScene);
     m_SegmentedGDelegate->setMainWindow(this);
     m_SegmentedGDelegate->setCachedImage(segImage);
-    m_SegmentedGDelegate->fitToWindow();
+    m_SegmentedGDelegate->fitToWindow(1);
     connect(this, SIGNAL(parentResized () ),
             m_SegmentedGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
 

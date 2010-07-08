@@ -136,6 +136,24 @@ void QCrossCorrelation::closeEvent(QCloseEvent *event)
 // -----------------------------------------------------------------------------
 void QCrossCorrelation::resizeEvent ( QResizeEvent * event )
 {
+  QSize osize = originalImageFrame->size();
+//  std::cout << "originalImageFrame.size: " << osize.width() << " x " << osize.height() << std::endl;
+  QSize psize = processedImageFrame->size();
+//  std::cout << "processedImageFrame.size: " << psize.width() << " x " << psize.height() << std::endl;
+  if (originalImageGView->isVisible() == true)
+  {
+    QRect sceneRect(0, 0, osize.width(), osize.height());
+    processedImageFrame->setGeometry(sceneRect);
+    processedImageGView->setGeometry(sceneRect);
+    m_ProcessedImageGScene->setSceneRect(sceneRect);
+  }
+  else if (processedImageGView->isVisible() == true)
+  {
+    QRect sceneRect(0, 0, psize.width(), psize.height());
+    originalImageFrame->setGeometry(sceneRect);
+    originalImageGView->setGeometry(sceneRect);
+    m_OriginalImageGScene->setSceneRect(sceneRect);
+  }
   emit parentResized();
 }
 
@@ -191,41 +209,6 @@ void QCrossCorrelation::writeSettings()
   WRITE_STRING_SETTING(prefs, outputPrefix);
   WRITE_STRING_SETTING(prefs, outputSuffix);
 }
-
-#if 0
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::dragEnterEvent(QDragEnterEvent* e)
-{
-  const QMimeData* dat = e->mimeData();
-  QList<QUrl> urls = dat->urls();
-  QString file = urls.count() ? urls[0].toLocalFile() : QString();
-  QDir parent(file);
-  this->m_OpenDialogLastDirectory = parent.dirName();
-  QFileInfo fi(file);
-  QString ext = fi.suffix();
-  if (fi.exists() && fi.isFile())
-  {
-    e->accept();
-  }
-  else
-  {
-    e->ignore();
-  }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::dropEvent(QDropEvent* e)
-{
-  const QMimeData* dat = e->mimeData();
-  QList<QUrl> urls = dat->urls();
-  QString file = urls.count() ? urls[0].toLocalFile() : QString();
-  openFile(file);
-}
-#endif
 
 // -----------------------------------------------------------------------------
 //
@@ -411,33 +394,9 @@ bool QCrossCorrelation::verifyPathExists(QString outFilePath, QLineEdit* lineEdi
 qint32 QCrossCorrelation::checkDirtyDocument()
 {
   qint32 err = -1;
-
-#if 0
-  if (this->isWindowModified() == true)
-  {
-    int r = QMessageBox::warning(this, tr("EM-MPM"), tr("The Image has been modified.\nDo you want to save your changes?"), QMessageBox::Save
-        | QMessageBox::Default, QMessageBox::Discard, QMessageBox::Cancel | QMessageBox::Escape);
-    if (r == QMessageBox::Save)
-    {
-      //TODO: Save the current document or otherwise save the state.
-    }
-    else if (r == QMessageBox::Discard)
-    {
-      err = 1;
-    }
-    else if (r == QMessageBox::Cancel)
-    {
-      err = -1;
-    }
-  }
-  else
-#endif
-
-
   {
     err = 1;
   }
-
   return err;
 }
 
@@ -516,53 +475,6 @@ void QCrossCorrelation::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 void QCrossCorrelation::on_registerButton_clicked()
 {
-//
-//  if (m_QueueController != NULL && m_QueueController->isFinished() == false)
-//  {
-//    emit cancelProcessQueue();
-//    return;
-//  }
-
-
-
-#if 0
-  if (this->m_OutputExistsCheck == false)
-  {
-    QFile file (this->m_CurrentProcessedFile );
-    if (file.exists() == true)
-    {
-      int ret = QMessageBox::warning(this, tr("QCrossCorrelation"),
-          tr("The Output File Already Exists\nDo you want to over write the existing file?"),
-          QMessageBox::No | QMessageBox::Default,
-          QMessageBox::Yes,
-          QMessageBox::Cancel);
-      if (ret == QMessageBox::Cancel)
-      {
-        return;
-      }
-      else if (ret == QMessageBox::Yes)
-      {
-        this->m_OutputExistsCheck = true;
-      }
-      else
-      {
-        QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
-        outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
-        if (!outputFile.isNull())
-        {
-          this->m_CurrentProcessedFile = "";
-          this->m_OutputExistsCheck = true;
-        }
-        else // The user clicked cancel from the save file dialog
-
-        {
-          return;
-        }
-      }
-    }
-  }
-#endif
-
 
   /* If the 'processFolder' checkbox is checked then we need to check for some
    * additional inputs
@@ -1067,7 +979,7 @@ AIMImage::Pointer QCrossCorrelation::loadImage(QString filePath)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QCrossCorrelation::initGraphicViews()
+qint32 QCrossCorrelation::initImageViews()
 {
   qint32 err = 0;
   QImage image;
@@ -1089,36 +1001,36 @@ qint32 QCrossCorrelation::initGraphicViews()
 
     // Create the QGraphicsScene Objects
     m_OriginalImageGScene = new QGraphicsScene(this);
-    m_OriginalImageGScene->setSceneRect(image.rect());
-    m_OriginalImageGScene->update(image.rect());
+
+    QSize baseSize = originalImageFrame->baseSize();
+    QRect sceneRect(0, 0, baseSize.width(), baseSize.height());
+    originalImageFrame->setGeometry(sceneRect);
+    originalImageGView->setGeometry(sceneRect);
+    m_OriginalImageGScene->setSceneRect(sceneRect);
     originalImageGView->setScene(m_OriginalImageGScene);
 
+
     m_OriginalGDelegate = new MXAImageGraphicsDelegate(this);
+    m_OriginalGDelegate->setDelegateName(QString("Original Image"));
     m_OriginalGDelegate->setGraphicsView(originalImageGView);
     m_OriginalGDelegate->setGraphicsScene(m_OriginalImageGScene);
     m_OriginalGDelegate->setMainWindow(this);
     m_OriginalGDelegate->setCachedImage(image);
-    originalImageGView->adjustSize();
+    fixedFitToWindowBtn->setChecked(true);
+    m_OriginalGDelegate->fitToWindow(Qt::Checked);
 
-//    QRectF sceneRect = m_OriginalImageGScene->sceneRect();
-//    QSize gViewSize = originalImageGView->size();
-//    QSize frameSize = OriginalImageFrame->size();
 
-//    originalImageGView->setStyleSheet("border: 1px solid red;");
-//    OriginalImageFrame->setStyleSheet("border: 1px solid blue;");
-
-    m_OriginalGDelegate->fitToWindow();
     connect(this, SIGNAL(parentResized () ),
-            m_OriginalGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
+            m_OriginalGDelegate, SLOT(on_parentResized () ));
 
-    connect(zoomIn, SIGNAL(clicked()),
+    connect(fixedZoomInBtn, SIGNAL(clicked()),
             m_OriginalGDelegate, SLOT(increaseZoom() ));
 
-    connect(zoomOut, SIGNAL(clicked()),
+    connect(fixedZoomOutBtn, SIGNAL(clicked()),
             m_OriginalGDelegate, SLOT(decreaseZoom() ));
 
-    connect(fitToWindow, SIGNAL(clicked()),
-            m_OriginalGDelegate, SLOT(fitToWindow() ));
+    connect(fixedFitToWindowBtn, SIGNAL(stateChanged(int)),
+            m_OriginalGDelegate, SLOT(fitToWindow(int) ));
 
     // Create the m_OriginalImage and m_Processed Image Objects
 
@@ -1134,11 +1046,11 @@ qint32 QCrossCorrelation::initGraphicViews()
 
   // If we have NOT loaded a processed file AND we have a valid Original Image, then
   // create the Processed image based on the input image.
-  QImage segImage;
+  QImage processedImage;
   if (m_CurrentProcessedFile.isEmpty() == true && NULL != m_OriginalImage.data() )
   {
-    segImage = image;
-    m_ProcessedImage = convertQImageToGrayScaleAIMImage(segImage);
+    processedImage = image;
+    m_ProcessedImage = convertQImageToGrayScaleAIMImage(processedImage);
     if (NULL == m_ProcessedImage.data())
     {
       return -1;
@@ -1146,14 +1058,14 @@ qint32 QCrossCorrelation::initGraphicViews()
   }
   else // We have an actual processed image file that the user wants us to read.
   {
-    segImage = QImage(m_CurrentProcessedFile);
-    if (segImage.isNull() == true)
+    processedImage = QImage(m_CurrentProcessedFile);
+    if (processedImage.isNull() == true)
     {
       this->statusbar->showMessage("Error loading Processed image from file");
       return -1;
     }
     // Convert it to an AIMImage in GrayScale
-    m_ProcessedImage = convertQImageToGrayScaleAIMImage(segImage);
+    m_ProcessedImage = convertQImageToGrayScaleAIMImage(processedImage);
     if (NULL == m_ProcessedImage.data() )
     {
       std::cout << "Error loading Processed image from file" << std::endl;
@@ -1165,24 +1077,34 @@ qint32 QCrossCorrelation::initGraphicViews()
   {
     // Create the QGraphicsScene Objects
     m_ProcessedImageGScene = new QGraphicsScene(this);
+    QSize baseSize = processedImageFrame->baseSize();
+    QRect sceneRect(0, 0, baseSize.width(), baseSize.height());
+    processedImageFrame->setGeometry(sceneRect);
+    processedImageGView->setGeometry(sceneRect);
+    m_ProcessedImageGScene->setSceneRect(sceneRect);
+    processedImageGView->setScene(m_ProcessedImageGScene);
+
+
     processedImageGView->setScene(m_ProcessedImageGScene);
     m_ProcessedGDelegate = new MXAImageGraphicsDelegate(this);
+    m_ProcessedGDelegate->setDelegateName(QString("Processed Image"));
     m_ProcessedGDelegate->setGraphicsView(processedImageGView);
     m_ProcessedGDelegate->setGraphicsScene(m_ProcessedImageGScene);
     m_ProcessedGDelegate->setMainWindow(this);
-    m_ProcessedGDelegate->setCachedImage(segImage);
-    m_ProcessedGDelegate->fitToWindow();
+    m_ProcessedGDelegate->setCachedImage(processedImage);
+    processedFitToWindowBtn->setChecked(true);
+    m_ProcessedGDelegate->fitToWindow(Qt::Checked);
     connect(this, SIGNAL(parentResized () ),
-            m_ProcessedGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
+            m_ProcessedGDelegate, SLOT(on_parentResized () ) );
 
-    connect(zoomIn_mount, SIGNAL(clicked()),
+    connect(processedZoomInBtn, SIGNAL(clicked()),
             m_ProcessedGDelegate, SLOT(increaseZoom() ));
 
-    connect(zoomOut_mount, SIGNAL(clicked()),
+    connect(processedZoomOutBtn, SIGNAL(clicked()),
             m_ProcessedGDelegate, SLOT(decreaseZoom() ));
 
-    connect(fitToWindow_mount, SIGNAL(clicked()),
-            m_ProcessedGDelegate, SLOT(fitToWindow() ));
+    connect(processedFitToWindowBtn, SIGNAL(stateChanged(int)),
+            m_ProcessedGDelegate, SLOT(fitToWindow(int) ));
   }
   return err;
 }
@@ -1200,7 +1122,7 @@ void QCrossCorrelation::initWithFile(const QString imageFile, QString processedI
   m_CurrentImageFile = imageFile;
   m_CurrentProcessedFile = processedImage;
 
-  qint32 err = initGraphicViews();
+  qint32 err = initImageViews();
 
   if (err < 0)
   {
