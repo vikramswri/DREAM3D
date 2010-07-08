@@ -48,8 +48,8 @@ IF(WIN32)
 ENDIF(WIN32)
 
 # Set some include directories
-include_directories( ${TO79_SOURCE_DIR}/Source )
-include_directories( ${TO79_SOURCE_DIR}/Source/MXA/Qt )
+include_directories( ${TO79_CODE_DIR} )
+include_directories( ${TO79_CODE_DIR}/MXA/Qt )
 include_directories( ${QCrossCorrelation_BINARY_DIR} )
 
 #-- Get the current set of source files
@@ -67,21 +67,21 @@ IDE_SOURCE_PROPERTIES( "CrossCorrelation/GUI" "${QCrossCorrelation_HDRS}" "${QCr
 
 #-- Get the current set of source files
 SET( CrossCorrelation_SRCS
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelation.cpp
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationData.cpp
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationTable.cpp
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImageFilter.cpp
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.cpp
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImagePadFilter.cpp
+    ${TO79_CODE_DIR}/CrossCorrelation/CrossCorrelation.cpp
+    ${TO79_CODE_DIR}/CrossCorrelation/CrossCorrelationData.cpp
+    ${TO79_CODE_DIR}/CrossCorrelation/CrossCorrelationTable.cpp
+    ${TO79_CODE_DIR}/CrossCorrelation/ImageFilters/R3DImageFilter.cpp
+    ${TO79_CODE_DIR}/CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.cpp
+    ${TO79_CODE_DIR}/CrossCorrelation/ImageFilters/R3DImagePadFilter.cpp
 )
 
 SET (CrossCorrelation_HDRS
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelation.h
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationData.h
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/CrossCorrelationTable.h
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImageFilter.h
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h
-    ${TO79_SOURCE_DIR}/Source/CrossCorrelation/ImageFilters/R3DImagePadFilter.h
+    ${TO79_CODE_DIR}/CrossCorrelation/CrossCorrelation.h
+    ${TO79_CODE_DIR}/CrossCorrelation/CrossCorrelationData.h
+    ${TO79_CODE_DIR}/CrossCorrelation/CrossCorrelationTable.h
+    ${TO79_CODE_DIR}/CrossCorrelation/ImageFilters/R3DImageFilter.h
+    ${TO79_CODE_DIR}/CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h
+    ${TO79_CODE_DIR}/CrossCorrelation/ImageFilters/R3DImagePadFilter.h
 
 )
 IDE_SOURCE_PROPERTIES( "CrossCorrelation/GUI" "${QCrossCorrelation_HDRS}" "${QCrossCorrelation_SRCS}")
@@ -89,7 +89,7 @@ IDE_SOURCE_PROPERTIES( "CrossCorrelation/GUI" "${QCrossCorrelation_HDRS}" "${QCr
 
 # --------------------------------------------------------------------
 # include this so the source files can have moc and uic run on them
-include(${TO79_SOURCE_DIR}/Source/MXA/Qt/SourceList.cmake)
+include(${TO79_CODE_DIR}/MXA/Qt/SourceList.cmake)
 
 # --------------------------------------------------------------------
 #  Get a list of the header to run 'moc' on 
@@ -126,7 +126,7 @@ QT4_WRAP_CPP( Generated_MOC_SRCS ${QCrossCorrelation_MOC_HDRS} )
 #-- Put the generated files into their own group for IDEs
 IDE_SOURCE_PROPERTIES( "Generated" "${Generated_UI_HDRS}" "${Generated_MOC_SRCS};${Generated_RC_SRCS}")
 
-include ( ${TO79_SOURCE_DIR}/Source/AIM/Common/Common_SourceList.cmake)
+include ( ${TO79_CODE_DIR}/AIM/Common/Common_SourceList.cmake)
 
 # --------------------------------------------------------------------
 # -- Finally set the Project Sources to include all the sources

@@ -41,8 +41,8 @@ IF(WIN32)
 ENDIF(WIN32)
 
 # Set some include directories
-include_directories( ${TO79_SOURCE_DIR}/Source )
-include_directories( ${TO79_SOURCE_DIR}/Source/MXA/Qt )
+include_directories( ${TO79_CODE_DIR} )
+include_directories( ${TO79_CODE_DIR}/MXA/Qt )
 include_directories( ${QEMMPM_BINARY_DIR} )
 
 
@@ -60,33 +60,33 @@ SET (QEMMPM_HDRS
 IDE_SOURCE_PROPERTIES( "EMMPM/GUI" "${QEMMPM_HDRS}" "${QEMMPM_SRCS}")
 
 set (EMMPM_COMMON_QT_SRCS
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ApplicationAboutBoxDialog.cpp
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QRecentFileList.cpp
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFileCompleter.cpp
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/MXAImageGraphicsDelegate.cpp
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFSDroppableGraphicsView.cpp
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueDialog.cpp
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueController.cpp
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueTask.cpp
+    ${TO79_CODE_DIR}/MXA/Qt/ApplicationAboutBoxDialog.cpp
+    ${TO79_CODE_DIR}/MXA/Qt/QRecentFileList.cpp
+    ${TO79_CODE_DIR}/MXA/Qt/QFileCompleter.cpp
+    ${TO79_CODE_DIR}/MXA/Qt/MXAImageGraphicsDelegate.cpp
+    ${TO79_CODE_DIR}/MXA/Qt/QFSDroppableGraphicsView.cpp
+    ${TO79_CODE_DIR}/MXA/Qt/ProcessQueueDialog.cpp
+    ${TO79_CODE_DIR}/MXA/Qt/ProcessQueueController.cpp
+    ${TO79_CODE_DIR}/MXA/Qt/ProcessQueueTask.cpp
 )
 set (EMMPM_COMMON_QT_HDRS
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ApplicationAboutBoxDialog.h
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QRecentFileList.h
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFileCompleter.h
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/MXAImageGraphicsDelegate.h
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/QFSDroppableGraphicsView.h
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueDialog.h
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueController.h
-    ${TO79_SOURCE_DIR}/Source/MXA/Qt/ProcessQueueTask.h
+    ${TO79_CODE_DIR}/MXA/Qt/ApplicationAboutBoxDialog.h
+    ${TO79_CODE_DIR}/MXA/Qt/QRecentFileList.h
+    ${TO79_CODE_DIR}/MXA/Qt/QFileCompleter.h
+    ${TO79_CODE_DIR}/MXA/Qt/MXAImageGraphicsDelegate.h
+    ${TO79_CODE_DIR}/MXA/Qt/QFSDroppableGraphicsView.h
+    ${TO79_CODE_DIR}/MXA/Qt/ProcessQueueDialog.h
+    ${TO79_CODE_DIR}/MXA/Qt/ProcessQueueController.h
+    ${TO79_CODE_DIR}/MXA/Qt/ProcessQueueTask.h
 )
 IDE_SOURCE_PROPERTIES("EMMPM/Qt" "${EMMPM_COMMON_QT_HDRS}" "${EMMPM_COMMON_QT_SRCS}")
 
 set (EMMPM_COMMON_SRCS
-    ${TO79_SOURCE_DIR}/Source/AIM/Common/AIMImage.cpp
+    ${TO79_CODE_DIR}/AIM/Common/AIMImage.cpp
 )
 set (EMMPM_COMMON_HDRS
-    ${TO79_SOURCE_DIR}/Source/AIM/Common/AIMArray.hpp
-    ${TO79_SOURCE_DIR}/Source/AIM/Common/AIMImage.h   )
+    ${TO79_CODE_DIR}/AIM/Common/AIMArray.hpp
+    ${TO79_CODE_DIR}/AIM/Common/AIMImage.h   )
 IDE_SOURCE_PROPERTIES("EMMPM/Common" "${EMMPM_COMMON_HDRS}" "${EMMPM_COMMON_SRCS}")
 
 
@@ -103,8 +103,8 @@ SET( QEMMPM_MOC_HDRS
 # --------------------------------------------------------------------
 SET( QEMMPM_UIS
   ${QEMMPM_SOURCE_DIR}/UI_Files/QEmMpm.ui
-  ${TO79_SOURCE_DIR}/Source/MXA/Qt/UI_Files/ProcessQueueDialog.ui
-  ${TO79_SOURCE_DIR}/Source/MXA/Qt/UI_Files/ApplicationAboutBoxDialog.ui
+  ${TO79_CODE_DIR}/MXA/Qt/UI_Files/ProcessQueueDialog.ui
+  ${TO79_CODE_DIR}/MXA/Qt/UI_Files/ApplicationAboutBoxDialog.ui
 
 )
 
