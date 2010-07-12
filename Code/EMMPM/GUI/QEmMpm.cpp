@@ -243,7 +243,7 @@ void QEmMpm::setupGui()
   resize(mySize);
 #endif
   m_OriginalImageGScene = NULL;
-  m_SegmentedImageGScene = NULL;
+  m_ProcessedImageGScene = NULL;
 
   modeComboBox->blockSignals(true);
 
@@ -282,7 +282,7 @@ void QEmMpm::setupGui()
   connect (originalImageGView, SIGNAL(loadImageFileRequested(const QString &)),
            this, SLOT(loadImageFile(const QString &)), Qt::QueuedConnection);
 
-  connect (segmentedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
+  connect (processedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
            this, SLOT(loadSegmentedImageFile(const QString &)));
 
 }
@@ -305,9 +305,9 @@ void QEmMpm::setWidgetListEnabled(bool b)
 void QEmMpm::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
-  m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_SegmentedGDelegate->updateGraphicsScene();
+  m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
+  m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+  m_ProcessedGDelegate->updateGraphicsScene();
 }
 
 
@@ -419,7 +419,7 @@ void QEmMpm::openFile(QString imageFile)
   {
     return;
   }
-  this->initWithFile(imageFile, m_CurrentSegmentedFile);
+  this->initWithFile(imageFile, m_CurrentProcessedFile);
 
   // Tell the RecentFileList to update itself then broadcast those changes.
   QRecentFileList::instance()->addFile(imageFile);
@@ -456,7 +456,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
 
   if (this->m_OutputExistsCheck == false)
   {
-    QFile file (this->m_CurrentSegmentedFile );
+    QFile file (this->m_CurrentProcessedFile );
     if (file.exists() == true)
     {
      int ret = QMessageBox::warning(this, tr("QEmMpm"),
@@ -478,7 +478,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
         outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
         if (!outputFile.isNull())
         {
-          this->m_CurrentSegmentedFile = "";
+          this->m_CurrentProcessedFile = "";
           this->m_OutputExistsCheck = true;
         }
         else // The user clicked cancel from the save file dialog
@@ -724,7 +724,7 @@ void QEmMpm::on_actionSave_triggered()
 // -----------------------------------------------------------------------------
 void QEmMpm::on_actionSave_As_triggered()
 {
-  m_CurrentSegmentedFile = QString();
+  m_CurrentProcessedFile = QString();
   saveSegmentedImage();
 }
 
@@ -755,40 +755,40 @@ void QEmMpm::on_actionClose_triggered() {
 // -----------------------------------------------------------------------------
 void QEmMpm::on_modeComboBox_currentIndexChanged()
 {
-  if (NULL == m_SegmentedGDelegate) { return; }
+  if (NULL == m_ProcessedGDelegate) { return; }
   int index = modeComboBox->currentIndex();
   switch(index)
   {
-  case 0: m_SegmentedGDelegate->setExclusionMode(); break;
-  case 1: m_SegmentedGDelegate->setSourceMode(); break;
-  case 2: m_SegmentedGDelegate->setDestinationMode(); break;
-  case 3: m_SegmentedGDelegate->setSourceOverMode(); break;
-  case 4: m_SegmentedGDelegate->setDestinationOverMode(); break;
-  case 5: m_SegmentedGDelegate->setSourceInMode(); break;
-  case 6: m_SegmentedGDelegate->setDestInMode(); break;
-  case 7: m_SegmentedGDelegate->setDifferenceMode(); break;
-  case 8: m_SegmentedGDelegate->setDestOutMode(); break;
-  case 9: m_SegmentedGDelegate->setSourceAtopMode(); break;
-  case 10: m_SegmentedGDelegate->setDestAtopMode(); break;
-  case 11: m_SegmentedGDelegate->setPlusMode(); break;
-  case 12: m_SegmentedGDelegate->setMultiplyMode(); break;
-  case 13: m_SegmentedGDelegate->setScreenMode(); break;
-  case 14: m_SegmentedGDelegate->setOverlayMode(); break;
-  case 15: m_SegmentedGDelegate->setDarkenMode(); break;
-  case 16: m_SegmentedGDelegate->setLightenMode(); break;
-  case 17: m_SegmentedGDelegate->setColorDodgeMode(); break;
-  case 18: m_SegmentedGDelegate->setColorBurnMode(); break;
-  case 19: m_SegmentedGDelegate->setHardLightMode(); break;
-  case 20: m_SegmentedGDelegate->setSoftLightMode(); break;
+  case 0: m_ProcessedGDelegate->setExclusionMode(); break;
+  case 1: m_ProcessedGDelegate->setSourceMode(); break;
+  case 2: m_ProcessedGDelegate->setDestinationMode(); break;
+  case 3: m_ProcessedGDelegate->setSourceOverMode(); break;
+  case 4: m_ProcessedGDelegate->setDestinationOverMode(); break;
+  case 5: m_ProcessedGDelegate->setSourceInMode(); break;
+  case 6: m_ProcessedGDelegate->setDestInMode(); break;
+  case 7: m_ProcessedGDelegate->setDifferenceMode(); break;
+  case 8: m_ProcessedGDelegate->setDestOutMode(); break;
+  case 9: m_ProcessedGDelegate->setSourceAtopMode(); break;
+  case 10: m_ProcessedGDelegate->setDestAtopMode(); break;
+  case 11: m_ProcessedGDelegate->setPlusMode(); break;
+  case 12: m_ProcessedGDelegate->setMultiplyMode(); break;
+  case 13: m_ProcessedGDelegate->setScreenMode(); break;
+  case 14: m_ProcessedGDelegate->setOverlayMode(); break;
+  case 15: m_ProcessedGDelegate->setDarkenMode(); break;
+  case 16: m_ProcessedGDelegate->setLightenMode(); break;
+  case 17: m_ProcessedGDelegate->setColorDodgeMode(); break;
+  case 18: m_ProcessedGDelegate->setColorBurnMode(); break;
+  case 19: m_ProcessedGDelegate->setHardLightMode(); break;
+  case 20: m_ProcessedGDelegate->setSoftLightMode(); break;
 
 
   default:
-    m_SegmentedGDelegate->setExclusionMode(); break;
+    m_ProcessedGDelegate->setExclusionMode(); break;
   }
 
-  m_SegmentedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_SegmentedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_SegmentedGDelegate->updateGraphicsScene();
+  m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
+  m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+  m_ProcessedGDelegate->updateGraphicsScene();
 }
 
 // -----------------------------------------------------------------------------
@@ -810,24 +810,24 @@ void QEmMpm::openSegmentedImage(QString mountImage)
 // -----------------------------------------------------------------------------
 qint32 QEmMpm::saveSegmentedImage()
 {
-  QImage image = m_SegmentedGDelegate->getCachedImage();
+  QImage image = m_ProcessedGDelegate->getCachedImage();
   int err = 0;
-  if (m_CurrentSegmentedFile.isEmpty())
+  if (m_CurrentProcessedFile.isEmpty())
   {
     QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Segmented.tif";
     outputFile = QFileDialog::getSaveFileName(this, tr("Save Segmented Image As ..."), outputFile, tr("Images (*.tif *.bmp *.jpg *.png)"));
     if ( !outputFile.isEmpty() )
     {
-      m_CurrentSegmentedFile = outputFile;
+      m_CurrentProcessedFile = outputFile;
     }
     else {
       return -1;
     }
   }
 
-  bool ok = image.save(m_CurrentSegmentedFile);
+  bool ok = image.save(m_CurrentProcessedFile);
   if (ok == true) {
-    segmentedImageTitle->setText(m_CurrentSegmentedFile);
+    segmentedImageTitle->setText(m_CurrentProcessedFile);
   }
   else
   {
@@ -911,7 +911,7 @@ void QEmMpm::queueControllerFinished()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QEmMpm::initGraphicViews()
+qint32 QEmMpm::initImageViews()
 {
   qint32 err = 0;
   QImage image;
@@ -933,26 +933,38 @@ qint32 QEmMpm::initGraphicViews()
 
     // Create the QGraphicsScene Objects
     m_OriginalImageGScene = new QGraphicsScene(this);
+
+    QSize baseSize = originalImageFrame->baseSize();
+    QRect sceneRect(0, 0, baseSize.width(), baseSize.height());
+    originalImageFrame->setGeometry(sceneRect);
+    originalImageGView->setGeometry(sceneRect);
+    m_OriginalImageGScene->setSceneRect(sceneRect);
     originalImageGView->setScene(m_OriginalImageGScene);
+
+
     m_OriginalGDelegate = new MXAImageGraphicsDelegate(this);
+    m_OriginalGDelegate->setDelegateName(QString("Original Image"));
     m_OriginalGDelegate->setGraphicsView(originalImageGView);
     m_OriginalGDelegate->setGraphicsScene(m_OriginalImageGScene);
     m_OriginalGDelegate->setMainWindow(this);
     m_OriginalGDelegate->setCachedImage(image);
-    m_OriginalGDelegate->fitToWindow(1);
-    connect(this, SIGNAL(parentResized () ),
-            m_OriginalGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
+    fixedFitToWindowBtn->setChecked(true);
+    m_OriginalGDelegate->fitToWindow(Qt::Checked);
 
-    connect(zoomIn, SIGNAL(clicked()),
+
+    connect(this, SIGNAL(parentResized () ),
+            m_OriginalGDelegate, SLOT(on_parentResized () ));
+
+    connect(fixedZoomInBtn, SIGNAL(clicked()),
             m_OriginalGDelegate, SLOT(increaseZoom() ));
 
-    connect(zoomOut, SIGNAL(clicked()),
+    connect(fixedZoomOutBtn, SIGNAL(clicked()),
             m_OriginalGDelegate, SLOT(decreaseZoom() ));
 
-    connect(fitToWindow, SIGNAL(clicked()),
-            m_OriginalGDelegate, SLOT(fitToWindow() ));
+    connect(fixedFitToWindowBtn, SIGNAL(stateChanged(int)),
+            m_OriginalGDelegate, SLOT(fitToWindow(int) ));
 
-    // Create the m_OriginalImage and m_Segmented Image Objects
+    // Create the m_OriginalImage and m_Processed Image Objects
 
 
     m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
@@ -964,59 +976,68 @@ qint32 QEmMpm::initGraphicViews()
   }
 
 
-  // If we have NOT loaded a segmented file AND we have a valid Original Image, then
-  // create the Segmented image based on the input image.
-  QImage segImage;
-  if (m_CurrentSegmentedFile.isEmpty() == true && NULL != m_OriginalImage.data() )
+  // If we have NOT loaded a processed file AND we have a valid Original Image, then
+  // create the Processed image based on the input image.
+  QImage processedImage;
+  if (m_CurrentProcessedFile.isEmpty() == true && NULL != m_OriginalImage.data() )
   {
-    segImage = image;
-    m_SegmentedImage = convertQImageToGrayScaleAIMImage(segImage);
-    if (NULL == m_SegmentedImage.data())
+    processedImage = image;
+    m_ProcessedImage = convertQImageToGrayScaleAIMImage(processedImage);
+    if (NULL == m_ProcessedImage.data())
     {
       return -1;
     }
   }
-  else // We have an actual segmented image file that the user wants us to read.
+  else // We have an actual processed image file that the user wants us to read.
   {
-    segImage = QImage(m_CurrentSegmentedFile);
-    if (segImage.isNull() == true)
+    processedImage = QImage(m_CurrentProcessedFile);
+    if (processedImage.isNull() == true)
     {
-      this->statusbar->showMessage("Error loading Segmented image from file");
+      this->statusbar->showMessage("Error loading Processed image from file");
       return -1;
     }
     // Convert it to an AIMImage in GrayScale
-    m_SegmentedImage = convertQImageToGrayScaleAIMImage(segImage);
-    if (NULL == m_SegmentedImage.data() )
+    m_ProcessedImage = convertQImageToGrayScaleAIMImage(processedImage);
+    if (NULL == m_ProcessedImage.data() )
     {
-      std::cout << "Error loading Segmented image from file" << std::endl;
+      std::cout << "Error loading Processed image from file" << std::endl;
       return -1;
     }
   }
 
-  if (NULL != m_SegmentedImage.data() )
+
+  if (NULL != m_ProcessedImage.data() )
   {
-
-
     // Create the QGraphicsScene Objects
-    m_SegmentedImageGScene = new QGraphicsScene(this);
-    segmentedImageGView->setScene(m_SegmentedImageGScene);
-    m_SegmentedGDelegate = new MXAImageGraphicsDelegate(this);
-    m_SegmentedGDelegate->setGraphicsView(segmentedImageGView);
-    m_SegmentedGDelegate->setGraphicsScene(m_SegmentedImageGScene);
-    m_SegmentedGDelegate->setMainWindow(this);
-    m_SegmentedGDelegate->setCachedImage(segImage);
-    m_SegmentedGDelegate->fitToWindow(1);
+    m_ProcessedImageGScene = new QGraphicsScene(this);
+    QSize baseSize = processedImageFrame->baseSize();
+    QRect sceneRect(0, 0, baseSize.width(), baseSize.height());
+    processedImageFrame->setGeometry(sceneRect);
+    processedImageGView->setGeometry(sceneRect);
+    m_ProcessedImageGScene->setSceneRect(sceneRect);
+    processedImageGView->setScene(m_ProcessedImageGScene);
+
+
+    processedImageGView->setScene(m_ProcessedImageGScene);
+    m_ProcessedGDelegate = new MXAImageGraphicsDelegate(this);
+    m_ProcessedGDelegate->setDelegateName(QString("Processed Image"));
+    m_ProcessedGDelegate->setGraphicsView(processedImageGView);
+    m_ProcessedGDelegate->setGraphicsScene(m_ProcessedImageGScene);
+    m_ProcessedGDelegate->setMainWindow(this);
+    m_ProcessedGDelegate->setCachedImage(processedImage);
+    processedFitToWindowBtn->setChecked(true);
+    m_ProcessedGDelegate->fitToWindow(Qt::Checked);
     connect(this, SIGNAL(parentResized () ),
-            m_SegmentedGDelegate, SLOT(on_parentResized () ), Qt::QueuedConnection);
+            m_ProcessedGDelegate, SLOT(on_parentResized () ) );
 
-    connect(zoomIn_mount, SIGNAL(clicked()),
-            m_SegmentedGDelegate, SLOT(increaseZoom() ));
+    connect(processedZoomInBtn, SIGNAL(clicked()),
+            m_ProcessedGDelegate, SLOT(increaseZoom() ));
 
-    connect(zoomOut_mount, SIGNAL(clicked()),
-            m_SegmentedGDelegate, SLOT(decreaseZoom() ));
+    connect(processedZoomOutBtn, SIGNAL(clicked()),
+            m_ProcessedGDelegate, SLOT(decreaseZoom() ));
 
-    connect(fitToWindow_mount, SIGNAL(clicked()),
-            m_SegmentedGDelegate, SLOT(fitToWindow() ));
+    connect(processedFitToWindowBtn, SIGNAL(stateChanged(int)),
+            m_ProcessedGDelegate, SLOT(fitToWindow(int) ));
   }
   return err;
 }
@@ -1032,9 +1053,9 @@ void QEmMpm::initWithFile(const QString imageFile, QString mountImage)
   this->m_OpenDialogLastDirectory = fileInfo.path();
 
   m_CurrentImageFile = imageFile;
-  m_CurrentSegmentedFile = mountImage;
+  m_CurrentProcessedFile = mountImage;
 
-  qint32 err = initGraphicViews();
+  qint32 err = initImageViews();
   if (err < 0)
   {
     this->statusBar()->showMessage("Error Loading Original Image");
@@ -1043,15 +1064,15 @@ void QEmMpm::initWithFile(const QString imageFile, QString mountImage)
   this->originalImageTitle->setText(fileInfo.fileName());
   this->originalImageTitle->setToolTip(m_CurrentImageFile);
 
-  if (m_CurrentSegmentedFile.isEmpty())
+  if (m_CurrentProcessedFile.isEmpty())
   {
     this->segmentedImageTitle->setText("Unsaved Segmented Image");
     this->setWindowModified(true);
   }
   else {
-    QFileInfo segInfo(m_CurrentSegmentedFile);
+    QFileInfo segInfo(m_CurrentProcessedFile);
     this->segmentedImageTitle->setText(segInfo.fileName());
-    this->segmentedImageTitle->setToolTip(m_CurrentSegmentedFile);
+    this->segmentedImageTitle->setToolTip(m_CurrentProcessedFile);
   }
   this->statusBar()->showMessage("Input Image Loaded");
 }

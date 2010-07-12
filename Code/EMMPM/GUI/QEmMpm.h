@@ -48,10 +48,10 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     void initWithFile(const QString imageFile, QString mountImage);
 
     MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, OriginalImage)
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, SegmentedImage)
+    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, ProcessedImage)
 
     MXA_INSTANCE_PROPERTY_m(QString, CurrentImageFile)
-    MXA_INSTANCE_PROPERTY_m(QString, CurrentSegmentedFile)
+    MXA_INSTANCE_PROPERTY_m(QString, CurrentProcessedFile)
 
     qint32 saveSegmentedImage();
 
@@ -183,7 +183,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
 
      AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
-     qint32 initGraphicViews();
+     qint32 initImageViews();
 
      void populateFileTable();
 
@@ -198,10 +198,10 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     bool            m_OutputExistsCheck;
 
     QGraphicsScene*             m_OriginalImageGScene;
-    QGraphicsScene*             m_SegmentedImageGScene;
+    QGraphicsScene*             m_ProcessedImageGScene;
 
     MXAImageGraphicsDelegate*      m_OriginalGDelegate;
-    MXAImageGraphicsDelegate*      m_SegmentedGDelegate;
+    MXAImageGraphicsDelegate*      m_ProcessedGDelegate;
 
     ProcessQueueController*        m_QueueController;
     ProcessQueueDialog*            m_QueueDialog;

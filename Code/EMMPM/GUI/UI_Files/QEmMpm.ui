@@ -92,7 +92,7 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2" rowspan="2">
+          <item row="1" column="2">
            <spacer name="horizontalSpacer_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -353,6 +353,48 @@
          </layout>
         </item>
         <item>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Input Image</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLineEdit" name="fixedImageFile"/>
+          </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="fixedImageButton">
+            <property name="text">
+             <string>Select...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Output Image</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLineEdit" name="outputImageFile">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QPushButton" name="outputImageButton">
+            <property name="text">
+             <string>Select...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QCheckBox" name="processFolder">
           <property name="text">
            <string>Process Folder</string>
@@ -539,19 +581,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QToolButton" name="fitToWindow">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normalon>:/fitToWindow.png</normalon>
-             </iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="zoomIn">
+           <widget class="QToolButton" name="fixedZoomInBtn">
             <property name="text">
              <string>...</string>
             </property>
@@ -563,13 +593,25 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="zoomOut">
+           <widget class="QToolButton" name="fixedZoomOutBtn">
             <property name="text">
              <string>...</string>
             </property>
             <property name="icon">
              <iconset>
               <normalon>:/zoomOut.png</normalon>
+             </iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="fixedFitToWindowBtn">
+            <property name="text">
+             <string>Fit To Window</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normalon>:/fitToWindow.png</normalon>
              </iconset>
             </property>
            </widget>
@@ -590,7 +632,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QFrame" name="OriginalImageFrame">
+         <widget class="QFrame" name="originalImageFrame">
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
@@ -648,19 +690,7 @@
            <number>2</number>
           </property>
           <item>
-           <widget class="QToolButton" name="fitToWindow_mount">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normalon>:/fitToWindow.png</normalon>
-             </iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="zoomIn_mount">
+           <widget class="QToolButton" name="processedZoomInBtn">
             <property name="text">
              <string>...</string>
             </property>
@@ -672,13 +702,31 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="zoomOut_mount">
+           <widget class="QToolButton" name="processedZoomOutBtn">
             <property name="text">
              <string>...</string>
             </property>
             <property name="icon">
              <iconset>
               <normalon>:/zoomOut.png</normalon>
+             </iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="processedFitToWindowBtn">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Fit To Window</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normalon>:/fitToWindow.png</normalon>
              </iconset>
             </property>
            </widget>
@@ -728,7 +776,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QFrame" name="SegmentedImageFrame">
+         <widget class="QFrame" name="processedImageFrame">
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
@@ -743,7 +791,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QFSDroppableGraphicsView" name="segmentedImageGView"/>
+            <widget class="QFSDroppableGraphicsView" name="processedImageGView"/>
            </item>
           </layout>
          </widget>
