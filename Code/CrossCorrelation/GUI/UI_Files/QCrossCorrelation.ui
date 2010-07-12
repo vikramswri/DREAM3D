@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="inputsTab">
        <attribute name="title">
@@ -590,7 +590,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="registerButton">
+       <widget class="QPushButton" name="processBtn">
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
         </property>

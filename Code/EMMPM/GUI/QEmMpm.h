@@ -70,16 +70,24 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     void on_actionExit_triggered();
 
     /* slots for the buttons in the GUI */
-    void on_m_SegmentBtn_clicked();
+    void on_processBtn_clicked();
     void on_aboutBtn_clicked();
 
     void on_compositeWithOriginal_stateChanged(int state);
     void on_modeComboBox_currentIndexChanged();
 
+    void on_fixedImageButton_clicked();
+    void on_outputImageButton_clicked();
+
     void on_processFolder_stateChanged(int state  );
     void on_sourceDirectoryBtn_clicked();
     void on_outputDirectoryBtn_clicked();
 
+
+    void on_fixedImageFile_textChanged(const QString &string);
+    void on_outputImageFile_textChanged(const QString & text);
+    void on_sourceDirectoryLE_textChanged(const QString & text);
+    void on_outputDirectoryLE_textChanged(const QString & text);
 
     void on_filterPatternLineEdit_textChanged();
 

@@ -473,7 +473,7 @@ void QCrossCorrelation::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_registerButton_clicked()
+void QCrossCorrelation::on_processBtn_clicked()
 {
 
   /* If the 'processFolder' checkbox is checked then we need to check for some
@@ -609,15 +609,6 @@ void QCrossCorrelation::on_registerButton_clicked()
 
     task->setInputFilePath(fixedImageFile->text());
     task->setMovingImagePath(movingImageFile->text());
-//    QFileInfo fileInfo(movingImageFile->text());
-//    QString basename = fileInfo.completeBaseName();
-//    QString extension = fileInfo.suffix();
-//    QString filepath = fileInfo.absolutePath();
-//    filepath.append(QDir::separator());
-//    filepath.append(basename);
-//    filepath.append("_Registered");
-//    filepath.append(".");
-//    filepath.append(extension);
     task->setOutputFilePath(outputImageFile->text());
     CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
     crossCorrelationData->setFixedSlice(0);
@@ -670,7 +661,7 @@ void QCrossCorrelation::on_registerButton_clicked()
   connect(m_QueueController, SIGNAL(finished()), this, SLOT(queueControllerFinished()));
 
   this->m_QueueDialog->setVisible(true);
-  registerButton->setEnabled(false);
+  processBtn->setEnabled(false);
 
   m_QueueController->start();
 }
@@ -893,7 +884,7 @@ void QCrossCorrelation::queueControllerFinished()
   QRecentFileList::instance()->addFile(m_CurrentProcessedFile);
   setWidgetListEnabled(true);
 
-  registerButton->setEnabled(true);
+  processBtn->setEnabled(true);
   m_QueueController->deleteLater();
   m_QueueController = NULL;
   this->statusBar()->showMessage("Registration Complete");

@@ -132,6 +132,24 @@ void QEmMpm::closeEvent(QCloseEvent *event)
 // -----------------------------------------------------------------------------
 void QEmMpm::resizeEvent ( QResizeEvent * event )
 {
+  QSize osize = originalImageFrame->size();
+//  std::cout << "originalImageFrame.size: " << osize.width() << " x " << osize.height() << std::endl;
+  QSize psize = processedImageFrame->size();
+//  std::cout << "processedImageFrame.size: " << psize.width() << " x " << psize.height() << std::endl;
+  if (originalImageGView->isVisible() == true)
+  {
+    QRect sceneRect(0, 0, osize.width(), osize.height());
+    processedImageFrame->setGeometry(sceneRect);
+    processedImageGView->setGeometry(sceneRect);
+    m_ProcessedImageGScene->setSceneRect(sceneRect);
+  }
+  else if (processedImageGView->isVisible() == true)
+  {
+    QRect sceneRect(0, 0, psize.width(), psize.height());
+    originalImageFrame->setGeometry(sceneRect);
+    originalImageGView->setGeometry(sceneRect);
+    m_OriginalImageGScene->setSceneRect(sceneRect);
+  }
   emit parentResized();
 }
 
@@ -155,6 +173,8 @@ void QEmMpm::readSettings()
   READ_SETTING(prefs, m_NumClasses, ok, i, 2, Int);
   READ_BOOL_SETTING(prefs, useSimulatedAnnealing, true);
   READ_BOOL_SETTING(prefs, processFolder, false);
+  READ_STRING_SETTING(prefs, fixedImageFile, "");
+  READ_STRING_SETTING(prefs, outputImageFile, "");
   READ_STRING_SETTING(prefs, sourceDirectoryLE, "");
   READ_STRING_SETTING(prefs, outputDirectoryLE, "");
   READ_STRING_SETTING(prefs, outputPrefix, "");
@@ -186,6 +206,8 @@ void QEmMpm::writeSettings()
   WRITE_SETTING(prefs, m_NumClasses);
   WRITE_BOOL_SETTING(prefs, useSimulatedAnnealing, useSimulatedAnnealing->isChecked());
   WRITE_BOOL_SETTING(prefs, processFolder, processFolder->isChecked());
+  WRITE_STRING_SETTING(prefs, fixedImageFile);
+  WRITE_STRING_SETTING(prefs, outputImageFile);
   WRITE_STRING_SETTING(prefs, sourceDirectoryLE);
   WRITE_STRING_SETTING(prefs, outputDirectoryLE);
   WRITE_STRING_SETTING(prefs, outputPrefix);
@@ -285,6 +307,28 @@ void QEmMpm::setupGui()
   connect (processedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
            this, SLOT(loadSegmentedImageFile(const QString &)));
 
+  QFileCompleter* com = new QFileCompleter(this, false);
+  fixedImageFile->setCompleter(com);
+  QObject::connect( com, SIGNAL(activated(const QString &)),
+           this, SLOT(on_fixedImageFile_textChanged(const QString &)));
+
+
+  QFileCompleter* com4 = new QFileCompleter(this, false);
+  outputImageFile->setCompleter(com4);
+  QObject::connect( com4, SIGNAL(activated(const QString &)),
+           this, SLOT(on_outputImageFile_textChanged(const QString &)));
+
+
+  QFileCompleter* com2 = new QFileCompleter(this, true);
+  sourceDirectoryLE->setCompleter(com2);
+  QObject::connect( com2, SIGNAL(activated(const QString &)),
+           this, SLOT(on_sourceDirectoryLE_textChanged(const QString &)));
+
+  QFileCompleter* com3 = new QFileCompleter(this, true);
+  outputDirectoryLE->setCompleter(com3);
+  QObject::connect( com3, SIGNAL(activated(const QString &)),
+           this, SLOT(on_outputDirectoryLE_textChanged(const QString &)));
+
 }
 
 // -----------------------------------------------------------------------------
@@ -344,29 +388,9 @@ bool QEmMpm::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 qint32 QEmMpm::checkDirtyDocument()
 {
   qint32 err = -1;
-
-  if (this->isWindowModified() == true)
-  {
-    int r = QMessageBox::warning(this, tr("EM-MPM"), tr("The Image has been modified.\nDo you want to save your changes?"), QMessageBox::Save
-        | QMessageBox::Default, QMessageBox::Discard, QMessageBox::Cancel | QMessageBox::Escape);
-    if (r == QMessageBox::Save)
-    {
-      //TODO: Save the current document or otherwise save the state.
-    }
-    else if (r == QMessageBox::Discard)
-    {
-      err = 1;
-    }
-    else if (r == QMessageBox::Cancel)
-    {
-      err = -1;
-    }
-  }
-  else
   {
     err = 1;
   }
-
   return err;
 }
 
@@ -443,51 +467,9 @@ void QEmMpm::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QEmMpm::on_m_SegmentBtn_clicked()
+void QEmMpm::on_processBtn_clicked()
 {
-//
-//  if (m_QueueController != NULL && m_QueueController->isFinished() == false)
-//  {
-//    emit cancelProcessQueue();
-//    return;
-//  }
 
-
-
-  if (this->m_OutputExistsCheck == false)
-  {
-    QFile file (this->m_CurrentProcessedFile );
-    if (file.exists() == true)
-    {
-     int ret = QMessageBox::warning(this, tr("QEmMpm"),
-                  tr("The Output File Already Exists\nDo you want to over write the existing file?"),
-          QMessageBox::No | QMessageBox::Default,
-          QMessageBox::Yes,
-                  QMessageBox::Cancel);
-     if (ret == QMessageBox::Cancel)
-     {
-       return;
-     }
-     else if (ret == QMessageBox::Yes)
-     {
-       this->m_OutputExistsCheck = true;
-     }
-     else
-      {
-        QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
-        outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
-        if (!outputFile.isNull())
-        {
-          this->m_CurrentProcessedFile = "";
-          this->m_OutputExistsCheck = true;
-        }
-        else // The user clicked cancel from the save file dialog
-        {
-          return;
-        }
-      }
-    }
-  }
 
   /* If the 'processFolder' checkbox is checked then we need to check for some
    * additional inputs
@@ -535,6 +517,57 @@ void QEmMpm::on_m_SegmentBtn_clicked()
     }
 
   }
+  else
+  {
+    QFileInfo fi(fixedImageFile->text());
+    if (fi.exists() == false)
+    {
+      QMessageBox::critical(this, tr("Fixed Image File Error"),
+                                    tr("Fixed Image does not exist. Please check the path."),
+                                    QMessageBox::Ok);
+      return;
+    }
+
+    if (outputImageFile->text().isEmpty() == true)
+    {
+      QMessageBox::critical(this, tr("Output Image File Error"),
+                                    tr("Please select a file name for the registered image to be saved as."),
+                                    QMessageBox::Ok);
+      return;
+    }
+    QFile file (outputImageFile->text() );
+       if (file.exists() == true)
+       {
+         int ret = QMessageBox::warning(this, tr("QEM/MPM"),
+             tr("The Output File Already Exists\nDo you want to over write the existing file?"),
+             QMessageBox::No | QMessageBox::Default,
+             QMessageBox::Yes,
+             QMessageBox::Cancel);
+         if (ret == QMessageBox::Cancel)
+         {
+           return;
+         }
+         else if (ret == QMessageBox::Yes)
+         {
+           this->m_OutputExistsCheck = true;
+         }
+         else
+         {
+           QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
+           outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
+           if (!outputFile.isNull())
+           {
+             this->m_CurrentProcessedFile = "";
+             this->m_OutputExistsCheck = true;
+           }
+           else // The user clicked cancel from the save file dialog
+
+           {
+             return;
+           }
+         }
+       }
+  }
 
   m_QueueDialog->clearTable();
 
@@ -542,14 +575,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
   bool ok;
   if (this->processFolder->isChecked() == false)
   {
-    if (m_CurrentImageFile.isEmpty() )
-    {
-      QMessageBox::critical(this, tr("Input File Error"),
-                                    tr("No image file is open in the viewer to segment. Use the File->Open menu itme to open an image first."),
-                                    QMessageBox::Ok);
-      m_QueueController->deleteLater();
-      return;
-    }
+
     EmMpmTask* task = new EmMpmTask(NULL);
     task->setBeta(m_Beta->text().toFloat(&ok));
     task->setGamma(m_Gamma->text().toFloat(&ok));
@@ -560,17 +586,8 @@ void QEmMpm::on_m_SegmentBtn_clicked()
     {
       task->useSimulatedAnnealing();
     }
-    task->setInputFilePath(m_CurrentImageFile);
-    QFileInfo fileInfo(m_CurrentImageFile);
-    QString basename = fileInfo.completeBaseName();
-    QString extension = fileInfo.suffix();
-    QString filepath = fileInfo.absolutePath();
-    filepath.append(QDir::separator());
-    filepath.append(basename);
-    filepath.append("_Segmented");
-    filepath.append(".");
-    filepath.append(extension);
-    task->setOutputFilePath(filepath);
+    task->setInputFilePath(fixedImageFile->text());
+    task->setOutputFilePath(outputImageFile->text());
 
     m_QueueController->addTask(static_cast<QThread*>(task) );
     this->addProcess(task);
@@ -617,7 +634,7 @@ void QEmMpm::on_m_SegmentBtn_clicked()
   connect(m_QueueController, SIGNAL(finished()), this, SLOT(queueControllerFinished()));
 
   this->m_QueueDialog->setVisible(true);
-  m_SegmentBtn->setEnabled(false);
+  processBtn->setEnabled(false);
 
   m_QueueController->start();
 }
@@ -760,27 +777,27 @@ void QEmMpm::on_modeComboBox_currentIndexChanged()
   switch(index)
   {
   case 0: m_ProcessedGDelegate->setExclusionMode(); break;
-  case 1: m_ProcessedGDelegate->setSourceMode(); break;
-  case 2: m_ProcessedGDelegate->setDestinationMode(); break;
-  case 3: m_ProcessedGDelegate->setSourceOverMode(); break;
-  case 4: m_ProcessedGDelegate->setDestinationOverMode(); break;
-  case 5: m_ProcessedGDelegate->setSourceInMode(); break;
-  case 6: m_ProcessedGDelegate->setDestInMode(); break;
-  case 7: m_ProcessedGDelegate->setDifferenceMode(); break;
-  case 8: m_ProcessedGDelegate->setDestOutMode(); break;
-  case 9: m_ProcessedGDelegate->setSourceAtopMode(); break;
-  case 10: m_ProcessedGDelegate->setDestAtopMode(); break;
-  case 11: m_ProcessedGDelegate->setPlusMode(); break;
-  case 12: m_ProcessedGDelegate->setMultiplyMode(); break;
-  case 13: m_ProcessedGDelegate->setScreenMode(); break;
-  case 14: m_ProcessedGDelegate->setOverlayMode(); break;
-  case 15: m_ProcessedGDelegate->setDarkenMode(); break;
-  case 16: m_ProcessedGDelegate->setLightenMode(); break;
-  case 17: m_ProcessedGDelegate->setColorDodgeMode(); break;
-  case 18: m_ProcessedGDelegate->setColorBurnMode(); break;
-  case 19: m_ProcessedGDelegate->setHardLightMode(); break;
-  case 20: m_ProcessedGDelegate->setSoftLightMode(); break;
+  case 1: m_ProcessedGDelegate->setDifferenceMode(); break;
+  case 2: m_ProcessedGDelegate->setPlusMode(); break;
+  case 3: m_ProcessedGDelegate->setMultiplyMode(); break;
+  case 4: m_ProcessedGDelegate->setScreenMode(); break;
+  case 5: m_ProcessedGDelegate->setDarkenMode(); break;
+  case 6: m_ProcessedGDelegate->setLightenMode(); break;
+  case 7: m_ProcessedGDelegate->setColorDodgeMode(); break;
+  case 8: m_ProcessedGDelegate->setColorBurnMode(); break;
+  case 9: m_ProcessedGDelegate->setHardLightMode(); break;
+  case 10: m_ProcessedGDelegate->setSoftLightMode(); break;
 
+  case 11: m_ProcessedGDelegate->setSourceMode(); break;
+  case 12: m_ProcessedGDelegate->setDestinationMode(); break;
+  case 13: m_ProcessedGDelegate->setSourceOverMode(); break;
+  case 14: m_ProcessedGDelegate->setDestinationOverMode(); break;
+  case 15: m_ProcessedGDelegate->setSourceInMode(); break;
+  case 16: m_ProcessedGDelegate->setDestInMode(); break;
+  case 17: m_ProcessedGDelegate->setDestOutMode(); break;
+  case 18: m_ProcessedGDelegate->setSourceAtopMode(); break;
+  case 19: m_ProcessedGDelegate->setDestAtopMode(); break;
+  case 20: m_ProcessedGDelegate->setOverlayMode(); break;
 
   default:
     m_ProcessedGDelegate->setExclusionMode(); break;
@@ -838,74 +855,47 @@ qint32 QEmMpm::saveSegmentedImage()
   return err;
 }
 
-#if 0
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskMessage(const QString &message)
-{
-  this->statusBar()->showMessage(message);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskProgress(int p)
-{
-  this->progressBar->setValue(p);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QEmMpm::receiveTaskFinished()
-{
-  m_SegmentBtn->setText("Segment");
-  // this->statusbar->showMessage("Ready To Encode");
-
-  m_EmMpmThread->deleteLater();
-  this->progressBar->setValue(0);
-
-  // Now put the image into the QGraphicsView
-  qint32 width = m_MovingImage->getImagePixelWidth();
-  qint32 height = m_MovingImage->getImagePixelHeight();
-  quint8* dataPointer = m_MovingImage->getImageBuffer();
-  QImage image(width, height, QImage::Format_Indexed8);
-  QVector<QRgb> colorTable(256);
-  for (quint32 i = 0; i < 256; ++i)
-  {
-    colorTable[i] = qRgb(i, i, i);
-  }
-  image.setColorTable(colorTable);
-  qint32 index;
-  for (qint32 j=0; j<height; j++)
-  {
-    for (qint32 i =0; i<width; i++)
-    {
-      index = (j * width) + i;
-      image.setPixel(i, j, dataPointer[index]);
-    }
-  }
-  m_ProcessedGDelegate->setCachedImage(image);
-  m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_ProcessedGDelegate->updateGraphicsScene();
-  this->setWindowModified(true);
-  setWidgetListEnabled(true);
-}
-#endif
-
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
 void QEmMpm::queueControllerFinished()
 {
-  m_SegmentBtn->setEnabled(true);
-  m_QueueController->deleteLater();
-  m_QueueController = NULL;
- // std::cout << "QEmMpm::queueControllerFinished() --- Complete" << std::endl;
   m_QueueDialog->setVisible(false);
+  if (this->processFolder->isChecked() == false)
+     {
+      m_CurrentImageFile = fixedImageFile->text();
+      m_CurrentProcessedFile = outputImageFile->text();
+     }
+    else
+    {
+      QStringList fileList = generateInputFileList();
+      m_CurrentImageFile = fileList.at(0);
+
+      QFileInfo fileInfo(fileList.at(0));
+      QString basename = fileInfo.completeBaseName();
+      QString extension = fileInfo.suffix();
+      QString filepath = outputDirectoryLE->text();
+      filepath.append(QDir::separator());
+      filepath.append(outputPrefix->text());
+      filepath.append(basename);
+      filepath.append(outputSuffix->text());
+      filepath.append(".");
+      filepath.append(outputImageType->currentText());
+      m_CurrentProcessedFile = filepath;
+
+    }
+
+    initWithFile(m_CurrentImageFile, m_CurrentProcessedFile);
+    // Tell the RecentFileList to update itself then broadcast those changes.
+    QRecentFileList::instance()->addFile(m_CurrentImageFile);
+    QRecentFileList::instance()->addFile(m_CurrentProcessedFile);
+    setWidgetListEnabled(true);
+
+    processBtn->setEnabled(true);
+    m_QueueController->deleteLater();
+    m_QueueController = NULL;
+    this->statusBar()->showMessage("Segmentation Complete");
+
 }
 
 // -----------------------------------------------------------------------------
@@ -1111,6 +1101,12 @@ void QEmMpm::on_processFolder_stateChanged(int state)
   fileListView->setEnabled(enabled);
   outputImageTypeLabel->setEnabled(enabled);
   outputImageType->setEnabled(enabled);
+
+  fixedImageFile->setEnabled(!enabled);
+  fixedImageButton->setEnabled(!enabled);
+
+  outputImageFile->setEnabled(!enabled);
+  outputImageButton->setEnabled(!enabled);
 }
 
 // -----------------------------------------------------------------------------
@@ -1193,5 +1189,70 @@ AIMImage::Pointer QEmMpm::convertQImageToGrayScaleAIMImage(QImage image)
     }
   }
   return aimImage;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_fixedImageButton_clicked()
+{
+  //std::cout << "on_actionOpen_triggered" << std::endl;
+  QString imageFile = QFileDialog::getOpenFileName(this, tr("Select Fixed Image"),
+    m_OpenDialogLastDirectory,
+    tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)") );
+
+  if ( true == imageFile.isEmpty() )
+  {
+    return;
+  }
+  fixedImageFile->setText(imageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_outputImageButton_clicked()
+{
+  QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
+  outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)"));
+  if (outputFile.isEmpty() )
+  {
+    return;
+  }
+  outputImageFile->setText(outputFile);
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_fixedImageFile_textChanged(const QString & text)
+{
+  verifyPathExists(fixedImageFile->text(), fixedImageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_outputImageFile_textChanged(const QString & text)
+{
+//  verifyPathExists(outputImageFile->text(), movingImageFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_sourceDirectoryLE_textChanged(const QString & text)
+{
+  verifyPathExists(sourceDirectoryLE->text(), sourceDirectoryLE);
+  this->populateFileTable();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::on_outputDirectoryLE_textChanged(const QString & text)
+{
+  verifyPathExists(outputDirectoryLE->text(), outputDirectoryLE);
 }
 

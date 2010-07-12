@@ -71,7 +71,7 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
     void on_actionExit_triggered();
 
     /* slots for the buttons in the GUI */
-    void on_registerButton_clicked();
+    void on_processBtn_clicked();
     void on_aboutBtn_clicked();
 
     void on_compositeWithOriginal_stateChanged(int state);

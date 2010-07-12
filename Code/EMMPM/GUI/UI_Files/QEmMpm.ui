@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="inputsTab">
        <attribute name="title">
@@ -633,6 +633,12 @@
         </item>
         <item>
          <widget class="QFrame" name="originalImageFrame">
+          <property name="baseSize">
+           <size>
+            <width>622</width>
+            <height>475</height>
+           </size>
+          </property>
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
@@ -647,7 +653,14 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QFSDroppableGraphicsView" name="originalImageGView"/>
+            <widget class="QFSDroppableGraphicsView" name="originalImageGView">
+             <property name="baseSize">
+              <size>
+               <width>622</width>
+               <height>475</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -777,6 +790,12 @@
         </item>
         <item>
          <widget class="QFrame" name="processedImageFrame">
+          <property name="baseSize">
+           <size>
+            <width>622</width>
+            <height>475</height>
+           </size>
+          </property>
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
@@ -791,7 +810,14 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QFSDroppableGraphicsView" name="processedImageGView"/>
+            <widget class="QFSDroppableGraphicsView" name="processedImageGView">
+             <property name="baseSize">
+              <size>
+               <width>622</width>
+               <height>475</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -832,7 +858,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="m_SegmentBtn">
+       <widget class="QPushButton" name="processBtn">
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
         </property>
