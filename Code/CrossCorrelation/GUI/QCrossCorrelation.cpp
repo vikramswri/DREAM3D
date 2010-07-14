@@ -140,14 +140,16 @@ void QCrossCorrelation::resizeEvent ( QResizeEvent * event )
 //  std::cout << "originalImageFrame.size: " << osize.width() << " x " << osize.height() << std::endl;
   QSize psize = processedImageFrame->size();
 //  std::cout << "processedImageFrame.size: " << psize.width() << " x " << psize.height() << std::endl;
-  if (originalImageGView->isVisible() == true)
+  if (originalImageGView->isVisible() == true
+      && NULL != m_ProcessedImageGScene)
   {
     QRect sceneRect(0, 0, osize.width(), osize.height());
     processedImageFrame->setGeometry(sceneRect);
     processedImageGView->setGeometry(sceneRect);
     m_ProcessedImageGScene->setSceneRect(sceneRect);
   }
-  else if (processedImageGView->isVisible() == true)
+  else if (processedImageGView->isVisible() == true
+      && NULL != m_OriginalImageGScene)
   {
     QRect sceneRect(0, 0, psize.width(), psize.height());
     originalImageFrame->setGeometry(sceneRect);
