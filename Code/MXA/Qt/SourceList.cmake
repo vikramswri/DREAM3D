@@ -1,3 +1,20 @@
+# ------------------------------------------------------------------------------
+#  Qt 4 Section
+#------------------------------------------------------------------------------
+# by default only QtCore and QtGui modules are enabled
+# other modules must be enabled like this:  
+IF (WIN32)
+  SET (QT_USE_QTMAIN TRUE)
+ENDIF (WIN32)
+
+# this command finds Qt4 libraries and sets all required variables
+# note that it's Qt4, not QT4 or qt4
+FIND_PACKAGE( Qt4 REQUIRED )
+# add some useful macros and variables
+# (QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that 
+# contains a path to CMake script)
+INCLUDE( ${QT_USE_FILE} )
+
 set (MXA_QT_SRCS
     ${MXA_SOURCE_DIR}/MXA/Qt/ApplicationAboutBoxDialog.cpp
     ${MXA_SOURCE_DIR}/MXA/Qt/QRecentFileList.cpp
@@ -28,3 +45,23 @@ SET( MXA_QT_UI_FILES
   ${MXA_SOURCE_DIR}/MXA/Qt/UI_Files/ProcessQueueDialog.ui
   ${MXA_SOURCE_DIR}/MXA/Qt/UI_Files/ApplicationAboutBoxDialog.ui
 )
+
+
+# and finally any resource files
+#SET( QMXA_RCS ${PROJECT_RESOURCES_DIR}/icons/images/Icons.qrc)
+
+# --------------------------------------------------------------------
+# Run on the files   
+#QT4_ADD_RESOURCES( QMXA_Generated_RC_SRCS ${QCrossCorrelation_RCS} )
+
+# --------------------------------------------------------------------
+# this will run uic on .ui files:
+QT4_WRAP_UI( QMXA_Generated_UI_HDRS ${MXA_QT_UI_FILES} )
+
+# --------------------------------------------------------------------
+# and finally this will run moc:
+QT4_WRAP_CPP( QMXA_Generated_MOC_SRCS ${MXA_QT_HDRS} )
+
+# --------------------------------------------------------------------
+#-- Put the generated files into their own group for IDEs
+IDE_SOURCE_PROPERTIES( "Generated" "${QMXA_Generated_UI_HDRS}" "${QMXA_Generated_MOC_SRCS};${QMXA_Generated_RC_SRCS}")

@@ -197,6 +197,61 @@ macro(StaticLibraryProperties targetName )
 
 endmacro(StaticLibraryProperties)
 
+# --------------------------------------------------------------------
+#
+# --------------------------------------------------------------------
+macro(LibraryProperties targetName DEBUG_EXTENSION)
+    if ( NOT BUILD_SHARED_LIBS AND MSVC)
+      SET_TARGET_PROPERTIES( ${targetName} 
+        PROPERTIES
+        DEBUG_OUTPUT_NAME lib${targetName}
+        RELEASE_OUTPUT_NAME lib${targetName}  )
+    endif()
+    
+    #-- Set the Debug and Release names for the libraries
+    SET_TARGET_PROPERTIES( ${targetName} 
+        PROPERTIES
+        DEBUG_POSTFIX ${DEBUG_EXTENSION} )
+    
+    IF (APPLE AND BUILD_SHARED_LIBS)
+      OPTION (MXA_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
+      IF(MXA_BUILD_WITH_INSTALL_NAME)
+      
+          SET_TARGET_PROPERTIES(${MXADATAMODEL_LIB_NAME}
+             PROPERTIES
+             LINK_FLAGS "-current_version ${${PROJECT_NAME}_VERSION} -compatibility_version ${${PROJECT_NAME}_VERSION}"
+             INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+             BUILD_WITH_INSTALL_RPATH ${MXA_BUILD_WITH_INSTALL_NAME}
+          )
+     ENDIF(MXA_BUILD_WITH_INSTALL_NAME)
+   ENDIF (APPLE AND BUILD_SHARED_LIBS)
+
+endmacro(LibraryProperties DEBUG_EXTENSION)
+
+# --------------------------------------------------------------------
+#
+# --------------------------------------------------------------------
+macro(PluginProperties targetName DEBUG_EXTENSION)
+    if ( NOT BUILD_SHARED_LIBS AND MSVC)
+      SET_TARGET_PROPERTIES( ${targetName} 
+        PROPERTIES
+        DEBUG_OUTPUT_NAME lib${targetName}
+        RELEASE_OUTPUT_NAME lib${targetName}  )
+    endif()
+    
+    #-- Set the Debug and Release names for the libraries
+    SET_TARGET_PROPERTIES( ${targetName} 
+        PROPERTIES
+        DEBUG_POSTFIX ${DEBUG_EXTENSION} )
+    
+    IF (APPLE AND BUILD_SHARED_LIBS)
+      SET_TARGET_PROPERTIES(${MXADATAMODEL_LIB_NAME}
+         PROPERTIES
+         LINK_FLAGS "-current_version ${${PROJECT_NAME}_VERSION} -compatibility_version ${${PROJECT_NAME}_VERSION}"
+      )
+   ENDIF (APPLE AND BUILD_SHARED_LIBS)
+
+endmacro(PluginProperties DEBUG_EXTENSION)
 
 #-------------------------------------------------------------------------------
 # This macro will attempt a try_run command in order to compile and then 
