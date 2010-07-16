@@ -77,6 +77,9 @@ class QCrossCorrelation: public QMainWindow, private Ui::QCrossCorrelation
     void on_compositeWithOriginal_stateChanged(int state);
     void on_modeComboBox_currentIndexChanged();
 
+    void disableFixedFitToWindow();
+    void disableProcessedFitToWindow();
+
     void on_fixedImageButton_clicked();
     void on_movingImageButton_clicked();
     void on_outputImageButton_clicked();

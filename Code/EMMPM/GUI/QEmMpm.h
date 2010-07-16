@@ -76,6 +76,9 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     void on_compositeWithOriginal_stateChanged(int state);
     void on_modeComboBox_currentIndexChanged();
 
+    void disableFixedFitToWindow();
+    void disableProcessedFitToWindow();
+
     void on_fixedImageButton_clicked();
     void on_outputImageButton_clicked();
 
@@ -98,7 +101,7 @@ class QEmMpm: public QMainWindow, private Ui::QEmMpm
     void receiveTaskMessage(const QString &msg);
     void receiveTaskProgress(int p);
     void receiveTaskFinished();
-*/
+     */
 
     /**
      * @brief Updates the QMenu 'Recent Files' with the latest list of files. This

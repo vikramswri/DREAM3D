@@ -956,9 +956,12 @@ qint32 QEmMpm::initImageViews()
     connect(fixedFitToWindowBtn, SIGNAL(stateChanged(int)),
             m_OriginalGDelegate, SLOT(fitToWindow(int) ));
 
+    connect(fixedZoomInBtn, SIGNAL(clicked()),
+            this, SLOT(disableFixedFitToWindow()) );
+    connect(fixedZoomOutBtn, SIGNAL(clicked()),
+            this, SLOT(disableFixedFitToWindow()) );
+
     // Create the m_OriginalImage and m_Processed Image Objects
-
-
     m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
     if (NULL == m_OriginalImage.data())
     {
@@ -1030,6 +1033,11 @@ qint32 QEmMpm::initImageViews()
 
     connect(processedFitToWindowBtn, SIGNAL(stateChanged(int)),
             m_ProcessedGDelegate, SLOT(fitToWindow(int) ));
+
+    connect(processedZoomInBtn, SIGNAL(clicked()),
+            this, SLOT(disableProcessedFitToWindow()) );
+    connect(processedZoomOutBtn, SIGNAL(clicked()),
+            this, SLOT(disableProcessedFitToWindow()) );
   }
   return err;
 }
@@ -1258,3 +1266,18 @@ void QEmMpm::on_outputDirectoryLE_textChanged(const QString & text)
   verifyPathExists(outputDirectoryLE->text(), outputDirectoryLE);
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::disableFixedFitToWindow()
+{
+  this->fixedFitToWindowBtn->setChecked(false);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void QEmMpm::disableProcessedFitToWindow()
+{
+  this->processedFitToWindowBtn->setChecked(false);
+}

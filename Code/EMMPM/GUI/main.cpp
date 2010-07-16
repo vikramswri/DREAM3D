@@ -40,20 +40,20 @@ int main(int argc, char *argv[])
 
   {
     plugin_path = appDir.absolutePath() + QDir::separator() + "Libraries";
-    qWarning() << "plugin_path: " << plugin_path;
+ //   qWarning() << "plugin_path: " << plugin_path;
     QDir cPath(plugin_path);
     QStringList plugins = cPath.entryList(filters);
     for (int i = 0; i < plugins.size(); ++i)
     {
-      qWarning() << "Trying to load: " << plugins.at(i);
+   //   qWarning() << "Trying to load: " << plugins.at(i);
       QPluginLoader qplugin(plugin_path + QDir::separator() + plugins.at(i));
       if (qplugin.load())
       {
-        qWarning() << "Plugin: " << plugins.at(i) << " Loaded.";
+   //     qWarning() << "Plugin: " << plugins.at(i) << " Loaded.";
       }
       else
       {
-        qWarning() << "Plugin did NOT load: Error was " << qplugin.errorString();
+    //    qWarning() << "Plugin did NOT load: Error was " << qplugin.errorString();
       }
     }
   }

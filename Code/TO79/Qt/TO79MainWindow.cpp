@@ -4,12 +4,16 @@
 //  All rights reserved.
 //  BSD License: http://www.opensource.org/licenses/bsd-license.html
 //
+
 ///////////////////////////////////////////////////////////////////////////////
+#include "TO79MainWindow.h"
 
 //-- C++ includes
 #include <iostream>
 
 //-- Qt Includes
+
+#include <QtCore/QPluginLoader>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
@@ -19,11 +23,13 @@
 #include <QtCore/QThread>
 #include <QtCore/QThreadPool>
 #include <QtCore/QFileInfoList>
+#include <QtGui/QApplication>
 #include <QtGui/QFileDialog>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QMessageBox>
 #include <QtGui/QListWidget>
 #include <QtGui/QStringListModel>
+#include <QtGui/QLineEdit>
 
 // Our Project wide includes
 #include "MXA/Qt/ApplicationAboutBoxDialog.h"
@@ -33,13 +39,8 @@
 #include "MXA/Qt/ProcessQueueController.h"
 #include "MXA/Qt/ProcessQueueDialog.h"
 
-// Our Own Includes
-#include "QCrossCorrelation.h"
-#include "CrossCorrelationTask.h"
-#include "CrossCorrelation/CrossCorrelation.h"
 
 #include "TO79/Common/TO79Version.h"
-
 
 
 #define READ_STRING_SETTING(prefs, var, emptyValue)\
@@ -69,22 +70,24 @@
 #define WRITE_BOOL_SETTING(prefs, var, b)\
     prefs.setValue(#var, (b) );
 
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QCrossCorrelation::QCrossCorrelation(QWidget *parent) :
-  QMainWindow(parent),
-  m_ProxyModel(NULL),
+TO79MainWindow::TO79MainWindow(QWidget *parent) :
+QMainWindow(parent),
 #if defined(Q_WS_WIN)
-      m_OpenDialogLastDirectory("C:\\")
+    m_OpenDialogLastDirectory("C:\\")
 #else
 m_OpenDialogLastDirectory("~/")
 #endif
 {
   setupUi(this);
   readSettings();
+  loadPlugins();
+
   setupGui();
-//  m_CrossCorrelationThread = NULL;
+  //  m_CrossCorrelationThread = NULL;
   m_QueueController = NULL;
   m_OutputExistsCheck = false;
   QRecentFileList* recentFileList = QRecentFileList::instance();
@@ -95,21 +98,20 @@ m_OpenDialogLastDirectory("~/")
   m_QueueDialog = new ProcessQueueDialog(this);
   m_QueueDialog->setVisible(false);
 
-  m_CrossCorrelationTable = CrossCorrelationTable::New();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QCrossCorrelation::~QCrossCorrelation()
+TO79MainWindow::~TO79MainWindow()
 {
-
+  // TODO Auto-generated destructor stub
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_actionExit_triggered()
+void TO79MainWindow::on_actionExit_triggered()
 {
   this->close();
 }
@@ -117,7 +119,7 @@ void QCrossCorrelation::on_actionExit_triggered()
 // -----------------------------------------------------------------------------
 //  Called when the main window is closed.
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::closeEvent(QCloseEvent *event)
+void TO79MainWindow::closeEvent(QCloseEvent *event)
 {
   qint32 err = checkDirtyDocument();
   if (err < 0)
@@ -134,22 +136,20 @@ void QCrossCorrelation::closeEvent(QCloseEvent *event)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::resizeEvent ( QResizeEvent * event )
+void TO79MainWindow::resizeEvent ( QResizeEvent * event )
 {
   QSize osize = originalImageFrame->size();
 //  std::cout << "originalImageFrame.size: " << osize.width() << " x " << osize.height() << std::endl;
   QSize psize = processedImageFrame->size();
 //  std::cout << "processedImageFrame.size: " << psize.width() << " x " << psize.height() << std::endl;
-  if (originalImageGView->isVisible() == true
-      && NULL != m_ProcessedImageGScene)
+  if (originalImageGView->isVisible() == true)
   {
     QRect sceneRect(0, 0, osize.width(), osize.height());
     processedImageFrame->setGeometry(sceneRect);
     processedImageGView->setGeometry(sceneRect);
     m_ProcessedImageGScene->setSceneRect(sceneRect);
   }
-  else if (processedImageGView->isVisible() == true
-      && NULL != m_OriginalImageGScene)
+  else if (processedImageGView->isVisible() == true)
   {
     QRect sceneRect(0, 0, psize.width(), psize.height());
     originalImageFrame->setGeometry(sceneRect);
@@ -162,39 +162,21 @@ void QCrossCorrelation::resizeEvent ( QResizeEvent * event )
 // -----------------------------------------------------------------------------
 //  Read the prefs from the local storage file
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::readSettings()
+void TO79MainWindow::readSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
 #else
   QSettings prefs(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
 #endif
-  QString val;
-//  bool ok;
-//  qint32 i;
 
-  READ_BOOL_SETTING(prefs, processFolder, false);
-  READ_STRING_SETTING(prefs, fixedImageFile, "");
-  READ_STRING_SETTING(prefs, movingImageFile, "");
-  READ_STRING_SETTING(prefs, outputImageFile, "");
-  READ_STRING_SETTING(prefs, sourceDirectoryLE, "");
-  READ_STRING_SETTING(prefs, outputDirectoryLE, "");
-  READ_STRING_SETTING(prefs, outputPrefix, "");
-  READ_STRING_SETTING(prefs, outputSuffix, "");
-
-  on_processFolder_stateChanged(processFolder->isChecked());
-
-  if (this->sourceDirectoryLE->text().isEmpty() == false)
-  {
-    this->populateFileTable();
-  }
 
 }
 
 // -----------------------------------------------------------------------------
 //  Write our prefs to file
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::writeSettings()
+void TO79MainWindow::writeSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
@@ -202,20 +184,13 @@ void QCrossCorrelation::writeSettings()
   QSettings prefs(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
 #endif
 
-  WRITE_BOOL_SETTING(prefs, processFolder, processFolder->isChecked());
-  WRITE_STRING_SETTING(prefs, fixedImageFile);
-  WRITE_STRING_SETTING(prefs, movingImageFile);
-  WRITE_STRING_SETTING(prefs, outputImageFile);
-  WRITE_STRING_SETTING(prefs, sourceDirectoryLE);
-  WRITE_STRING_SETTING(prefs, outputDirectoryLE);
-  WRITE_STRING_SETTING(prefs, outputPrefix);
-  WRITE_STRING_SETTING(prefs, outputSuffix);
 }
+
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::setupGui()
+void TO79MainWindow::setupGui()
 {
 
 #ifdef Q_WS_MAC
@@ -269,39 +244,13 @@ void QCrossCorrelation::setupGui()
   connect (processedImageGView, SIGNAL(loadImageFileRequested(const QString &)),
            this, SLOT(loadProcessedImageFile(const QString &)));
 
-  QFileCompleter* com = new QFileCompleter(this, false);
-  fixedImageFile->setCompleter(com);
-  QObject::connect( com, SIGNAL(activated(const QString &)),
-           this, SLOT(on_fixedImageFile_textChanged(const QString &)));
-
-  QFileCompleter* com1 = new QFileCompleter(this, false);
-  movingImageFile->setCompleter(com1);
-  QObject::connect( com1, SIGNAL(activated(const QString &)),
-           this, SLOT(on_movingImageFile_textChanged(const QString &)));
-
-  QFileCompleter* com4 = new QFileCompleter(this, false);
-  outputImageFile->setCompleter(com4);
-  QObject::connect( com4, SIGNAL(activated(const QString &)),
-           this, SLOT(on_outputImageFile_textChanged(const QString &)));
-
-
-  QFileCompleter* com2 = new QFileCompleter(this, true);
-  sourceDirectoryLE->setCompleter(com2);
-  QObject::connect( com2, SIGNAL(activated(const QString &)),
-           this, SLOT(on_sourceDirectoryLE_textChanged(const QString &)));
-
-  QFileCompleter* com3 = new QFileCompleter(this, true);
-  outputDirectoryLE->setCompleter(com3);
-  QObject::connect( com3, SIGNAL(activated(const QString &)),
-           this, SLOT(on_outputDirectoryLE_textChanged(const QString &)));
-
 }
 
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_modeComboBox_currentIndexChanged()
+void TO79MainWindow::on_modeComboBox_currentIndexChanged()
 {
   if (NULL == m_ProcessedGDelegate) { return; }
   int index = modeComboBox->currentIndex();
@@ -342,7 +291,7 @@ void QCrossCorrelation::on_modeComboBox_currentIndexChanged()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::setWidgetListEnabled(bool b)
+void TO79MainWindow::setWidgetListEnabled(bool b)
 {
   foreach (QWidget* w, m_WidgetList)
   {
@@ -354,7 +303,7 @@ void QCrossCorrelation::setWidgetListEnabled(bool b)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_compositeWithOriginal_stateChanged(int state)
+void TO79MainWindow::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
   m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
@@ -366,7 +315,7 @@ void QCrossCorrelation::on_compositeWithOriginal_stateChanged(int state)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool QCrossCorrelation::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
+bool TO79MainWindow::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   QDir parent(fileinfo.dir());
@@ -376,7 +325,7 @@ bool QCrossCorrelation::verifyOutputPathParentExists(QString outFilePath, QLineE
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool QCrossCorrelation::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool TO79MainWindow::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   if (false == fileinfo.exists())
@@ -393,7 +342,7 @@ bool QCrossCorrelation::verifyPathExists(QString outFilePath, QLineEdit* lineEdi
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QCrossCorrelation::checkDirtyDocument()
+qint32 TO79MainWindow::checkDirtyDocument()
 {
   qint32 err = -1;
   {
@@ -405,9 +354,9 @@ qint32 QCrossCorrelation::checkDirtyDocument()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::updateRecentFileList(const QString &file)
+void TO79MainWindow::updateRecentFileList(const QString &file)
 {
-  // std::cout << "QCrossCorrelation::updateRecentFileList" << std::endl;
+  // std::cout << "TO79MainWindow::updateRecentFileList" << std::endl;
 
   // Clear the Recent Items Menu
   this->menu_RecentFiles->clear();
@@ -428,7 +377,7 @@ void QCrossCorrelation::updateRecentFileList(const QString &file)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::openRecentFile()
+void TO79MainWindow::openRecentFile()
 {
   //std::cout << "QRecentFileList::openRecentFile()" << std::endl;
 
@@ -445,7 +394,7 @@ void QCrossCorrelation::openRecentFile()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::openFile(QString imageFile)
+void TO79MainWindow::openFile(QString imageFile)
 {
   if ( true == imageFile.isEmpty() ) // User cancelled the operation
   {
@@ -462,7 +411,7 @@ void QCrossCorrelation::openFile(QString imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_aboutBtn_clicked()
+void TO79MainWindow::on_aboutBtn_clicked()
 {
   ApplicationAboutBoxDialog about(this);
   QString an = QCoreApplication::applicationName();
@@ -475,229 +424,15 @@ void QCrossCorrelation::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_processBtn_clicked()
+void TO79MainWindow::on_processBtn_clicked()
 {
 
-  /* If the 'processFolder' checkbox is checked then we need to check for some
-   * additional inputs
-   */
-  if (this->processFolder->isChecked())
-  {
-    if (this->sourceDirectoryLE->text().isEmpty() == true)
-    {
-      this->statusBar()->showMessage("Error: Source Directory must be set.");
-      QMessageBox::critical(this, tr("Input Parameter Error"),
-                                    tr("Source Directory must be set."),
-                                    QMessageBox::Ok);
-      return;
-    }
-
-    if (this->outputDirectoryLE->text().isEmpty() == true)
-    {
-      this->statusBar()->showMessage("Error: Output Directory must be set");
-      QMessageBox::critical(this, tr("Output Parameter Error"),
-                                    tr("Output Directory must be set."),
-                                    QMessageBox::Ok);
-      return;
-    }
-
-    if (this->fileListView->model()->rowCount() == 0  )
-    {
-      this->statusBar()->showMessage("Error: No image files are available in the file list view.");
-      QMessageBox::critical(this, tr("Parameter Error"),
-                                    tr("No image files are available in the file list view."),
-                                    QMessageBox::Ok);
-      return;
-    }
-
-    QDir outputDir(this->outputDirectoryLE->text());
-    if ( outputDir.exists() == false)
-    {
-      bool ok = outputDir.mkpath(".");
-      if (ok == false)
-      {
-        QMessageBox::critical(this, tr("Output Directory Creation"),
-                                      tr("The output directory could not be created."),
-                                      QMessageBox::Ok);
-        return;
-      }
-    }
-
-  }
-  else
-  {
-   QFileInfo fi(fixedImageFile->text());
-   if (fi.exists() == false)
-   {
-     QMessageBox::critical(this, tr("Fixed Image File Error"),
-                                   tr("Fixed Image does not exist. Please check the path."),
-                                   QMessageBox::Ok);
-     return;
-   }
-   QFileInfo mfi(movingImageFile->text());
-   if (mfi.exists() == false)
-   {
-     QMessageBox::critical(this, tr("Moving Image File Error"),
-                                   tr("Moving Image does not exist. Please check the path."),
-                                   QMessageBox::Ok);
-     return;
-   }
-   if (outputImageFile->text().isEmpty() == true)
-   {
-     QMessageBox::critical(this, tr("Output Image File Error"),
-                                   tr("Please select a file name for the registered image to be saved as."),
-                                   QMessageBox::Ok);
-     return;
-   }
-   QFile file (outputImageFile->text() );
-   if (file.exists() == true)
-   {
-     int ret = QMessageBox::warning(this, tr("QCrossCorrelation"),
-         tr("The Output File Already Exists\nDo you want to over write the existing file?"),
-         QMessageBox::No | QMessageBox::Default,
-         QMessageBox::Yes,
-         QMessageBox::Cancel);
-     if (ret == QMessageBox::Cancel)
-     {
-       return;
-     }
-     else if (ret == QMessageBox::Yes)
-     {
-       this->m_OutputExistsCheck = true;
-     }
-     else
-     {
-       QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
-       outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("TIF (*.tif)"));
-       if (!outputFile.isNull())
-       {
-         this->m_CurrentProcessedFile = "";
-         this->m_OutputExistsCheck = true;
-       }
-       else // The user clicked cancel from the save file dialog
-
-       {
-         return;
-       }
-     }
-   }
-
-  }
-
-  m_QueueDialog->clearTable();
-
-  m_QueueController = new ProcessQueueController(this);
-//  bool ok;
-  if (this->processFolder->isChecked() == false)
-  {
-    if (fixedImageFile->text().isEmpty() )
-    {
-      QMessageBox::critical(this, tr("Input File Error"),
-                                    tr("Fixed Image is not selected"),
-                                    QMessageBox::Ok);
-      m_QueueController->deleteLater();
-      return;
-    }
-    if (movingImageFile->text().isEmpty() )
-    {
-      QMessageBox::critical(this, tr("Input File Error"),
-                                    tr("Moving Image is not selected"),
-                                    QMessageBox::Ok);
-      m_QueueController->deleteLater();
-      return;
-    }
-
-    CrossCorrelationTask* task = new CrossCorrelationTask(NULL);
-
-    task->setInputFilePath(fixedImageFile->text());
-    task->setMovingImagePath(movingImageFile->text());
-    task->setOutputFilePath(outputImageFile->text());
-    CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
-    crossCorrelationData->setFixedSlice(0);
-    crossCorrelationData->setMovingSlice(1);
-    task->setCrossCorrelationData(crossCorrelationData);
-    m_CrossCorrelationTable->addCrossCorrelationData(0, crossCorrelationData);
-
-    m_QueueController->addTask(static_cast<QThread*>(task) );
-    this->addProcess(task);
-  }
-  else
-  {
-    QStringList fileList = generateInputFileList();
-    int32_t count = fileList.count();
-    CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
-    m_CrossCorrelationTable->addCrossCorrelationData(0, crossCorrelationData);
-    for (int32_t i = 0; i < count-1; ++i)
-    {
-    //  std::cout << "Adding input file:" << fileList.at(i).toStdString() << std::endl;
-      CrossCorrelationTask* task  = new CrossCorrelationTask(NULL);
-
-      task->setInputFilePath(sourceDirectoryLE->text() + QDir::separator() + fileList.at(i));
-      task->setMovingImagePath(sourceDirectoryLE->text() + QDir::separator() + fileList.at(i+1));
-      QFileInfo fileInfo(fileList.at(i+1));
-      QString basename = fileInfo.completeBaseName();
-      QString extension = fileInfo.suffix();
-      QString filepath = outputDirectoryLE->text();
-      filepath.append(QDir::separator());
-      filepath.append(outputPrefix->text());
-      filepath.append(basename);
-      filepath.append(outputSuffix->text());
-      filepath.append(".");
-      filepath.append(outputImageType->currentText());
-      task->setOutputFilePath(filepath);
-      CrossCorrelationData::Pointer crossCorrelationData = CrossCorrelationData::New();
-      crossCorrelationData->setFixedSlice(i);
-      crossCorrelationData->setMovingSlice(i+1);
-      task->setCrossCorrelationData(crossCorrelationData);
-      m_CrossCorrelationTable->addCrossCorrelationData(i+1, crossCorrelationData);
-
-      m_QueueController->addTask(static_cast<QThread*>(task) );
-      this->addProcess(task);
-    }
-
-  }
-
-  // When the event loop of the controller starts it will signal the ProcessQueue to run
-  connect(m_QueueController, SIGNAL(started()), m_QueueController, SLOT(processTask()));
-  // When the ProcessQueue finishes it will signal the QueueController to 'quit', thus stopping the thread
-  connect(m_QueueController, SIGNAL(finished()), this, SLOT(queueControllerFinished()));
-
-  this->m_QueueDialog->setVisible(true);
-  processBtn->setEnabled(false);
-
-  m_QueueController->start();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::addProcess(CrossCorrelationTask* task)
-{
-  this->m_QueueDialog->addProcess(task);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-QStringList QCrossCorrelation::generateInputFileList()
-{
-  QStringList list;
-  int count = this->m_ProxyModel->rowCount();
-  // this->fileListView->selectAll();
-  QAbstractItemModel* sourceModel = this->m_ProxyModel->sourceModel();
-  for (int i = 0; i < count; ++i)
-  {
-    QModelIndex proxyIndex = this->m_ProxyModel->index(i,0);
-    QModelIndex sourceIndex = this->m_ProxyModel->mapToSource(proxyIndex);
-    list.append( sourceModel->data(sourceIndex, 0).toString() );
-  }
-  return list;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_actionOpen_Processed_Image_triggered()
+void TO79MainWindow::on_actionOpen_Processed_Image_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Processed Image File"),
@@ -714,7 +449,7 @@ void QCrossCorrelation::on_actionOpen_Processed_Image_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_actionOpen_triggered()
+void TO79MainWindow::on_actionOpen_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
@@ -732,7 +467,7 @@ void QCrossCorrelation::on_actionOpen_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::loadImageFile(const QString &imageFile)
+void TO79MainWindow::loadImageFile(const QString &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -745,7 +480,7 @@ void QCrossCorrelation::loadImageFile(const QString &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::loadProcessedImageFile(const QString  &imageFile)
+void TO79MainWindow::loadProcessedImageFile(const QString  &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -759,7 +494,7 @@ void QCrossCorrelation::loadProcessedImageFile(const QString  &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_actionSave_triggered()
+void TO79MainWindow::on_actionSave_triggered()
 {
   saveProcessedImage();
 }
@@ -768,7 +503,7 @@ void QCrossCorrelation::on_actionSave_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_actionSave_As_triggered()
+void TO79MainWindow::on_actionSave_As_triggered()
 {
   m_CurrentProcessedFile = QString();
   saveProcessedImage();
@@ -777,7 +512,7 @@ void QCrossCorrelation::on_actionSave_As_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_actionClose_triggered() {
+void TO79MainWindow::on_actionClose_triggered() {
   // std::cout << "AIMMountMaker::on_actionClose_triggered" << std::endl;
   qint32 err = -1;
   err = checkDirtyDocument();
@@ -800,7 +535,7 @@ void QCrossCorrelation::on_actionClose_triggered() {
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::openProcessedImage(QString processedImage)
+void TO79MainWindow::openProcessedImage(QString processedImage)
 {
   if ( true == processedImage.isEmpty() ) // User cancelled the operation
   {
@@ -815,7 +550,7 @@ void QCrossCorrelation::openProcessedImage(QString processedImage)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QCrossCorrelation::saveProcessedImage()
+qint32 TO79MainWindow::saveProcessedImage()
 {
   QImage image = m_ProcessedGDelegate->getCachedImage();
   int err = 0;
@@ -849,42 +584,12 @@ qint32 QCrossCorrelation::saveProcessedImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::queueControllerFinished()
+void TO79MainWindow::queueControllerFinished()
 {
   this->statusBar()->showMessage("Accumulating Translations and writing final images");
   m_QueueDialog->setVisible(false);
 
-  CrossCorrelation::Pointer cc = CrossCorrelation::New();
-  CrossCorrelationData::Pointer ccData = CrossCorrelationData::NullPointer();
-  if (this->processFolder->isChecked() == false)
-   {
-    AIMImage::Pointer image = loadImage(movingImageFile->text());
-    ccData = m_CrossCorrelationTable->getCrossCorrelationData(0);
-
-    cc->writeRegisteredImage(image, ccData, outputImageFile->text().toStdString());
-//    loadImageFile(fixedImageFile->text());
-//    loadProcessedImageFile(outputImageFile->text());
-
-    m_CurrentImageFile = fixedImageFile->text();
-    m_CurrentProcessedFile = outputImageFile->text();
-   }
-  else
-  {
-    QStringList fileList = generateInputFileList();
-    double xt = 0.0;
-    double yt = 0.0;
-    int32_t count = fileList.count();
-    for (int32_t i = 0; i < count; ++i)
-    {
-      writeRegisteredImage(fileList.at(i), i, xt, yt);
-    }
-  }
-
-  initWithFile(m_CurrentImageFile, m_CurrentProcessedFile);
-  // Tell the RecentFileList to update itself then broadcast those changes.
-  QRecentFileList::instance()->addFile(m_CurrentImageFile);
-  QRecentFileList::instance()->addFile(m_CurrentProcessedFile);
-  setWidgetListEnabled(true);
+  /* Code that cleans up anything from the processing */
 
   processBtn->setEnabled(true);
   m_QueueController->deleteLater();
@@ -895,50 +600,7 @@ void QCrossCorrelation::queueControllerFinished()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int QCrossCorrelation::writeRegisteredImage(QString file, int i, double &xt, double &yt)
-{
-  QString inFile(sourceDirectoryLE->text() + QDir::separator() + file);
-  AIMImage::Pointer image = loadImage(inFile);
-  if (NULL == image)
-  {
-    qDebug("Error Loading image to translate.");
-    return -1;
-  }
-  CrossCorrelationData::Pointer ccData = m_CrossCorrelationTable->getCrossCorrelationData(i);
-  // Accumulate the translations
-  xt = xt + ccData->getXTrans();
-  yt = yt + ccData->getYTrans();
-  ccData->setXTrans(xt);
-  ccData->setYTrans(yt);
-
-  QFileInfo fileInfo(file);
-  QString basename = fileInfo.completeBaseName();
-  QString extension = fileInfo.suffix();
-  QString filepath = outputDirectoryLE->text();
-  filepath.append(QDir::separator());
-  filepath.append(outputPrefix->text());
-  filepath.append(basename);
-  filepath.append(outputSuffix->text());
-  filepath.append(".");
-  filepath.append(outputImageType->currentText());
-
-  CrossCorrelation::Pointer cc = CrossCorrelation::New();
-  cc->writeRegisteredImage(image, ccData, filepath.toStdString());
-  if (i == 0)
-  {
-    m_CurrentImageFile = filepath;
-  }
-  if ( i == 1)
-  {
-    m_CurrentProcessedFile = filepath;
-  }
-  return 1;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-AIMImage::Pointer QCrossCorrelation::loadImage(QString filePath)
+AIMImage::Pointer TO79MainWindow::loadImage(QString filePath)
 {
 //  std::cout << " loadImage(): filePath: " << filePath.toStdString() << std::endl;
   QImage image;
@@ -972,7 +634,7 @@ AIMImage::Pointer QCrossCorrelation::loadImage(QString filePath)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 QCrossCorrelation::initImageViews()
+qint32 TO79MainWindow::initImageViews()
 {
   qint32 err = 0;
   QImage image;
@@ -1115,7 +777,7 @@ qint32 QCrossCorrelation::initImageViews()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::initWithFile(const QString imageFile, QString processedImage)
+void TO79MainWindow::initWithFile(const QString imageFile, QString processedImage)
 {
   QFileInfo fileInfo(imageFile);
   this->m_OpenDialogLastDirectory = fileInfo.path();
@@ -1147,106 +809,11 @@ void QCrossCorrelation::initWithFile(const QString imageFile, QString processedI
 }
 
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_filterPatternLineEdit_textChanged()
-{
- // std::cout << "filterPattern: " << std::endl;
-  m_ProxyModel->setFilterFixedString(filterPatternLineEdit->text());
-  m_ProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-}
-
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_processFolder_stateChanged(int state)
-{
-  bool enabled = true;
-  if (state == Qt::Unchecked)
-  {
-    enabled = false;
-  }
-
-  sourceDirectoryLE->setEnabled(enabled);
-  sourceDirectoryBtn->setEnabled(enabled);
-  outputDirectoryLE->setEnabled(enabled);
-  outputDirectoryBtn->setEnabled(enabled);
-  outputPrefix->setEnabled(enabled);
-  outputSuffix->setEnabled(enabled);
-  filterPatternLabel->setEnabled(enabled);
-  filterPatternLineEdit->setEnabled(enabled);
-  fileListView->setEnabled(enabled);
-  outputImageTypeLabel->setEnabled(enabled);
-  outputImageType->setEnabled(enabled);
-
-  fixedImageFile->setEnabled(!enabled);
-  fixedImageButton->setEnabled(!enabled);
-  movingImageFile->setEnabled(!enabled);
-  movingImageButton->setEnabled(!enabled);
-
-  outputImageFile->setEnabled(!enabled);
-  outputImageButton->setEnabled(!enabled);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_sourceDirectoryBtn_clicked() {
-  this->m_OpenDialogLastDirectory = QFileDialog::getExistingDirectory(this, tr("Select Source Directory"),
-                                                               this->m_OpenDialogLastDirectory,
-                                                               QFileDialog::ShowDirsOnly
-                                                               | QFileDialog::DontResolveSymlinks);
-  if ( !this->m_OpenDialogLastDirectory.isNull() )
-  {
-    this->sourceDirectoryLE->setText(this->m_OpenDialogLastDirectory);
-  }
-  this->populateFileTable();
-}
-
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_outputDirectoryBtn_clicked()
-{
-  this->m_OpenDialogLastDirectory = QFileDialog::getExistingDirectory(this, tr("Select Output Directory"),
-                                                               this->m_OpenDialogLastDirectory,
-                                                               QFileDialog::ShowDirsOnly
-                                                               | QFileDialog::DontResolveSymlinks);
-  if ( !this->m_OpenDialogLastDirectory.isNull() )
-  {
-    this->outputDirectoryLE->setText(this->m_OpenDialogLastDirectory);
-  }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::populateFileTable()
-{
-  if ( NULL == m_ProxyModel)
-  {
-    m_ProxyModel = new QSortFilterProxyModel(this);
-  }
-
-  QDir sourceDir (this->sourceDirectoryLE->text() );
-  sourceDir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks );
-  QStringList strList = sourceDir.entryList();
-  QAbstractItemModel* strModel = new QStringListModel(strList, this->m_ProxyModel);
-  m_ProxyModel->setSourceModel(strModel);
-  m_ProxyModel->setDynamicSortFilter(true);
-  m_ProxyModel->setFilterKeyColumn(0);
-  fileListView->setModel(m_ProxyModel);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-AIMImage::Pointer QCrossCorrelation::convertQImageToGrayScaleAIMImage(QImage image)
+AIMImage::Pointer TO79MainWindow::convertQImageToGrayScaleAIMImage(QImage image)
 {
   AIMImage::Pointer aimImage = AIMImage::New();
   quint8* oImage = aimImage->allocateImageBuffer(image.width(), image.height(), true);
@@ -1275,97 +842,7 @@ AIMImage::Pointer QCrossCorrelation::convertQImageToGrayScaleAIMImage(QImage ima
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::on_fixedImageButton_clicked()
-{
-  //std::cout << "on_actionOpen_triggered" << std::endl;
-  QString imageFile = QFileDialog::getOpenFileName(this, tr("Select Fixed Image"),
-    m_OpenDialogLastDirectory,
-    tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)") );
-
-  if ( true == imageFile.isEmpty() )
-  {
-    return;
-  }
-  fixedImageFile->setText(imageFile);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_movingImageButton_clicked()
-{
-  QString imageFile = QFileDialog::getOpenFileName(this, tr("Select Moving Image"),
-    m_OpenDialogLastDirectory,
-    tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)") );
-
-  if ( true == imageFile.isEmpty() )
-  {
-    return;
-  }
-  movingImageFile->setText(imageFile);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_outputImageButton_clicked()
-{
-  QString outputFile = this->m_OpenDialogLastDirectory + QDir::separator() + "Untitled.tif";
-  outputFile = QFileDialog::getSaveFileName(this, tr("Save Output File As ..."), outputFile, tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)"));
-  if (outputFile.isEmpty() )
-  {
-    return;
-  }
-  outputImageFile->setText(outputFile);
-}
-
-
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_fixedImageFile_textChanged(const QString & text)
-{
-  verifyPathExists(fixedImageFile->text(), fixedImageFile);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_movingImageFile_textChanged(const QString & text)
-{
-  verifyPathExists(movingImageFile->text(), movingImageFile);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_outputImageFile_textChanged(const QString & text)
-{
-//  verifyPathExists(outputImageFile->text(), movingImageFile);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_sourceDirectoryLE_textChanged(const QString & text)
-{
-  verifyPathExists(sourceDirectoryLE->text(), sourceDirectoryLE);
-  this->populateFileTable();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::on_outputDirectoryLE_textChanged(const QString & text)
-{
-  verifyPathExists(outputDirectoryLE->text(), outputDirectoryLE);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void QCrossCorrelation::disableFixedFitToWindow()
+void TO79MainWindow::disableFixedFitToWindow()
 {
   this->fixedFitToWindowBtn->setChecked(false);
 }
@@ -1373,8 +850,84 @@ void QCrossCorrelation::disableFixedFitToWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void QCrossCorrelation::disableProcessedFitToWindow()
+void TO79MainWindow::disableProcessedFitToWindow()
 {
   this->processedFitToWindowBtn->setChecked(false);
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void TO79MainWindow::loadPlugins()
+ {
+     foreach (QObject *plugin, QPluginLoader::staticInstances())
+         populateMenus(plugin);
+
+     pluginsDir = QDir(qApp->applicationDirPath());
+
+ #if defined(Q_OS_WIN)
+     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+         pluginsDir.cdUp();
+ #elif defined(Q_OS_MAC)
+     if (pluginsDir.dirName() == "MacOS") {
+         pluginsDir.cdUp();
+         pluginsDir.cdUp();
+         pluginsDir.cdUp();
+     }
+ #endif
+     //pluginsDir.cd("plugins");
+
+     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+         QObject *plugin = loader.instance();
+         if (plugin) {
+             populateMenus(plugin);
+             pluginFileNames += fileName;
+         }
+     }
+
+//     brushMenu->setEnabled(!brushActionGroup->actions().isEmpty());
+//     shapesMenu->setEnabled(!shapesMenu->actions().isEmpty());
+//     filterMenu->setEnabled(!filterMenu->actions().isEmpty());
+ }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+ void TO79MainWindow::populateMenus(QObject *plugin)
+ {
+   std::cout << "Found Plugin..." << std::endl;
+//     BrushInterface *iBrush = qobject_cast<BrushInterface *>(plugin);
+//     if (iBrush)
+//         addToMenu(plugin, iBrush->brushes(), brushMenu, SLOT(changeBrush()),
+//                   brushActionGroup);
+//
+//     ShapeInterface *iShape = qobject_cast<ShapeInterface *>(plugin);
+//     if (iShape)
+//         addToMenu(plugin, iShape->shapes(), shapesMenu, SLOT(insertShape()));
+//
+//     FilterInterface *iFilter = qobject_cast<FilterInterface *>(plugin);
+//     if (iFilter)
+//         addToMenu(plugin, iFilter->filters(), filterMenu, SLOT(applyFilter()));
+ }
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+ void TO79MainWindow::addToMenu(QObject *plugin, const QStringList &texts,
+                            QMenu *menu, const char *member,
+                            QActionGroup *actionGroup)
+ {
+//     foreach (QString text, texts) {
+//         QAction *action = new QAction(text, plugin);
+//         connect(action, SIGNAL(triggered()), this, member);
+//         menu->addAction(action);
+//
+//         if (actionGroup) {
+//             action->setCheckable(true);
+//             actionGroup->addAction(action);
+//         }
+//     }
+ }
 

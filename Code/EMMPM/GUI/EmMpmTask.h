@@ -261,7 +261,7 @@ void EmMpmTask::execute( T* imageData, S* outputData)
   local_mu = (double) s1 / s0;
   local_sigma = (s2 - s1*local_mu)/s0;
   local_sigma = sqrt(local_sigma);
-  printf("mu=%f sigma=%f\n",local_mu,local_sigma);
+  // printf("mu=%f sigma=%f\n",local_mu,local_sigma);
 
   // initialize variables on main thread
   double local_mean_estimate[MAX_CLASSES];
@@ -345,8 +345,8 @@ void EmMpmTask::execute( T* imageData, S* outputData)
   m_TotalIterations = m_EmIterations * m_MpmIterations;
   m_CurrentIteration = 0;
 
-  printf("Beta: %f\n", m_Beta);
-  printf("Gamma: %f\n", m_Gamma);
+//  printf("Beta: %f\n", m_Beta);
+//  printf("Gamma: %f\n", m_Gamma);
 
   // perform EM
   for (uint32_t k = 0; k < EMIterations; ++k)
@@ -414,7 +414,7 @@ void EmMpmTask::execute( T* imageData, S* outputData)
       }
       else
       {
-        printf("local_N[%d] = %f\n", l, local_N[l]);
+       // printf("local_N[%d] = %f\n", l, local_N[l]);
       }
     }
 
@@ -424,9 +424,9 @@ void EmMpmTask::execute( T* imageData, S* outputData)
       if (EMIterations < 10 || (k + 1) % (EMIterations / 10) == 0)
       {
         for (int l = 0; l < NumberClasses - 1; l++) {
-          printf("%.3f %.3f ", local_mean_estimate[l], local_variance[l]);
+        //  printf("%.3f %.3f ", local_mean_estimate[l], local_variance[l]);
         }
-        printf("%.3f %.3f\n", local_mean_estimate[NumberClasses - 1], local_variance[NumberClasses - 1]);
+       // printf("%.3f %.3f\n", local_mean_estimate[NumberClasses - 1], local_variance[NumberClasses - 1]);
       }
     }
 

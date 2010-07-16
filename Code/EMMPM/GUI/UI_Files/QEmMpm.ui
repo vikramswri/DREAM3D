@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>648</width>
-    <height>665</height>
+    <width>718</width>
+    <height>721</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -672,6 +672,9 @@
         <string>Segmented Image</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="spacing">
+         <number>2</number>
+        </property>
         <property name="margin">
          <number>4</number>
         </property>
@@ -698,10 +701,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <property name="spacing">
-           <number>2</number>
-          </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QToolButton" name="processedZoomInBtn">
             <property name="text">
@@ -750,7 +750,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
+             <enum>QSizePolicy::Expanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -773,7 +773,7 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
+             <enum>QSizePolicy::Expanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -790,6 +790,12 @@
         </item>
         <item>
          <widget class="QFrame" name="processedImageFrame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="baseSize">
            <size>
             <width>622</width>
@@ -807,10 +813,16 @@
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <property name="margin">
-            <number>0</number>
+            <number>1</number>
            </property>
            <item row="0" column="0">
             <widget class="QFSDroppableGraphicsView" name="processedImageGView">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="baseSize">
               <size>
                <width>622</width>
@@ -879,7 +891,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>648</width>
+     <width>718</width>
      <height>22</height>
     </rect>
    </property>
