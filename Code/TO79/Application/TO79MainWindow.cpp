@@ -42,7 +42,7 @@
 
 #include "TO79/Common/TO79Version.h"
 
-#include "TO79/Application/plugins/QImageProcessingInterface.h"
+#include "TO79/plugins/QImageProcessingInterface.h"
 
 
 
@@ -316,9 +316,12 @@ void TO79MainWindow::setWidgetListEnabled(bool b)
 void TO79MainWindow::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
-  m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
-  m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_ProcessedGDelegate->updateGraphicsScene();
+  QImage cachedImage ( m_OriginalGDelegate->getCachedImage() );
+  if (cachedImage.isNull() != true) {
+    m_ProcessedGDelegate->setOverlayImage(cachedImage);
+    m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+    m_ProcessedGDelegate->updateGraphicsScene();
+  }
 }
 
 
@@ -481,7 +484,7 @@ void TO79MainWindow::on_actionOpen_Processed_Image_triggered()
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Processed Image File"),
     m_OpenDialogLastDirectory,
-    tr("Images (*.tif *.bmp *.jpg *.png)") );
+    tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)") );
 
   if ( true == imageFile.isEmpty() )
   {
@@ -587,7 +590,9 @@ void TO79MainWindow::openProcessedImage(QString processedImage)
   }
   this->initWithFile(m_CurrentImageFile, processedImage);
   setWidgetListEnabled(true);
-  on_modeComboBox_currentIndexChanged();
+  if (compositeWithOriginal->isChecked()) {
+    on_modeComboBox_currentIndexChanged();
+  }
 }
 
 
@@ -683,25 +688,26 @@ qint32 TO79MainWindow::initImageViews()
 
 
     // Create the QGraphicsScene Objects
-    m_OriginalImageGScene = new QGraphicsScene(this);
+    if (NULL == m_OriginalImageGScene)
+    {
+      m_OriginalImageGScene = new QGraphicsScene(this);
+      QSize baseSize = originalImageFrame->baseSize();
+      QRect sceneRect(0, 0, baseSize.width(), baseSize.height());
+      originalImageFrame->setGeometry(sceneRect);
+      originalImageGView->setGeometry(sceneRect);
+      m_OriginalImageGScene->setSceneRect(sceneRect);
+      originalImageGView->setScene(m_OriginalImageGScene);
+    }
+    if (NULL == m_OriginalGDelegate) {
+      m_OriginalGDelegate = new MXAImageGraphicsDelegate(this);
+      m_OriginalGDelegate->setDelegateName(QString("Original Image"));
+      m_OriginalGDelegate->setGraphicsView(originalImageGView);
+      m_OriginalGDelegate->setGraphicsScene(m_OriginalImageGScene);
+      m_OriginalGDelegate->setMainWindow(this);
+    }
 
-    QSize baseSize = originalImageFrame->baseSize();
-    QRect sceneRect(0, 0, baseSize.width(), baseSize.height());
-    originalImageFrame->setGeometry(sceneRect);
-    originalImageGView->setGeometry(sceneRect);
-    m_OriginalImageGScene->setSceneRect(sceneRect);
-    originalImageGView->setScene(m_OriginalImageGScene);
-
-
-    m_OriginalGDelegate = new MXAImageGraphicsDelegate(this);
-    m_OriginalGDelegate->setDelegateName(QString("Original Image"));
-    m_OriginalGDelegate->setGraphicsView(originalImageGView);
-    m_OriginalGDelegate->setGraphicsScene(m_OriginalImageGScene);
-    m_OriginalGDelegate->setMainWindow(this);
     m_OriginalGDelegate->setCachedImage(image);
-    fixedFitToWindowBtn->setChecked(true);
-    m_OriginalGDelegate->fitToWindow(Qt::Checked);
-
+    m_OriginalGDelegate->updateGraphicsScene(false);
 
     connect(this, SIGNAL(parentResized () ),
             m_OriginalGDelegate, SLOT(on_parentResized () ));
@@ -762,24 +768,27 @@ qint32 TO79MainWindow::initImageViews()
   if (NULL != m_ProcessedImage.data() )
   {
     // Create the QGraphicsScene Objects
-    m_ProcessedImageGScene = new QGraphicsScene(this);
-    QSize baseSize = processedImageFrame->baseSize();
-    QRect sceneRect(0, 0, baseSize.width(), baseSize.height());
-    processedImageFrame->setGeometry(sceneRect);
-    processedImageGView->setGeometry(sceneRect);
-    m_ProcessedImageGScene->setSceneRect(sceneRect);
-    processedImageGView->setScene(m_ProcessedImageGScene);
+    if (NULL == m_ProcessedImageGScene) {
+      m_ProcessedImageGScene = new QGraphicsScene(this);
+      QSize baseSize = processedImageFrame->baseSize();
+      QRect sceneRect(0, 0, baseSize.width(), baseSize.height());
+      processedImageFrame->setGeometry(sceneRect);
+      processedImageGView->setGeometry(sceneRect);
+      m_ProcessedImageGScene->setSceneRect(sceneRect);
+      processedImageGView->setScene(m_ProcessedImageGScene);
+      processedImageGView->setScene(m_ProcessedImageGScene);
+    }
 
-
-    processedImageGView->setScene(m_ProcessedImageGScene);
-    m_ProcessedGDelegate = new MXAImageGraphicsDelegate(this);
-    m_ProcessedGDelegate->setDelegateName(QString("Processed Image"));
-    m_ProcessedGDelegate->setGraphicsView(processedImageGView);
-    m_ProcessedGDelegate->setGraphicsScene(m_ProcessedImageGScene);
-    m_ProcessedGDelegate->setMainWindow(this);
+    if (NULL == m_ProcessedGDelegate) {
+      m_ProcessedGDelegate = new MXAImageGraphicsDelegate(this);
+      m_ProcessedGDelegate->setDelegateName(QString("Processed Image"));
+      m_ProcessedGDelegate->setGraphicsView(processedImageGView);
+      m_ProcessedGDelegate->setGraphicsScene(m_ProcessedImageGScene);
+      m_ProcessedGDelegate->setMainWindow(this);
+    }
     m_ProcessedGDelegate->setCachedImage(processedImage);
-    processedFitToWindowBtn->setChecked(true);
-    m_ProcessedGDelegate->fitToWindow(Qt::Checked);
+    m_ProcessedGDelegate->updateGraphicsScene(false);
+
     connect(this, SIGNAL(parentResized () ),
             m_ProcessedGDelegate, SLOT(on_parentResized () ) );
 
@@ -797,6 +806,11 @@ qint32 TO79MainWindow::initImageViews()
     connect(processedZoomOutBtn, SIGNAL(clicked()),
             this, SLOT(disableProcessedFitToWindow()) );
   }
+
+  if (compositeWithOriginal->isChecked())
+  {
+    on_compositeWithOriginal_stateChanged(Qt::Checked);
+  }
   return err;
 }
 
@@ -812,12 +826,19 @@ void TO79MainWindow::initWithFile(const QString imageFile, QString processedImag
 
   m_CurrentImageFile = imageFile;
   m_CurrentProcessedFile = processedImage;
-
+  if (m_CurrentImageFile.isEmpty())
+  {
+    this->compositeWithOriginal->setEnabled(false);
+  }
+  else
+  {
+    this->compositeWithOriginal->setEnabled(true);
+  }
   qint32 err = initImageViews();
 
   if (err < 0)
   {
-    this->statusBar()->showMessage("Error Loading Original Image");
+    this->statusBar()->showMessage("Error Loading Images");
     return;
   }
   this->originalImageTitle->setText(fileInfo.fileName());
@@ -915,8 +936,10 @@ void TO79MainWindow::loadPlugins()
      }
 
      menuPlugins->setEnabled(!pluginActionGroup->actions().isEmpty());
-//     shapesMenu->setEnabled(!shapesMenu->actions().isEmpty());
-//     filterMenu->setEnabled(!filterMenu->actions().isEmpty());
+     // Load the first plugin found
+     if (pluginActionGroup->actions().size() > 0) {
+       pluginActionGroup->actions().at(0)->activate(QAction::Trigger);
+     }
  }
 
 // -----------------------------------------------------------------------------
@@ -929,9 +952,10 @@ void TO79MainWindow::loadPlugins()
   if (ipPlugin)
   {
     m_LoadedPlugins.push_back(ipPlugin);
-    QWidget* activeInputWidget = ipPlugin->getInputWidget(NULL);
+  //  QWidget* activeInputWidget = ipPlugin->getInputWidget(NULL);
     qWarning(ipPlugin->getPluginName().toAscii());
     addToPluginMenu(plugin, ipPlugin->getPluginName(), menuPlugins, SLOT(setInputUI()), pluginActionGroup);
+    //m_ActivePlugin = ipPlugin;
   }
 }
 
@@ -968,9 +992,9 @@ void TO79MainWindow::setInputUI()
   QAction *action = qobject_cast<QAction*> (sender());
   // Get a pointer to the new active plugin instance
   m_ActivePlugin = qobject_cast<QImageProcessingInterface* > (action->parent());
+  this->setWindowTitle(m_ActivePlugin->getPluginName() + " is now Active");
 
   // Get a pointer to the plugins Input Widget
   QWidget* inputWidget = m_ActivePlugin->getInputWidget(this);
   inputsTab->layout()->addWidget(inputWidget);
-  //  paintArea->setBrush(iBrush, brush);
 }

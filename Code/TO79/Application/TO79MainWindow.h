@@ -74,8 +74,10 @@ class TO79MainWindow : public QMainWindow, private Ui::TO79MainWindow
     void disableFixedFitToWindow();
     void disableProcessedFitToWindow();
 
-    /* Slots to receive events from the ProcessQueueController */
-
+    /**
+     * @brief Qt Slot that fires in response to a click on a "Recent File' Menu entry.
+     */
+    void openRecentFile();
 
     void loadImageFile(const QString &filename);
 
@@ -103,10 +105,6 @@ class TO79MainWindow : public QMainWindow, private Ui::TO79MainWindow
 
 
 
-    /**
-     * @brief Qt Slot that fires in response to a click on a "Recent File' Menu entry.
-     */
-    void openRecentFile();
 
 
 
@@ -177,9 +175,6 @@ class TO79MainWindow : public QMainWindow, private Ui::TO79MainWindow
     AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
     qint32 initImageViews();
-
-    void populateFileTable();
-
 
     AIMImage::Pointer loadImage(QString filePath);
 

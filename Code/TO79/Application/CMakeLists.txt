@@ -128,12 +128,7 @@ TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
                         ${QT_LIBRARIES}
                         ${ITK_LIBRARIES}
                         MXADataModel)
-                        
-
-add_subdirectory(${PROJECT_SOURCE_DIR}/plugins/EMMPM ${PROJECT_BINARY_DIR}/plugins/EMMPM)
-add_subdirectory(${PROJECT_SOURCE_DIR}/plugins/CrossCorrelation ${PROJECT_BINARY_DIR}/plugins/CrossCorrelation)
-
-
+                       
 FindQtPlugins("qgif;qjpeg;qtiff")
 
 InstallationSupport(${PROJECT_NAME} ${EXE_DEBUG_EXTENSION} ${TO79MainWindow_BINARY_DIR})                

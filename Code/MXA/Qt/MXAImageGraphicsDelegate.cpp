@@ -29,7 +29,13 @@
 //
 // -----------------------------------------------------------------------------
 MXAImageGraphicsDelegate::MXAImageGraphicsDelegate(QObject* parent) :
-  QObject(parent), m_MainWindow(NULL), m_GraphicsView(NULL), m_GraphicsScene(NULL), m_CompositeImages(false), m_CurrentGraphicsItem(NULL), _zoomFactor(1.0),
+  QObject(parent),
+  m_MainWindow(NULL),
+  m_GraphicsView(NULL),
+  m_GraphicsScene(NULL),
+  m_CompositeImages(false),
+  m_CurrentGraphicsItem(NULL),
+  _zoomFactor(1.0),
       _shouldFitToWindow(false)
 {
 
@@ -46,6 +52,8 @@ MXAImageGraphicsDelegate::MXAImageGraphicsDelegate(QObject* parent) :
   _zoomIndex = 4;
 
   m_composition_mode = QPainter::CompositionMode_Exclusion;
+  this->m_CachedImage = QImage();
+  this->m_OverlayImage = QImage();
 }
 
 // -----------------------------------------------------------------------------
