@@ -48,8 +48,6 @@ class MXAImageGraphicsDelegate : public QObject
   MXA_INSTANCE_PROPERTY_m(QMainWindow*, MainWindow)
   MXA_INSTANCE_PROPERTY_m(QGraphicsView*, GraphicsView)
   MXA_INSTANCE_PROPERTY_m(QGraphicsScene*, GraphicsScene)
-
-
   MXA_INSTANCE_PROPERTY_m(QImage, CachedImage)
   MXA_INSTANCE_PROPERTY_m(QImage, OverlayImage)
   MXA_INSTANCE_PROPERTY_m(bool, CompositeImages)

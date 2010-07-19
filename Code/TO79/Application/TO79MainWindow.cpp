@@ -316,11 +316,13 @@ void TO79MainWindow::setWidgetListEnabled(bool b)
 void TO79MainWindow::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
-  QImage cachedImage ( m_OriginalGDelegate->getCachedImage() );
-  if (cachedImage.isNull() != true) {
-    m_ProcessedGDelegate->setOverlayImage(cachedImage);
-    m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-    m_ProcessedGDelegate->updateGraphicsScene();
+  if (NULL != m_OriginalGDelegate) {
+    QImage cachedImage ( m_OriginalGDelegate->getCachedImage() );
+    if (cachedImage.isNull() != true) {
+      m_ProcessedGDelegate->setOverlayImage(cachedImage);
+      m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+      m_ProcessedGDelegate->updateGraphicsScene();
+    }
   }
 }
 
@@ -814,8 +816,6 @@ qint32 TO79MainWindow::initImageViews()
   return err;
 }
 
-
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -856,8 +856,6 @@ void TO79MainWindow::initWithFile(const QString imageFile, QString processedImag
   }
   this->statusBar()->showMessage("Input Image Loaded");
 }
-
-
 
 // -----------------------------------------------------------------------------
 //

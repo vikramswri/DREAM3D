@@ -54,6 +54,7 @@ MXAImageGraphicsDelegate::MXAImageGraphicsDelegate(QObject* parent) :
   m_composition_mode = QPainter::CompositionMode_Exclusion;
   this->m_CachedImage = QImage();
   this->m_OverlayImage = QImage();
+  m_DelegateName = "Default MXAImageGraphicsDelegate";
 }
 
 // -----------------------------------------------------------------------------

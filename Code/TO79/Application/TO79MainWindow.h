@@ -103,11 +103,6 @@ class TO79MainWindow : public QMainWindow, private Ui::TO79MainWindow
                                QMenu *menu, const char *member,
                                QActionGroup *actionGroup);
 
-
-
-
-
-
     QStringList generateInputFileList();
     /**
     *
