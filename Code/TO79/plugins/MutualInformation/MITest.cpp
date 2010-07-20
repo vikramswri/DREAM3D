@@ -111,7 +111,8 @@ int main(int argc, char **argv)
 
   CMUMutualInformation mi;
 
-  AIMArray<uint32_t>::Pointer jointHistogram = mi.jointHistogram(images, binSize);
+  AIMArray<uint32_t>::Pointer jointHistogram = mi.jointHistogram(images, binSize, false);
+  mi.mutualInfomation(jointHistogram);
 
   std::ofstream ofile("/tmp/joinhistogram.raw", std::ios::binary);
   size_t length = jointHistogram->getNumElements();

@@ -38,6 +38,7 @@ class CMUMutualInformation
                                                bool normalize);
 
 
+    int mutualInfomation(AIMArray<uint32_t>::Pointer jointHistogram, int level = -1);
 
 
   private:

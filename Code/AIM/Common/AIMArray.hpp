@@ -55,6 +55,15 @@ class AIMArray
 //    MXA_INSTANCE_2DVECTOR_PROPERTY(int, ImagePixelSize, _pixelSize)
     MXA_INSTANCE_PROPERTY_m(size_t, NumElements);
 
+    void setDimensions(std::vector<size_t> dims)
+    {
+      m_Dimensions = dims;
+    }
+
+    std::vector<size_t> getDimensions()
+    {
+      return m_Dimensions;
+    }
 
     // -----------------------------------------------------------------------------
     //
@@ -188,6 +197,8 @@ class AIMArray
 #endif
       this->_managememory = manageMemory;
       this->setNumElements(numElements);
+      m_Dimensions.clear();
+      m_Dimensions.push_back(numElements);
       return _imageBuffer;
     }
 
@@ -197,7 +208,9 @@ class AIMArray
     template<typename K>
     T* allocateSameSizeArray(typename AIMArray<K>::Pointer array)
     {
-      return allocateDataArray(array->getNumElements(), true);
+      allocateDataArray(array->getNumElements(), true);
+      setDimensions( array->getDimensions() );
+      return _imageBuffer;
     }
 
     // -----------------------------------------------------------------------------
@@ -273,8 +286,7 @@ class AIMArray
   protected:
     AIMArray()
     {
-//      _pixelSize[0] = -1;
-//      _pixelSize[1] = -1;
+      m_Dimensions.push_back(0);
       m_NumElements = 0;
       _managememory = false;
       this->_imageBuffer = NULL;
@@ -282,6 +294,7 @@ class AIMArray
 
   private:
     T* _imageBuffer;
+    std::vector<size_t> m_Dimensions;
     AIMArray(const AIMArray&); // Copy Constructor Not Implemented
     void operator=(const AIMArray&); // Operator '=' Not Implemented
 };
