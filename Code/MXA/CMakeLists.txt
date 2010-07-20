@@ -30,8 +30,8 @@ set (Project_SRCS ${Project_SRCS}
         ${MXA_QT_HDRS}
         ${QMXA_Generated_UI_HDRS}
         ${QMXA_Generated_MOC_SRCS}
-            ${AIM_COMMON_SRCS}
-    ${AIM_COMMON_HDRS}
+        ${AIM_COMMON_SRCS}
+        ${AIM_COMMON_HDRS}
         )
 
 include_directories(${MXADataModel_SOURCE_DIR}/..)

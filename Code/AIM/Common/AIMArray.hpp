@@ -9,12 +9,16 @@
 #ifndef AIMARRAY_HPP_
 #define AIMARRAY_HPP_
 
-
-#include "MXA/Common/MXASetGetMacros.h"
-#include <EMMPM/Common/AIMImage.h>
-
-#include <iostream>
+//-- C Includes
 #include <string.h>
+
+//-- C++ Includes
+#include <iostream>
+
+//-- MXA Includes
+#include "MXA/MXATypes.h"
+#include "MXA/Common/MXASetGetMacros.h"
+#include "AIM/Common/AIMImage.h"
 
 #if defined ( AIM_USE_SSE ) && defined ( __SSE2__ )
 #include <mm_malloc.h>
@@ -48,51 +52,84 @@ class AIMArray
       }
     }
 
-    MXA_INSTANCE_2DVECTOR_PROPERTY(int, ImagePixelSize, _pixelSize)
+//    MXA_INSTANCE_2DVECTOR_PROPERTY(int, ImagePixelSize, _pixelSize)
+    MXA_INSTANCE_PROPERTY_m(size_t, NumElements);
+
 
     // -----------------------------------------------------------------------------
-    // Tested
+    //
     // -----------------------------------------------------------------------------
-    const int32* getImagePixelSize()
+    template <typename K, typename J>
+    typename AIMArray<J>::Pointer add(typename AIMArray<K>::Pointer v1)
     {
-      return _pixelSize;
+      T* v0Ptr = _imageBuffer;
+      K* v1Ptr = v1->getPointer(0);
+
+      size_t nEl0 = getNumElements();
+      size_t nEl1 = v1->getNumElements();
+      if (getNumElements() != v1->getNumElements())
+      {
+        std::cout << "Number of elements in Arrays do not match. " << __FILE__ << "(" << __LINE__ << ")" << std::endl;
+        return AIMArray<J>::NullPointer();
+      }
+
+      typename AIMArray<J>::Pointer h =  AIMArray<J>::New();
+
+      size_t numElements = getNumElements();
+      J* outPtr = h->allocateDataArray(numElements, true);
+      if (NULL == outPtr)
+      {
+        std::cout << "Could not Allocate new array. " << __FILE__ << "(" << __LINE__ << ")" << std::endl;
+        return AIMArray<J>::NullPointer();
+      }
+
+      for (size_t e = 0; e < numElements; ++e)
+      {
+        *outPtr = static_cast<J>(*v0Ptr) + static_cast<J>(*v1Ptr);
+        ++outPtr; ++v0Ptr; ++v1Ptr;
+      }
+
+      return h;
     }
 
     // -----------------------------------------------------------------------------
-    // Tested
+    //
     // -----------------------------------------------------------------------------
-    template<typename K>
-    void setImagePixelSize(typename AIMArray<K>::Pointer image)
+    template <typename K>
+    typename AIMArray<K>::Pointer ishft( int shift)
     {
-      int s[2];
-      image->getImagePixelSize(s);
-      _pixelSize[0] = s[0];
-      _pixelSize[1] = s[1];
+      T* inPtr = getPointer(0);
+      typename AIMArray<K>::Pointer h = AIMArray<K>::New();
+      K* outPtr = h->allocateDataArray(getNumElements(), true);
+
+      if (NULL == outPtr)
+      {
+        return AIMArray<K>::NullPointer();
+      }
+      size_t numElements = getNumElements();
+      K tmp = 0;
+      if (shift < 0)  // Right Shift
+      {
+        for (size_t e = 0; e < numElements; ++e)
+        {
+          tmp = getValue(e);
+          *outPtr = tmp >> shift;
+          ++outPtr; ++inPtr;
+        }
+      }
+      else  // Left Shift
+      {
+        for (size_t e = 0; e < numElements; ++e)
+        {
+          tmp = getValue(e);
+          *outPtr = tmp << shift;
+          ++outPtr; ++inPtr;
+        }
+      }
+      return h;
     }
 
-    // -----------------------------------------------------------------------------
-    // Tested
-    // -----------------------------------------------------------------------------
-    int32 getImagePixelWidth()
-    {
-      return _pixelSize[0];
-    }
 
-    // -----------------------------------------------------------------------------
-    // Tested
-    // -----------------------------------------------------------------------------
-    int32 getImagePixelHeight()
-    {
-      return _pixelSize[1];
-    }
-
-    // -----------------------------------------------------------------------------
-    // Tested
-    // -----------------------------------------------------------------------------
-    size_t getNumberOfElements()
-    {
-      return _pixelSize[0] * _pixelSize[1];
-    }
 
     // -----------------------------------------------------------------------------
     // Tested
@@ -123,19 +160,34 @@ class AIMArray
     }
 
     // -----------------------------------------------------------------------------
+    //
+    // -----------------------------------------------------------------------------
+    void setValue(T value, size_t index)
+    {
+      _imageBuffer[index] = value;
+    }
+
+    // -----------------------------------------------------------------------------
+    //
+    // -----------------------------------------------------------------------------
+    T getValue(size_t index)
+    {
+      return _imageBuffer[index];
+    }
+    // -----------------------------------------------------------------------------
     // Tested
     // -----------------------------------------------------------------------------
-    T* allocateDataArray(int32 width, int32 height, bool manageMemory = false)
+    T* allocateDataArray(size_t numElements, bool manageMemory = false)
     {
       this->deallocateArrayData();
-      size_t total = (size_t) width * (size_t) height;
+
 #if defined ( AIM_USE_SSE ) && defined ( __SSE2__ )
-      _imageBuffer = static_cast<T*>( _mm_malloc (total * sizeof(T), 16) );
+      _imageBuffer = static_cast<T*>( _mm_malloc (numElements * sizeof(T), 16) );
 #else
-        _imageBuffer = new T[total];
+        _imageBuffer = new T[numElements];
 #endif
       this->_managememory = manageMemory;
-      this->setImagePixelSize(width, height);
+      this->setNumElements(numElements);
       return _imageBuffer;
     }
 
@@ -145,7 +197,7 @@ class AIMArray
     template<typename K>
     T* allocateSameSizeArray(typename AIMArray<K>::Pointer array)
     {
-      return allocateDataArray(array->getImagePixelWidth(), array->getImagePixelHeight(), true);
+      return allocateDataArray(array->getNumElements(), true);
     }
 
     // -----------------------------------------------------------------------------
@@ -172,44 +224,58 @@ class AIMArray
     // -----------------------------------------------------------------------------
     // Tested
     // -----------------------------------------------------------------------------
-    int32 initializeImageWithSourceData(int32 width, int32 height, T* source)
+    int32_t initializeImageWithSourceData(size_t numElements, T* source)
     {
-      this->allocateDataArray(width, height, true);
+      this->allocateDataArray(numElements, true);
 
-      T* b = static_cast<T*> (::memcpy(_imageBuffer, source, sizeof(T) * width * height));
+      T* b = static_cast<T*> (::memcpy(_imageBuffer, source, sizeof(T) * numElements));
       return (b == _imageBuffer) ? 1 : -1;
     }
 
     // -----------------------------------------------------------------------------
     // Tested
     // -----------------------------------------------------------------------------
-    int32 zeroArrayData()
+    int32_t zeroArrayData()
     {
-      size_t total = _pixelSize[0] * _pixelSize[1] * sizeof(T);
-      ::memset(_imageBuffer, 0, total);
+     // size_t total = _pixelSize[0] * _pixelSize[1] * sizeof(T);
+      ::memset(_imageBuffer, 0, m_NumElements);
       return (NULL != _imageBuffer) ? 1 : -1;
     }
 
     // -----------------------------------------------------------------------------
     // Tested
     // -----------------------------------------------------------------------------
-    void printSelf(std::ostream& out)
+    void printSelf(std::ostream& out, int valuesPerLine)
     {
-      out << "AIMImage Properties" << std::endl;
-      // out << "  Origin:                 " << _origin[0] << ", " << _origin[1] << std::endl;
-      //out << "  ImageMicronSize:        " << _micronSize[0] << " x " << _micronSize[1] << std::endl;
-      out << "  ImagePixelSize:         " << _pixelSize[0] << " x " << _pixelSize[1] << std::endl;
-      //out << "  Scaling:                " << _scaling[0] << ", " << _scaling[1] << std::endl;
-      out << "  ManageMemory:           " << _managememory << std::endl;
-      out << "  ImageBuffer:            " << *_imageBuffer << std::endl;
-      // _intersectedTile->printSelf(out);
+      //      out << "AIMImage Properties" << std::endl;
+      //      out << "  ImagePixelSize:         " << _pixelSize[0] << " x " << _pixelSize[1] << std::endl;
+      //      out << "  ManageMemory:           " << _managememory << std::endl;
+      //      out << "  ImageBuffer:            " << *_imageBuffer << std::endl;
+      for (int y = 0; y < m_NumElements; ++y)
+      {
+        //   out << "[" << x << "]  ";
+        //  printf ("[%04d]  ", y);
+
+        printf("%04d ", (int)_imageBuffer[y]);
+        //          out << (int)_imageBuffer[ (_pixelSize[0] * y) + x];
+        /* if (x < _pixelSize[0] - 1) */
+        {
+          out << " ";
+        }
+        if (y % valuesPerLine == 0)
+        {
+          printf("\n");
+        }
+        //         out << std::endl;
+      }
     }
 
   protected:
     AIMArray()
     {
-      _pixelSize[0] = -1;
-      _pixelSize[1] = -1;
+//      _pixelSize[0] = -1;
+//      _pixelSize[1] = -1;
+      m_NumElements = 0;
       _managememory = false;
       this->_imageBuffer = NULL;
     }

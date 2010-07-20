@@ -81,12 +81,12 @@ IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/
 
    
 # Add our Qt based GUI project to the list of targets
-ADD_SUBDIRECTORY(${TO79_CODE_DIR}/MXA ${TO79_BINARY_DIR}/MXA)
-ADD_SUBDIRECTORY(${TO79_CODE_DIR}/TO79/Application ${TO79_BINARY_DIR}/Application)
+add_subdirectory(${TO79_CODE_DIR}/MXA ${TO79_BINARY_DIR}/MXA)
+add_subdirectory(${TO79_CODE_DIR}/TO79/Application ${TO79_BINARY_DIR}/Application)
 
 add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/EMMPM ${TO79_BINARY_DIR}/plugins/EMMPM)
 add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/CrossCorrelation ${TO79_BINARY_DIR}/plugins/CrossCorrelation)
-
+add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/MutualInformation ${TO79_BINARY_DIR}/plugins/MutualInformation)
 
 option(TO79_BUILD_API_DOCS "Use Doxygen to create the HTML based API documentation" OFF)
 if(TO79_BUILD_API_DOCS)
