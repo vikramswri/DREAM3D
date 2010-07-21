@@ -125,13 +125,13 @@ int CMUMutualInformation::mutualInfomation(AIMArray<uint32_t>::Pointer ndhist, i
 //  endelse
   std::cout << "Entropy contribution for level " << level << "  -> " << H  << std::endl;
 
-
-  if (szsz[0] > 1) {
-   for (int i=1; i < szsz[0]; ++i ) {
-     H += mutualInfomation(reform(total(ndhist,i)), level);
-     level -= 1;
-   }
-  }
+//
+//  if (szsz[0] > 1) {
+//   for (int i=1; i < szsz[0]; ++i ) {
+//     H += mutualInfomation(reform(total(ndhist,i)), level);
+//     level -= 1;
+//   }
+//  }
 
   return H;
 }
