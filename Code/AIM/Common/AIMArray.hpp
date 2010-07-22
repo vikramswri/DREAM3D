@@ -74,8 +74,8 @@ class AIMArray
       T* v0Ptr = _imageBuffer;
       K* v1Ptr = v1->getPointer(0);
 
-      size_t nEl0 = getNumElements();
-      size_t nEl1 = v1->getNumElements();
+//      size_t nEl0 = getNumElements();
+//      size_t nEl1 = v1->getNumElements();
       if (getNumElements() != v1->getNumElements())
       {
         std::cout << "Number of elements in Arrays do not match. " << __FILE__ << "(" << __LINE__ << ")" << std::endl;

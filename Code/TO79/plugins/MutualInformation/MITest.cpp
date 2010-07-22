@@ -71,7 +71,7 @@ AIMArray<uint8_t>::Pointer loadImage(QString filePath)
 //
 // -----------------------------------------------------------------------------
 template<typename T, typename K>
-T getIndex(T* S, const int ndims, K* i)
+T getIndex_(T* S, const int ndims, K* i)
 {
   T ndx = i[0];
   std::vector<T> products(ndims);
@@ -89,7 +89,7 @@ T getIndex(T* S, const int ndims, K* i)
 //
 // -----------------------------------------------------------------------------
 //template <typename T, typename K, typename J>
-void printArray(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, int* array)
+void printArray_(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, int* array)
 {
   if (0 == curDimIdx)
   {
@@ -107,13 +107,13 @@ void printArray(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, in
     i[n[curDimIdx]] = d;
     if (curDimIdx == ndims-1)
     {
-      ndx = getIndex(S, ndims, i);
+      ndx = getIndex_(S, ndims, i);
       printf("[%lu,%lu,%lu] %03d  ",i[0], i[1], i[2], array[ndx]);
       //printf("%03d  ", array[ndx]);
     }
     else
     {
-      printArray(ndims, S, i, curDimIdx+1, n, array);
+      printArray_(ndims, S, i, curDimIdx+1, n, array);
     }
   }
   if (curDimIdx == ndims-1)
@@ -126,7 +126,7 @@ void printArray(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, in
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void calc_sums(int* array,int actDim, int curDimIdx, size_t* dimsizes, int* n, size_t* S, int ndims, size_t* i,  int* totals, int &totalsIndex)
+void calc_sums_(int* array,int actDim, int curDimIdx, size_t* dimsizes, int* n, size_t* S, int ndims, size_t* i,  int* totals, int &totalsIndex)
 {
   size_t ndx = 0;
   for (int d = 0; d < dimsizes[curDimIdx]; ++d)
@@ -138,12 +138,12 @@ void calc_sums(int* array,int actDim, int curDimIdx, size_t* dimsizes, int* n, s
     }
     if (actDim == n[curDimIdx])
     {
-      ndx = getIndex<size_t, size_t>(S, ndims, i);
+      ndx = getIndex_<size_t, size_t>(S, ndims, i);
       totals[totalsIndex] += array[ndx];
     }
     else
     {
-      calc_sums(array, actDim, curDimIdx+1, dimsizes, n, S, ndims, i, totals, totalsIndex);
+      calc_sums_(array, actDim, curDimIdx+1, dimsizes, n, S, ndims, i, totals, totalsIndex);
     }
   }
   if (actDim == n[curDimIdx]) {
@@ -162,7 +162,7 @@ struct SumArray {
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void total(int actDim, size_t* arrayDimSizes, int ndims, int* array, SumArray* output)
+void total_(int actDim, size_t* arrayDimSizes, int ndims, int* array, SumArray* output)
 {
   size_t* i = static_cast<size_t*>(malloc(sizeof(size_t) * ndims));
   size_t* dimsizes = static_cast<size_t*>(malloc(sizeof(size_t) * ndims));
@@ -200,7 +200,7 @@ void total(int actDim, size_t* arrayDimSizes, int ndims, int* array, SumArray* o
   int sumsNDims = ndims-1;
   int sumsArrayIndex = 0;
 
-  calc_sums(array, actDim, 0, dimsizes, dimIndexLUT, arrayDimSizes, ndims, i, sums, sumsArrayIndex);
+  calc_sums_(array, actDim, 0, dimsizes, dimIndexLUT, arrayDimSizes, ndims, i, sums, sumsArrayIndex);
 
   // Print out the sums table
   size_t* sumsDimSizes = static_cast<size_t*>(malloc(sizeof(size_t) * sumsNDims));
@@ -211,7 +211,7 @@ void total(int actDim, size_t* arrayDimSizes, int ndims, int* array, SumArray* o
     sumsDimSizes[a] = dimsizes[sumsNDims-1-a];
     sumsDimLUT[a] = sumsNDims-1-a;
   }
-//  printArray(sumsNDims, sumsDimSizes, i, 0, sumsDimLUT, sums);
+//  printArray_(sumsNDims, sumsDimSizes, i, 0, sumsDimLUT, sums);
 
   output->data = sums;
   output->dims = sumsDimSizes;
@@ -231,6 +231,8 @@ void total(int actDim, size_t* arrayDimSizes, int ndims, int* array, SumArray* o
 int main(int argc, char **argv)
 {
   std::cout << "Mutual Information Test" << std::endl;
+
+#if 0
   size_t ndims = 3;
   size_t* S = static_cast<size_t*>(malloc(sizeof(size_t) * ndims)); // Allocate for 3 dimensions
   S[0] = 5;
@@ -251,7 +253,7 @@ int main(int argc, char **argv)
       for (size_t x = 0; x < S[0]; ++x)
       {
         i[0] = x; i[1] = y; i[2] = z;
-        ndx = getIndex<size_t, size_t>(S, ndims, i);
+        ndx = getIndex_<size_t, size_t>(S, ndims, i);
         array[ndx] = ndx;
      //   printf("[%lu,%lu,%lu] %lu  ",i[0], i[1], i[2], ndx);
       }
@@ -275,17 +277,17 @@ int main(int argc, char **argv)
 
 
   int n[3] = {2, 1, 0};
-  printArray(ndims, S, i, curDim, n, array);
+  printArray_(ndims, S, i, curDim, n, array);
 
   SumArray* output = static_cast<SumArray*>(malloc(sizeof(SumArray)));
   output->data = NULL;
   output->dims = NULL;
   output->ndims = 0;
-  total(actDim, S, ndims, array, output);
+  total_(actDim, S, ndims, array, output);
   actDim = 1;
-  total(actDim, S, ndims, array, output);
+  total_(actDim, S, ndims, array, output);
   actDim = 2;
-  total(actDim, S, ndims, array, output);
+  total_(actDim, S, ndims, array, output);
 
   free(output->data);
   free(output->dims);
@@ -295,7 +297,7 @@ int main(int argc, char **argv)
   free(array);
 
   if (true) exit(-1);
-
+#endif
 
   std::vector<AIMArray<uint8_t>::Pointer> images;
 
