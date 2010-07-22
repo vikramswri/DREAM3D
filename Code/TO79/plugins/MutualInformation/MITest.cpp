@@ -70,12 +70,13 @@ AIMArray<uint8_t>::Pointer loadImage(QString filePath)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-size_t getIndex(size_t* S, const size_t ndims, size_t* i)
+template<typename T, typename K>
+T getIndex(T* S, const int ndims, K* i)
 {
-  size_t ndx = i[0];
-  std::vector<size_t> products(ndims);
+  T ndx = i[0];
+  std::vector<T> products(ndims);
   products[0] = 1;
-  for (size_t d = 1; d < ndims; ++d)
+  for (int d = 1; d < ndims; ++d)
   {
     products[d] = products[d-1] * S[d-1];
     ndx = ndx + products[d] * i[d];
@@ -84,6 +85,10 @@ size_t getIndex(size_t* S, const size_t ndims, size_t* i)
   return ndx;
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+//template <typename T, typename K, typename J>
 void printArray(size_t ndims, size_t* S, size_t* i, size_t curDim, size_t actDim, int* array)
 {
   size_t ndx = 0;
@@ -108,68 +113,90 @@ void printArray(size_t ndims, size_t* S, size_t* i, size_t curDim, size_t actDim
     printf("------------------------------\n");
 }
 
-
-void sumActiveDimension(size_t ndims, size_t* S, size_t* i, size_t curDim, size_t actDim, int* array)
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void total_summation(int actDim, int curDimIdx, int* dimsizes, int* n, size_t* S, int ndims, size_t* i, int* array, int* totals, int &totalsIndex)
 {
   size_t ndx = 0;
-  for (size_t d = 0; d < S[curDim]; ++d)
+  for (int d = 0; d < dimsizes[curDimIdx]; ++d)
   {
-    i[curDim] = d;
-
-    if (curDim == 0)
+    i[n[curDimIdx]] = d;
+    if (curDimIdx == ndims - 2)
     {
-      ndx = getIndex(S, ndims, i);
-      printf("[%lu,%lu,%lu] %d  ",i[0], i[1], i[2], array[ndx]);
+      totals[totalsIndex] = 0;
+    }
+    if (actDim == n[curDimIdx])
+    {
+      ndx = getIndex<size_t, size_t>(S, ndims, i);
+      totals[totalsIndex] += array[ndx];
     }
     else
     {
-      sumActiveDimension(ndims, S, i, curDim-1, actDim, array);
+      total_summation(actDim, curDimIdx+1, dimsizes, n, S, ndims, i, array, totals, totalsIndex);
     }
   }
-  if (curDim == 0)
-  printf("\n");
-
-  if (curDim == ndims - 2)
-  printf("------------------------------\n");
+  if (actDim == n[curDimIdx]) {
+    totalsIndex++;
+    //printf("%03d ", sum);
+  }
+  //if (curDimIdx == ndims - 2) printf("\n");
 }
 
-
-
-void total(size_t actDim, size_t* S, size_t ndims, size_t* i, int* array)
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void total(int actDim, size_t* S, int ndims, size_t* i, int* array)
 {
   // Compute the number and size of the dimensions of the return
-  std::vector<int> dimsizes;
-  std::vector<int> n;
-  printf("Output Array will be sized: [");
+  size_t sDimSizes[3] = {0, 0, 0};
+  int dimsizes[3] = { 0, 0, 0};
+  int n[3] = { 0, 0, 0};
+  size_t curIndex = 0;
+
   size_t tot = 1;
-  for (size_t a = 0; a < ndims; ++a)
+  for (int a = ndims - 1; a >= 0; --a)
   {
     if (a != actDim)
     {
-      dimsizes.push_back(S[a]);
+      dimsizes[curIndex] = (S[a]);
       tot *= S[a];
-      printf("%lu ", S[a]);
-      n.push_back(a);
+
+      n[curIndex] = (a);
+      ++curIndex;
     }
   }
-  printf("]\n");
-  n.push_back(actDim);
-  dimsizes.push_back(S[actDim]);
-  size_t retNDims = dimsizes.size();
-  int* totals = static_cast<int*>(malloc(sizeof(int) * tot));
-  int sum = 0;
-  size_t ndx = 0;
 
-  for (int d = 0; d < dimsizes[1]; ++d)
+  printf("Output Array will be sized: [ ");
+  for (int a = ndims-2; a >= 0; --a)
   {
+    printf("%d ", dimsizes[a]);
+    sDimSizes[a] = dimsizes[a];
+  }
+  printf("]\n");
+  n[curIndex] = (actDim);
+  dimsizes[curIndex] = (S[actDim]);
+  int* totals = static_cast<int*>(malloc(sizeof(int) * tot));
+  int totalsIndex = 0;
+ // int sum = 0;
 
-    for (int dd = 0; dd < dimsizes[0]; ++dd)
+  total_summation(actDim, 0, dimsizes, n, S, ndims, i, array, totals, totalsIndex);
+
+
+  printArray(ndims-1, sDimSizes, i, ndims - 2, actDim, totals);
+//  printArray(ndims, S, i, curIndex, actDim, array);
+
+#if 0
+  size_t ndx = 0;
+  for (int d = 0; d < dimsizes[0]; ++d)
+  {
+    for (int dd = 0; dd < dimsizes[1]; ++dd)
     {
       sum = 0;
       for (int ddd = 0; ddd < dimsizes[2]; ++ddd)
       {
-        i[n[1]] = d;
-        i[n[0]] = dd;
+        i[n[0]] = d;
+        i[n[1]] = dd;
         i[n[2]] = ddd;
         ndx = getIndex(S, ndims, i);
         sum += array[ndx];
@@ -178,11 +205,9 @@ void total(size_t actDim, size_t* S, size_t ndims, size_t* i, int* array)
     }
     printf("\n");
   }
-
+#endif
 
   free(totals);
-
-
 }
 
 // -----------------------------------------------------------------------------
@@ -211,7 +236,7 @@ int main(int argc, char **argv)
       for (size_t x = 0; x < S[0]; ++x)
       {
         i[0] = x; i[1] = y; i[2] = z;
-        ndx = getIndex(S, ndims, i);
+        ndx = getIndex<size_t, size_t>(S, ndims, i);
         array[ndx] = ndx;
      //   printf("[%lu,%lu,%lu] %lu  ",i[0], i[1], i[2], ndx);
       }
@@ -222,10 +247,16 @@ int main(int argc, char **argv)
  // printf("+++++++++++++++++++++++++++++++++++++++\n");
   ndims = 3;
   size_t curDim = 2;
-  size_t actDim = 0;
+  int actDim = 0;
   i[0] = 0;
   i[1] = 0;
   i[2] = 0;
+  printf("Input Array Size: [ ");
+  for (size_t a = 0; a < ndims; ++a)
+  {
+    printf("%ul ", S[a]);
+  }
+  printf("]\n");
   printArray(ndims, S, i, curDim, actDim, array);
 
   total(actDim, S, ndims, i, array);
