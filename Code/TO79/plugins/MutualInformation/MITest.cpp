@@ -99,7 +99,7 @@ void printArray(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, in
     {
       ndx = getIndex(S, ndims, i);
       printf("[%lu,%lu,%lu] %03d  ",i[0], i[1], i[2], array[ndx]);
-      //printf("%02d  ", array[ndx]);
+      //printf("%03d  ", array[ndx]);
     }
     else
     {
@@ -116,7 +116,7 @@ void printArray(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, in
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void total_summation(int actDim, int curDimIdx, int* dimsizes, int* n, size_t* S, int ndims, size_t* i, int* array, int* totals, int &totalsIndex)
+void total_summation(int* array,int actDim, int curDimIdx, int* dimsizes, int* n, size_t* S, int ndims, size_t* i,  int* totals, int &totalsIndex)
 {
   size_t ndx = 0;
   for (int d = 0; d < dimsizes[curDimIdx]; ++d)
@@ -133,12 +133,12 @@ void total_summation(int actDim, int curDimIdx, int* dimsizes, int* n, size_t* S
     }
     else
     {
-      total_summation(actDim, curDimIdx+1, dimsizes, n, S, ndims, i, array, totals, totalsIndex);
+      total_summation(array, actDim, curDimIdx+1, dimsizes, n, S, ndims, i, totals, totalsIndex);
     }
   }
   if (actDim == n[curDimIdx]) {
-    totalsIndex++;
     printf("%03d ", totals[totalsIndex]);
+    totalsIndex++;
   }
   if (curDimIdx == ndims - 2) printf("\n");
 }
@@ -178,9 +178,7 @@ void total(int actDim, size_t* S, int ndims, size_t* i, int* array)
   dimsizes[curIndex] = (S[actDim]);
   int* totals = static_cast<int*>(malloc(sizeof(int) * tot));
   int totalsIndex = 0;
- // int sum = 0;
-
-  total_summation(actDim, 0, dimsizes, n, S, ndims, i, array, totals, totalsIndex);
+  total_summation(array, actDim, 0, dimsizes, n, S, ndims, i, totals, totalsIndex);
 
 
 //  printArray(ndims-1, sDimSizes, i, ndims - 2, actDim, totals);
