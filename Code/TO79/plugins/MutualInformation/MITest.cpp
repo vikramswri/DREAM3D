@@ -89,27 +89,27 @@ T getIndex(T* S, const int ndims, K* i)
 //
 // -----------------------------------------------------------------------------
 //template <typename T, typename K, typename J>
-void printArray(size_t ndims, size_t* S, size_t* i, size_t curDim, size_t actDim, int* array)
+void printArray(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, int* array)
 {
   size_t ndx = 0;
-  for (size_t d = 0; d < S[curDim]; ++d)
+  for (size_t d = 0; d < S[n[curDimIdx]]; ++d)
   {
-    i[curDim] = d;
-    if (curDim == 0)
+    i[n[curDimIdx]] = d;
+    if (curDimIdx == ndims-1)
     {
       ndx = getIndex(S, ndims, i);
-      //printf("[%lu,%lu,%lu] %d  ",i[0], i[1], i[2], array[ndx]);
-      printf("%02d  ", array[ndx]);
+      printf("[%lu,%lu,%lu] %03d  ",i[0], i[1], i[2], array[ndx]);
+      //printf("%02d  ", array[ndx]);
     }
     else
     {
-      printArray(ndims, S, i, curDim-1, actDim, array);
+      printArray(ndims, S, i, curDimIdx+1, n, array);
     }
   }
-  if (curDim == 0)
+  if (curDimIdx == ndims-1)
     printf("\n");
 
-  if (curDim == ndims - 2)
+  if (curDimIdx == ndims-2)
     printf("------------------------------\n");
 }
 
@@ -138,9 +138,9 @@ void total_summation(int actDim, int curDimIdx, int* dimsizes, int* n, size_t* S
   }
   if (actDim == n[curDimIdx]) {
     totalsIndex++;
-    //printf("%03d ", sum);
+    printf("%03d ", totals[totalsIndex]);
   }
-  //if (curDimIdx == ndims - 2) printf("\n");
+  if (curDimIdx == ndims - 2) printf("\n");
 }
 
 // -----------------------------------------------------------------------------
@@ -183,29 +183,8 @@ void total(int actDim, size_t* S, int ndims, size_t* i, int* array)
   total_summation(actDim, 0, dimsizes, n, S, ndims, i, array, totals, totalsIndex);
 
 
-  printArray(ndims-1, sDimSizes, i, ndims - 2, actDim, totals);
-//  printArray(ndims, S, i, curIndex, actDim, array);
+//  printArray(ndims-1, sDimSizes, i, ndims - 2, actDim, totals);
 
-#if 0
-  size_t ndx = 0;
-  for (int d = 0; d < dimsizes[0]; ++d)
-  {
-    for (int dd = 0; dd < dimsizes[1]; ++dd)
-    {
-      sum = 0;
-      for (int ddd = 0; ddd < dimsizes[2]; ++ddd)
-      {
-        i[n[0]] = d;
-        i[n[1]] = dd;
-        i[n[2]] = ddd;
-        ndx = getIndex(S, ndims, i);
-        sum += array[ndx];
-      }
-      printf("%03d ", sum);
-    }
-    printf("\n");
-  }
-#endif
 
   free(totals);
 }
@@ -246,7 +225,7 @@ int main(int argc, char **argv)
   }
  // printf("+++++++++++++++++++++++++++++++++++++++\n");
   ndims = 3;
-  size_t curDim = 2;
+  size_t curDim = 0;
   int actDim = 0;
   i[0] = 0;
   i[1] = 0;
@@ -254,20 +233,19 @@ int main(int argc, char **argv)
   printf("Input Array Size: [ ");
   for (size_t a = 0; a < ndims; ++a)
   {
-    printf("%ul ", S[a]);
+    printf("%lu ", S[a]);
   }
   printf("]\n");
-  printArray(ndims, S, i, curDim, actDim, array);
+
+
+  int n[3] = {2, 1, 0};
+  printArray(ndims, S, i, curDim, n, array);
 
   total(actDim, S, ndims, i, array);
   actDim = 1;
   total(actDim, S, ndims, i, array);
   actDim = 2;
   total(actDim, S, ndims, i, array);
-
-
- // total(ndims, S, i, curDim, actDim, array);
-
 
   free(S);
   free(i);
