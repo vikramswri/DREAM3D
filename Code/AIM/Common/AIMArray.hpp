@@ -14,6 +14,7 @@
 
 //-- C++ Includes
 #include <iostream>
+#include <limits>
 
 //-- MXA Includes
 #include "MXA/MXATypes.h"
@@ -138,7 +139,59 @@ class AIMArray
       return h;
     }
 
+    // -----------------------------------------------------------------------------
+    //
+    // -----------------------------------------------------------------------------
+    void minMax(T &min, T &max)
+    {
+      size_t nelements = getNumElements();
+      T* ptr = getPointer(0);
+      max = std::numeric_limits<T>::min();
+      min = std::numeric_limits<T>::max();
+      for (size_t i = 0; i < nelements; ++i)
+      {
+        if (ptr[i] < min) min = ptr[i];
+        if (ptr[i] > max) max = ptr[i];
+      }
+    }
 
+    // -----------------------------------------------------------------------------
+    //
+    // -----------------------------------------------------------------------------
+    template<typename K>
+    K sumElements()
+    {
+      size_t nelements = getNumElements();
+      T* ptr = getPointer(0);
+      K total = static_cast<K>(0);
+      for (size_t i = 0; i < nelements; ++i)
+      {
+        total += static_cast<K>(ptr[i]);
+      }
+      return total;
+    }
+
+    // -----------------------------------------------------------------------------
+    //
+    // -----------------------------------------------------------------------------
+    template <typename K>
+    typename AIMArray<K>::Pointer normalize()
+    {
+
+      typename AIMArray<K>::Pointer out = AIMArray<K>::New();
+      out->allocateDataArray(getNumElements(), true);
+      out->setDimensions(getDimensions() );
+      K* outPtr = out->getPointer(0);
+
+      K total = sumElements<double>();
+      size_t nelements = getNumElements();
+      T* ptr = getPointer(0);
+      for (size_t i = 0; i < nelements; ++i)
+      {
+        outPtr[i] =  static_cast<K>(ptr[i]/total);
+      }
+      return out;
+    }
 
     // -----------------------------------------------------------------------------
     // Tested

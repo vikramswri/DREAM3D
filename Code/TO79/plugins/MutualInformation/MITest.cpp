@@ -96,9 +96,9 @@ void printArray_(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, i
     printf(" printArray: \n");
     printf("   ndims: %03lu\n", ndims);
     printf("\tS\tn\n");
-    for (int a=0; a<ndims; ++a)
+    for (size_t a=0; a<ndims; ++a)
     {
-      printf("\t%03d\t%03d\n", S[a], n[a]);
+      printf("\t%03lu\t%03d\n", S[a], n[a]);
     }
   }
   size_t ndx = 0;
@@ -129,7 +129,7 @@ void printArray_(size_t ndims, size_t* S, size_t* i, size_t curDimIdx, int* n, i
 void calc_sums_(int* array,int actDim, int curDimIdx, size_t* dimsizes, int* n, size_t* S, int ndims, size_t* i,  int* totals, int &totalsIndex)
 {
   size_t ndx = 0;
-  for (int d = 0; d < dimsizes[curDimIdx]; ++d)
+  for (size_t d = 0; d < dimsizes[curDimIdx]; ++d)
   {
     i[n[curDimIdx]] = d;
     if (curDimIdx == ndims - 2)
@@ -335,7 +335,13 @@ int main(int argc, char **argv)
   CMUMutualInformation mi;
 
   AIMArray<uint32_t>::Pointer jointHistogram = mi.jointHistogram(images, binSize, false);
-  mi.mutualInfomation(jointHistogram);
+  AIMArray<double>::Pointer normalizedJointHistogram = jointHistogram->normalize<double>();
+  double min, max;
+  normalizedJointHistogram->minMax(min, max);
+  std::cout << "Normalized Histogram Min/Max: " << min << "  " << max << std::endl;
+  int level = -1;
+  double H = mi.mutualInfomation(normalizedJointHistogram, level);
+  std::cout << "Mutual Information: " << H << std::endl;
 
   std::ofstream ofile("/tmp/joinhistogram.raw", std::ios::binary);
   size_t length = jointHistogram->getNumElements();

@@ -18,8 +18,6 @@
 // -----------------------------------------------------------------------------
 CMUMutualInformation::CMUMutualInformation()
 {
-  // TODO Auto-generated constructor stub
-
 }
 
 // -----------------------------------------------------------------------------
@@ -27,7 +25,6 @@ CMUMutualInformation::CMUMutualInformation()
 // -----------------------------------------------------------------------------
 CMUMutualInformation::~CMUMutualInformation()
 {
-  // TODO Auto-generated destructor stub
 }
 
 
@@ -48,7 +45,7 @@ class NotEqual
 //
 // -----------------------------------------------------------------------------
 template<class T, typename K>
-std::vector<size_t> where(AIMArray<uint32_t>::Pointer array, T operation, K value, int &count)
+std::vector<size_t> where(typename AIMArray<K>::Pointer array, T operation, K value, int &count)
 {
   std::vector<size_t> ret;
   count = 0;
@@ -134,8 +131,9 @@ void CMUMutualInformation::printArray(size_t ndims, size_t* S, size_t* i, size_t
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void CMUMutualInformation::calc_sums(unsigned int* array,int actDim, int curDimIdx, size_t* dimsizes,
-               int* n, size_t* S, int ndims, size_t* i,  unsigned int* totals, int &totalsIndex)
+template<typename T>
+void calc_sums(T* array,int actDim, int curDimIdx, size_t* dimsizes,
+               int* n, size_t* S, int ndims, size_t* i,  T* totals, int &totalsIndex)
 {
   size_t ndx = 0;
   for (size_t d = 0; d < dimsizes[curDimIdx]; ++d)
@@ -161,14 +159,12 @@ void CMUMutualInformation::calc_sums(unsigned int* array,int actDim, int curDimI
   }
  // if (curDimIdx == ndims - 2) printf("\n");
 }
-
-
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void CMUMutualInformation::total(int actDim, AIMArray<uint32_t>::Pointer input,
-                                             AIMArray<uint32_t>::Pointer output)
+template<typename T>
+void total(int actDim, typename AIMArray<T>::Pointer input,
+                                             typename AIMArray<T>::Pointer output)
 {
   std::vector<size_t>::size_type ndims = input->getDimensions().size();
   size_t* i = new size_t[ndims]; //static_cast<size_t*>(malloc(sizeof(size_t) * ndims));
@@ -194,7 +190,7 @@ void CMUMutualInformation::total(int actDim, AIMArray<uint32_t>::Pointer input,
   dimsizes[curIndex] = (arrayDimSizes[actDim]);
   output->allocateDataArray(tot, true);
 
-  unsigned int* sums = output->getPointer(0); //static_cast<int*>(malloc(sizeof(int) * tot));
+  T* sums = output->getPointer(0); //static_cast<int*>(malloc(sizeof(int) * tot));
   int sumsNDims = ndims-1;
   int sumsArrayIndex = 0;
 
@@ -203,7 +199,7 @@ void CMUMutualInformation::total(int actDim, AIMArray<uint32_t>::Pointer input,
   // Print out the sums table
 
 //  size_t* sumsDimSizes = new size_t[sumsNDims]; //static_cast<size_t*>(malloc(sizeof(size_t) * sumsNDims));
-  std::vector<size_t> sumsDimSizes(2);
+  std::vector<size_t> sumsDimSizes(sumsNDims);
   int* sumsDimLUT = new int[sumsNDims]; //static_cast<int*>(malloc(sizeof(int) * sumsNDims));
 
   for (int a = sumsNDims-1; a >= 0; --a)
@@ -222,17 +218,16 @@ void CMUMutualInformation::total(int actDim, AIMArray<uint32_t>::Pointer input,
 //  free(sumsDimSizes);
   delete sumsDimLUT; // free(sumsDimLUT);
 }
-
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int CMUMutualInformation::mutualInfomation(AIMArray<uint32_t>::Pointer ndhist, int level)
+double CMUMutualInformation::mutualInfomation(AIMArray<double>::Pointer normalizedJointHistogram, int &level)
 {
+
   level += 1;
 
   //get the dimensions to determine the sign of this contribution
-  std::vector<size_t>::size_type szsz[1] = { ndhist->getDimensions().size() };
+  std::vector<size_t>::size_type szsz[1] = { normalizedJointHistogram->getDimensions().size() };
 
   int sign = 0;
   if (szsz[0] % 2 == 0)
@@ -246,13 +241,13 @@ int CMUMutualInformation::mutualInfomation(AIMArray<uint32_t>::Pointer ndhist, i
 
   // compute the entropy for this level of recursion
   int count;
-  typedef NotEqual<uint32_t, float> NotEqualType;
+  typedef NotEqual<double, double> NotEqualType;
 
   NotEqualType ne;
-  float compare = 0.0f;
-  std::vector<size_t> q = where(ndhist, ne, compare, count);
+  double compare = 0.0f;
+  std::vector<size_t> q = where(normalizedJointHistogram, ne, compare, count);
   //  q = where(ndhist ne 0.0,cnt)
-  int64_t H;
+  double H;
   if (count != 0)
   //  if (cnt ne 0)
   {
@@ -260,7 +255,7 @@ int CMUMutualInformation::mutualInfomation(AIMArray<uint32_t>::Pointer ndhist, i
     int64_t f = factorial(level);
     for (std::vector<size_t>::iterator iter = q.begin(); iter != q.end(); ++iter )
     {
-      total += ndhist->getValue(*iter) * log( static_cast<double>(ndhist->getValue(*iter)) );
+      total += normalizedJointHistogram->getValue(*iter) * log( static_cast<double>(normalizedJointHistogram->getValue(*iter)) );
     }
     H = -sign * total/f;
 
@@ -278,17 +273,17 @@ int CMUMutualInformation::mutualInfomation(AIMArray<uint32_t>::Pointer ndhist, i
   std::cout << "Entropy contribution for level " << level << "  -> " << H  << std::endl;
 
 //
-  AIMArray<uint32_t>::Pointer output = AIMArray<uint32_t>::New();
+  AIMArray<double>::Pointer output = AIMArray<double>::New();
   if (szsz[0] > 1)
   {
-    for (size_t i = 1; i < szsz[0]; ++i)
+    for (size_t i = 0; i < szsz[0]; ++i)
     {
-       total(i, ndhist, output);
-       ndhist = output;
-       H += mutualInfomation(ndhist, level);
+       total<double>( (int)i, normalizedJointHistogram, output);
+       // normalizedJointHistogram = output;
+       H += mutualInfomation(output, level);
       //     H += mutualInfomation(reform(total(ndhist,i)), level);
        level -= 1;
-       std::cout << "H=" << H << std::endl;
+     //  std::cout << "Mutual Infomation=" << H << std::endl;
     }
   }
 
@@ -368,24 +363,6 @@ AIMArray<uint32_t>::Pointer CMUMutualInformation::jointHistogram(std::vector<Ima
   {
     retPtr[ hPtr[i] ]++;
   }
-
-#if 0
-  size_t index = GET_INDEX(1,2,3, nbins);
-  std::cout << "index: " << index << "  ret[1,2,3]: " << retPtr[index] << std::endl;
-
-  index = GET_INDEX(5,6,7, nbins);
-  std::cout << "index: " << index << "  ret[5,6,7]: " << retPtr[index] << std::endl;
-
-  index = GET_INDEX(9,10,11, nbins);
-  std::cout << "index: " << index << "  ret[9,10,11]: " << retPtr[index] << std::endl;
-
-  index = GET_INDEX(13,14,15, nbins);
-  std::cout << "index: " << index << "  ret[13,14,15]: " << retPtr[index] << std::endl;
-
-  index = GET_INDEX(0,0,0, nbins);
-  std::cout << "index: " << index << "  ret[0,0,0]: " << retPtr[index] << std::endl;
-#endif
-
 
   return ret;
 }
