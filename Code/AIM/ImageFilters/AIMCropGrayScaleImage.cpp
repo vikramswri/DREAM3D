@@ -46,7 +46,7 @@ int AIMCropGrayScaleImage::run()
 {
   int err = 0;
   int32_t _inDimensions[2] = {0, 0};
-  _inData->getImagePixelSize(_inDimensions);
+  _inData->getImagePixelDimension(_inDimensions);
   PixelType* data = this->_inData->getImageBuffer();
   ImportFilterType::Pointer importFilter = ImportFilterType::New();
   initializeImportFilter(importFilter, data, _inDimensions[0], _inDimensions[1]);

@@ -1,11 +1,13 @@
-The EmMpmGUI Project uses computer codes from the following open-source
+The Task Order 79 Project uses computer codes from the following open-source
 projects:
+===========
+ITK Software library http://www.itk.org
 
 ===========
 Qt from Nokia http://qt.nokia.com/
   This project opted to utilize the GNU Lesser General Public License (LGPL). This
 allows the project to freely distribute the source code to Qt. For more informatio
-on the LGPL please see the file "Qt License/lgpl.html".
+on the LGPL please see the file "Qt License/lgpl.html" in the Qt software distribution.
 
 ===========
 Boost from http://www.boost.org/ - A subset of the complete boost open-source

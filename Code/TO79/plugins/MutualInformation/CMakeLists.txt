@@ -43,7 +43,7 @@ set (MutualInformation_PROJECT_SRCS
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin/plugins  )
 #add_library(MutualInformation STATIC ${MutualInformation_PROJECT_SRCS})
 add_executable(MITest ${MutualInformation_PROJECT_SRCS})
-target_link_libraries(MITest ${QT_LIBRARIES} MXADataModel)
+target_link_libraries(MITest ${QT_LIBRARIES} MXADataModel AIMLib)
 #PluginProperties(MutualInformation "_debug")
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin  )
 

@@ -50,7 +50,7 @@ int AIMImagePadFilter::run()
 {
   int err = 0;
   int32_t _inDimensions[2] = {0, 0};
-  m_InData->getImagePixelSize(_inDimensions);
+  m_InData->getImagePixelDimension(_inDimensions);
   PixelType* data = this->m_InData->getImageBuffer();
   ImportFilterType::Pointer importFilter = ImportFilterType::New();
   initializeImportFilter(importFilter, data, _inDimensions[0], _inDimensions[1]);

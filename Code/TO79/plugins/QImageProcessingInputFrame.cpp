@@ -1,10 +1,10 @@
-/*
- * QImageProcessingInputFrame.cpp
- *
- *  Created on: Jul 19, 2010
- *      Author: mjackson
- */
-
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
+//  All rights reserved.
+//  BSD License: http://www.opensource.org/licenses/bsd-license.html
+//
+///////////////////////////////////////////////////////////////////////////////
 #include "QImageProcessingInputFrame.h"
 
 //-- Qt Includes

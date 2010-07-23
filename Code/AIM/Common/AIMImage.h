@@ -40,13 +40,13 @@ class AIMImage
   */
   static AIMImage::Pointer NewFromSourceMosaic(AIMImage::Pointer image, bool allocateBuffer = true);
 
-  MXA_INSTANCE_2DVECTOR_PROPERTY(int, ImagePixelSize, _pixelSize);
-  const int32_t* getImagePixelSize()
+  MXA_INSTANCE_2DVECTOR_PROPERTY_m(int, ImagePixelDimension);
+  const int32_t* getImagePixelDimension()
   {
-    return _pixelSize;
+    return m_ImagePixelDimension;
   }
 
-  void setImagePixelSize(AIMImage::Pointer image);
+  void setImagePixelDimension(AIMImage::Pointer image);
   int32_t getImagePixelWidth();
   int32_t getImagePixelHeight();
 

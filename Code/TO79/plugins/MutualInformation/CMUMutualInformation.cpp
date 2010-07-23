@@ -315,29 +315,26 @@ AIMArray<uint32_t>::Pointer CMUMutualInformation::jointHistogram(std::vector<Ima
   int32_t nbins = 256 >> q;
 
 //  int32_t total_bins = pow (nbins, s[0]);
+//  AIMArray<uint8_t>::Pointer image = inData[s[0]-1];
+//  uint8_t* imagePtr = image->getPointer(0);
 
   AIMArray<uint32_t>::Pointer h = inData[s[0] -1]->bitShift<uint32_t>( -q);
-//  printf ("h     ");
-//  h->printSelf(std::cout);
+  uint32_t* hPtr = h->getPointer(0);
+
   AIMArray<uint32_t>::Pointer temp = AIMArray<uint32_t>::NullPointer();
 
   for (int i = s[0] - 2; i >= 0; --i)
   {
-//    std::cout << "i = " << i << " q = " << q << " -------------------------------------------" << std::endl;
     h = h->bitShift<uint32_t>( 8 - q);
-//    printf ("ishft<uint32_t, uint32_t>(h, 8 - q)      ");
-//    h->printSelf(std::cout);
-    temp = inData[i]->bitShift<uint32_t>( -q);
-//    printf ("ishft<uint8_t, uint32_t>(inData[i], -q)  ");
-//    temp->printSelf(std::cout);
+    hPtr = h->getPointer(0);
 
+    temp = inData[i]->bitShift<uint32_t>( -q);
     h = h->add<uint32_t, uint32_t>(temp);
+    hPtr = h->getPointer(0);
     if (NULL == h.data())
     {
       return AIMArray<uint32_t>::NullPointer();
     }
-//    printf ("add<uint32_t, uint32_t>(temp)            ");
-//    h->printSelf(std::cout);
   }
 
   //ret=make_array(TYPE=3,DIMENSION=replicate(nbins,s[0]),/NOZERO)
@@ -357,12 +354,13 @@ AIMArray<uint32_t>::Pointer CMUMutualInformation::jointHistogram(std::vector<Ima
   ret->zeroArrayData();
   ret->setDimensions(dimensions);
 
+  // Histogram Generation
   uint32_t* retPtr = ret->getPointer(0);
-  uint32_t* hPtr = h->getPointer(0);
+  hPtr = h->getPointer(0);
+
   for(size_t i = 0; i < h->getNumElements(); ++i)
   {
     retPtr[ hPtr[i] ]++;
   }
-
   return ret;
 }

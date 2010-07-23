@@ -229,7 +229,7 @@ void EMMPMTask::execute( T* imageData, S* outputData)
 {
   // data dimensions
   int32_t width, height;
-  m_OriginalImage->getImagePixelSize(width, height);
+  m_OriginalImage->getImagePixelDimension(width, height);
   size_t idim = width;
   size_t jdim = height;
   size_t ijdim = idim*jdim;

@@ -187,6 +187,14 @@ static Pointer New(void) \
     MXA_GET_2DVECTOR_PROPERTY(type, prpty, varname)
 
 
+
+#define MXA_INSTANCE_2DVECTOR_PROPERTY_m(type, prpty)\
+  private:\
+    type   m_##prpty[2];\
+  public:\
+    MXA_SET_2DVECTOR_PROPERTY(type, prpty, m_##prpty)\
+    MXA_GET_2DVECTOR_PROPERTY(type, prpty, m_##prpty)
+
 /**
 * @brief Creates a "setter" method to set the property.
 */

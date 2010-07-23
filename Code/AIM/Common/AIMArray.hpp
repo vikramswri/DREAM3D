@@ -56,7 +56,7 @@ class AIMArray
       }
     }
 
-//    void setNumElements(size_t value) { this->m_NumElements = value; }
+    void setNumElements(size_t value) { this->m_NumElements = value; }
     size_t  getNumElements() { return m_NumElements; }
 
     /**
@@ -158,9 +158,10 @@ class AIMArray
       K tmp = 0;
       if (shift < 0)  // Right Shift
       {
+        shift *= -1;
         for (size_t e = 0; e < numElements; ++e)
         {
-          tmp = getValue(e);
+          tmp = *inPtr;
           *outPtr = tmp >> shift;
           ++outPtr; ++inPtr;
         }
@@ -169,7 +170,7 @@ class AIMArray
       {
         for (size_t e = 0; e < numElements; ++e)
         {
-          tmp = getValue(e);
+          tmp = *inPtr;
           *outPtr = tmp << shift;
           ++outPtr; ++inPtr;
         }
@@ -237,13 +238,19 @@ class AIMArray
     // -----------------------------------------------------------------------------
     // Tested
     // -----------------------------------------------------------------------------
-    void setArrayData(T* value, bool manageMemory = false)
+    void setArrayData(T* value, std::vector<size_t> dims, bool manageMemory = false)
     {
       if (this->_imageBuffer != NULL && this->_managememory == true && value != this->_imageBuffer)
       {
         this->deallocateArrayData();
       }
       this->_imageBuffer = value;
+      this->m_Dimensions = dims;
+      m_NumElements = 1;
+       for (std::vector<size_t>::iterator dim = m_Dimensions.begin(); dim != m_Dimensions.end(); ++dim )
+       {
+         m_NumElements *= *dim;
+       }
     }
 
     // -----------------------------------------------------------------------------
