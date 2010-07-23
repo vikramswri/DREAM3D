@@ -337,7 +337,6 @@ AIMArray<uint32_t>::Pointer CMUMutualInformation::jointHistogram(std::vector<Ima
     }
   }
 
-  //ret=make_array(TYPE=3,DIMENSION=replicate(nbins,s[0]),/NOZERO)
   std::cout << "nbins: " << nbins << std::endl;
   std::cout << "s[0]:  " << s[0] << std::endl;
 
