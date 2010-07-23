@@ -6,7 +6,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "TO79MainWindow.h"
+#include "TO79Application.h"
 
 //-- Qt Headers
 #include <QtGui/QApplication>
@@ -19,12 +19,12 @@ int main (int argc, char *argv[])
   QApplication app(argc, argv);
   QCoreApplication::setOrganizationName("BlueQuartz Software");
   QCoreApplication::setOrganizationDomain("bluequartz.net");
-  QCoreApplication::setApplicationName("TO79MainWindow");
+  QCoreApplication::setApplicationName("TO79Application");
 #if defined( Q_WS_MAC )
   //Needed for typical Mac program behavior.
   app.setQuitOnLastWindowClosed( true );
 #endif //APPLE
-  TO79MainWindow *viewer = new TO79MainWindow;
+  TO79Application *viewer = new TO79Application;
   viewer->show();
   int app_return = app.exec();
   return app_return;

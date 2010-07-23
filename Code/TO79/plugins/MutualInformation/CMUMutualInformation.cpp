@@ -316,7 +316,7 @@ AIMArray<uint32_t>::Pointer CMUMutualInformation::jointHistogram(std::vector<Ima
 
 //  int32_t total_bins = pow (nbins, s[0]);
 
-  AIMArray<uint32_t>::Pointer h = inData[s[0] -1]->ishft<uint32_t>( -q);
+  AIMArray<uint32_t>::Pointer h = inData[s[0] -1]->bitShift<uint32_t>( -q);
 //  printf ("h     ");
 //  h->printSelf(std::cout);
   AIMArray<uint32_t>::Pointer temp = AIMArray<uint32_t>::NullPointer();
@@ -324,10 +324,10 @@ AIMArray<uint32_t>::Pointer CMUMutualInformation::jointHistogram(std::vector<Ima
   for (int i = s[0] - 2; i >= 0; --i)
   {
 //    std::cout << "i = " << i << " q = " << q << " -------------------------------------------" << std::endl;
-    h = h->ishft<uint32_t>( 8 - q);
+    h = h->bitShift<uint32_t>( 8 - q);
 //    printf ("ishft<uint32_t, uint32_t>(h, 8 - q)      ");
 //    h->printSelf(std::cout);
-    temp = inData[i]->ishft<uint32_t>( -q);
+    temp = inData[i]->bitShift<uint32_t>( -q);
 //    printf ("ishft<uint8_t, uint32_t>(inData[i], -q)  ");
 //    temp->printSelf(std::cout);
 

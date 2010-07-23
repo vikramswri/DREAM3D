@@ -8,14 +8,14 @@
 //                           F33615-03-C-5220
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "R3DCropGrayScaleImage.h"
+#include "AIMCropGrayScaleImage.h"
 
 #include <itkRegionOfInterestImageFilter.h>
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-R3DCropGrayScaleImage::R3DCropGrayScaleImage(AIMImage::Pointer imageData, int32_t* insets)
+AIMCropGrayScaleImage::AIMCropGrayScaleImage(AIMImage::Pointer imageData, int32_t* insets)
 {
   this->_numChannels = 1;
   ::memcpy(this->_insets, insets, sizeof(int32_t) * 4);
@@ -27,14 +27,14 @@ R3DCropGrayScaleImage::R3DCropGrayScaleImage(AIMImage::Pointer imageData, int32_
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-R3DCropGrayScaleImage::~R3DCropGrayScaleImage()
+AIMCropGrayScaleImage::~AIMCropGrayScaleImage()
 {
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer R3DCropGrayScaleImage::getOutputImage()
+AIMImage::Pointer AIMCropGrayScaleImage::getOutputImage()
 {
   return _outData;
 }
@@ -42,7 +42,7 @@ AIMImage::Pointer R3DCropGrayScaleImage::getOutputImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int R3DCropGrayScaleImage::run()
+int AIMCropGrayScaleImage::run()
 {
   int err = 0;
   int32_t _inDimensions[2] = {0, 0};

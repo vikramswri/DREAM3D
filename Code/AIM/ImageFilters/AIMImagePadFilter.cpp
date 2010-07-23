@@ -6,7 +6,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "R3DImagePadFilter.h"
+#include "AIMImagePadFilter.h"
 
 #include <itkConstantPadImageFilter.h>
 
@@ -16,7 +16,7 @@ typedef itk::ConstantPadImageFilter<InputImageType, OutputImageType>     FilterT
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-R3DImagePadFilter::R3DImagePadFilter(AIMImage::Pointer imageData, int32_t pixelPad[2], int32_t padValue)
+AIMImagePadFilter::AIMImagePadFilter(AIMImage::Pointer imageData, int32_t pixelPad[2], int32_t padValue)
 {
   m_InData = imageData;
   m_PixelPad[0] = pixelPad[0];
@@ -30,7 +30,7 @@ R3DImagePadFilter::R3DImagePadFilter(AIMImage::Pointer imageData, int32_t pixelP
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-R3DImagePadFilter::~R3DImagePadFilter()
+AIMImagePadFilter::~AIMImagePadFilter()
 {
 }
 
@@ -38,7 +38,7 @@ R3DImagePadFilter::~R3DImagePadFilter()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer R3DImagePadFilter::getOutputImage()
+AIMImage::Pointer AIMImagePadFilter::getOutputImage()
 {
   return m_OutData;
 }
@@ -46,7 +46,7 @@ AIMImage::Pointer R3DImagePadFilter::getOutputImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-int R3DImagePadFilter::run()
+int AIMImagePadFilter::run()
 {
   int err = 0;
   int32_t _inDimensions[2] = {0, 0};

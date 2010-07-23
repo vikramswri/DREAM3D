@@ -1,9 +1,18 @@
+#///////////////////////////////////////////////////////////////////////////////
+#  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
+#  All rights reserved.
+#  BSD License: http://www.opensource.org/licenses/bsd-license.html
+#///////////////////////////////////////////////////////////////////////////////
 project(EMMPMPlugin)
 
 include_directories(${PROJECT_SOURCE_DIR}  ${PROJECT_BINARY_DIR})
-include_directories( ${TO79_CODE_DIR} )
+
+include_directories(${TO79_CODE_DIR} )
+include_directories(${TO79_CODE_DIR}/QtSupport )
+
 include_directories(${TO79_BINARY_DIR})
-include_directories(${TO79_BINARY_DIR}/MXA)
+include_directories(${TO79_BINARY_DIR}/QtSupport)
+
 
 
 set (EMMPMPlugin_HDRS
@@ -34,7 +43,12 @@ set (EMMPMPlugin_PROJECT_SRCS
 # ---------- Setup output Directories -------------------------
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin/plugins  )
 add_library(EMMPMPlugin MODULE ${EMMPMPlugin_PROJECT_SRCS})
-target_link_libraries(EMMPMPlugin ${QT_LIBRARIES} MXADataModel)
+target_link_libraries(EMMPMPlugin 
+                    MXADataModel 
+                    ${QT_QTCORE_LIBRARY}   
+                    ${QT_QTGUI_LIBRARY} 
+                    QtSupport 
+                    AIMLib )
 PluginProperties(EMMPMPlugin "_debug")
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin  )
 

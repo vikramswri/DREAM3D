@@ -27,12 +27,12 @@
 #include <QtGui/QStringListModel>
 
 // Our Project wide includes
-#include "MXA/Qt/ApplicationAboutBoxDialog.h"
-#include "MXA/Qt/QRecentFileList.h"
-#include "MXA/Qt/QFileCompleter.h"
-#include "MXA/Qt/MXAImageGraphicsDelegate.h"
-#include "MXA/Qt/ProcessQueueController.h"
-#include "MXA/Qt/ProcessQueueDialog.h"
+#include "QtSupport/ApplicationAboutBoxDialog.h"
+#include "QtSupport/QRecentFileList.h"
+#include "QtSupport/QFileCompleter.h"
+#include "QtSupport/MXAImageGraphicsDelegate.h"
+#include "QtSupport/ProcessQueueController.h"
+#include "QtSupport/ProcessQueueDialog.h"
 
 // Our Own Includes
 #include "CrossCorrelationTask.h"

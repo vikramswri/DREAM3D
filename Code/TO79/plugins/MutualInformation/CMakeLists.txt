@@ -1,3 +1,8 @@
+#///////////////////////////////////////////////////////////////////////////////
+#  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
+#  All rights reserved.
+#  BSD License: http://www.opensource.org/licenses/bsd-license.html
+#///////////////////////////////////////////////////////////////////////////////
 project(MutualInformation)
 
 include_directories(${PROJECT_SOURCE_DIR}  ${PROJECT_BINARY_DIR})

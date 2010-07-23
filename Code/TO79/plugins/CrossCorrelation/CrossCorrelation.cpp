@@ -26,8 +26,8 @@
 #include "MXA/Utilities/MXALogger.h"
 
 //-- Our Includes
-#include "CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h"
-#include "CrossCorrelation/ImageFilters/R3DImagePadFilter.h"
+#include "AIM/ImageFilters/AIMCropGrayScaleImage.h"
+#include "AIM/ImageFilters/AIMImagePadFilter.h"
 #include "CrossCorrelation/pcm/itkPhaseCorrelationOperator.h"
 #include "CrossCorrelation/pcm/itkMaxPhaseCorrelationOptimizer.h"
 #include "CrossCorrelation/itk/itkFFTShiftImageFilter.h"
@@ -307,7 +307,7 @@ void CrossCorrelation::initializeImportFilter(ImportFilterType::Pointer importFi
     insets[2] = (imageData->getImagePixelHeight() / 2) - (fftDim / 2);
     insets[3] = imageData->getImagePixelHeight() - (insets[2] + fftDim);
     // Instantiate our "Cropper" object
-    R3DCropGrayScaleImage crop(imageData, insets);
+    AIMCropGrayScaleImage crop(imageData, insets);
     crop.run();  // Crop the fftDim sized region from the input image
     fftImageRegion = crop.getOutputImage();
   }
@@ -333,7 +333,7 @@ void CrossCorrelation::initializeImportFilter(ImportFilterType::Pointer importFi
     pad[2] = (fftDim - imageData->getImagePixelHeight() - extra[2])/2 + extra[2];
     pad[3] = (fftDim - imageData->getImagePixelHeight() - extra[3])/2 + extra[3];
 
-    R3DImagePadFilter padFilter(imageData, pad, 0);
+    AIMImagePadFilter padFilter(imageData, pad, 0);
     padFilter.run();
     fftImageRegion = padFilter.getOutputImage();
   }

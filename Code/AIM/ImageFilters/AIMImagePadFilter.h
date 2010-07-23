@@ -10,17 +10,17 @@
 #define R3DIMAGEPADFILTER_H_
 
 #include "AIM/Common/AIMImage.h"
-#include "CrossCorrelation/ImageFilters/R3DImageFilter.h"
+#include "AIM/ImageFilters/AIMImageFilter.h"
 
 /**
-* @class R3DImagePadFilter R3DImagePadFilter.h CrossCorrelation/ImageFilters/R3DImagePadFilter.h
+* @class R3DImagePadFilter R3DImagePadFilter.h AIM/ImageFilters/AIMImagePadFilter.h
 * @brief This class will pad an existing image by the amount given by the "pixelPad" value in
 * the constructor.
 * @author Michael A. Jackson for BlueQuartz Software
 * @date July 06, 2010
 * @version 1.0
 */
-class R3DImagePadFilter : public R3DImageFilter
+class AIMImagePadFilter : public AIMImageFilter
 {
   public:
     /**
@@ -30,8 +30,8 @@ class R3DImagePadFilter : public R3DImageFilter
      * @param padValue The value of the pixel
      * @return
      */
-    R3DImagePadFilter(AIMImage::Pointer imageData, int32_t pixelPad[4], int32_t padValue);
-    virtual ~R3DImagePadFilter();
+    AIMImagePadFilter(AIMImage::Pointer imageData, int32_t pixelPad[4], int32_t padValue);
+    virtual ~AIMImagePadFilter();
 
     /**
      * @brief Crops the input image
@@ -55,8 +55,8 @@ class R3DImagePadFilter : public R3DImageFilter
     int32_t m_PadValue;
     AIMImage::Pointer m_OutData;
 
-    R3DImagePadFilter(const R3DImagePadFilter&); // Copy Constructor Not Implemented
-    void operator=(const R3DImagePadFilter&); // Operator '=' Not Implemented
+    AIMImagePadFilter(const AIMImagePadFilter&); // Copy Constructor Not Implemented
+    void operator=(const AIMImagePadFilter&); // Operator '=' Not Implemented
 
 };
 

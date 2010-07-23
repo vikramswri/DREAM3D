@@ -8,19 +8,19 @@
 //                           F33615-03-C-5220
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "R3DImageFilter.h"
+#include "AIMImageFilter.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-R3DImageFilter::R3DImageFilter()
+AIMImageFilter::AIMImageFilter()
 {
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-R3DImageFilter::~R3DImageFilter()
+AIMImageFilter::~AIMImageFilter()
 {
 }
 
@@ -28,7 +28,7 @@ R3DImageFilter::~R3DImageFilter()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void R3DImageFilter::initializeImportFilter(ImportFilterType::Pointer importFilter,
+void AIMImageFilter::initializeImportFilter(ImportFilterType::Pointer importFilter,
                                                        PixelType* imageData,
                                                        int width, int height)
 {

@@ -12,16 +12,16 @@
 #define R3DCROPIMAGE_H_
 
 #include <AIM/Common/AIMImage.h>
-#include <CrossCorrelation/ImageFilters/R3DImageFilter.h>
+#include <AIM/ImageFilters/AIMImageFilter.h>
 
 /**
-* @class R3DCropGrayScaleImage R3DCropGrayScaleImage.h CrossCorrelation/ImageFilters/R3DCropGrayScaleImage.h
+* @class R3DCropGrayScaleImage R3DCropGrayScaleImage.h AIM/ImageFilters/AIMCropGrayScaleImage.h
 * @brief This class will crop an existing image using the supplied insets.
 * @author Michael A. Jackson for BlueQuartz Software
 * @date Mar 19, 2009
 * @version 1.0
 */
-class R3DCropGrayScaleImage : public R3DImageFilter
+class AIMCropGrayScaleImage : public AIMImageFilter
 {
   public:
     /**
@@ -29,9 +29,9 @@ class R3DCropGrayScaleImage : public R3DImageFilter
      * @param imageData The Image to crop
      * @param insets The number of pixels to remove from the left, right, top, bottom of the image
      */
-    R3DCropGrayScaleImage(AIMImage::Pointer imageData, int32_t* insets);
+    AIMCropGrayScaleImage(AIMImage::Pointer imageData, int32_t* insets);
 
-    virtual ~R3DCropGrayScaleImage();
+    virtual ~AIMCropGrayScaleImage();
 
     /**
      * @brief Crops the input image
@@ -52,8 +52,8 @@ class R3DCropGrayScaleImage : public R3DImageFilter
     int _insets[4];
     AIMImage::Pointer _outData;
 
-    R3DCropGrayScaleImage(const R3DCropGrayScaleImage&);    // Copy Constructor Not Implemented
-    void operator=(const R3DCropGrayScaleImage&);  // Operator '=' Not Implemented
+    AIMCropGrayScaleImage(const AIMCropGrayScaleImage&);    // Copy Constructor Not Implemented
+    void operator=(const AIMCropGrayScaleImage&);  // Operator '=' Not Implemented
 
 };
 

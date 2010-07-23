@@ -18,9 +18,9 @@
 #include <QtCore/QString>
 #include <QtGui/QImage>
 
-#include "MXA/Qt/ProcessQueueTask.h"
+#include "QtSupport/ProcessQueueTask.h"
 
-#include "TO79/Common/Random.h"
+#include "Random.h"
 
 #define PI  3.14159265358979323846
 #define MAX_CLASSES 15

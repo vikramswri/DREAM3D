@@ -35,11 +35,11 @@ typedef itk::Image<PixelType, R3D::ImageFilters::Dimension> OutputImageType;
 * @date Mar 19, 2009
 * @version 1.0
 */
-class R3DImageFilter
+class AIMImageFilter
 {
   public:
-    R3DImageFilter();
-    virtual ~R3DImageFilter();
+    AIMImageFilter();
+    virtual ~AIMImageFilter();
 
     /**
      * @brief Runs the filter
@@ -60,8 +60,8 @@ class R3DImageFilter
 
 
   private:
-    R3DImageFilter(const R3DImageFilter&);    // Copy Constructor Not Implemented
-    void operator=(const R3DImageFilter&);  // Operator '=' Not Implemented
+    AIMImageFilter(const AIMImageFilter&);    // Copy Constructor Not Implemented
+    void operator=(const AIMImageFilter&);  // Operator '=' Not Implemented
 };
 
 #endif /* R3DIMAGEFILTER_H_ */

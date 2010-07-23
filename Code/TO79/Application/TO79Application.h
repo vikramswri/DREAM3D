@@ -22,7 +22,7 @@
 #include <QtGui/QSortFilterProxyModel>
 
 //-- UIC generated Header
-#include <ui_TO79MainWindow.h>
+#include <ui_TO79Application.h>
 
 
 #include "AIM/Common/AIMImage.h"
@@ -33,13 +33,13 @@ class ProcessQueueDialog;
 class ProcessQueueController;
 class QImageProcessingInterface;
 
-class TO79MainWindow : public QMainWindow, private Ui::TO79MainWindow
+class TO79Application : public QMainWindow, private Ui::TO79Application
 {
   Q_OBJECT;
 
   public:
-    TO79MainWindow(QWidget *parent = 0);
-    virtual ~TO79MainWindow();
+    TO79Application(QWidget *parent = 0);
+    virtual ~TO79Application();
     void initWithFile(const QString imageFile, QString mountImage);
 
     MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, OriginalImage)
@@ -194,8 +194,8 @@ class TO79MainWindow : public QMainWindow, private Ui::TO79MainWindow
  //   bool            m_OutputExistsCheck;
 
 
-    TO79MainWindow(const TO79MainWindow&); // Copy Constructor Not Implemented
-    void operator=(const TO79MainWindow&); // Operator '=' Not Implemented
+    TO79Application(const TO79Application&); // Copy Constructor Not Implemented
+    void operator=(const TO79Application&); // Operator '=' Not Implemented
 };
 
 #endif /* TO79MAINWINDOW_H_ */

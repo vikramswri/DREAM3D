@@ -18,9 +18,8 @@
 #include <QtCore/QString>
 #include <QtGui/QImage>
 
-#include "MXA/Qt/ProcessQueueTask.h"
+#include "QtSupport/ProcessQueueTask.h"
 #include "AIM/Common/AIMImage.h"
-#include "TO79/Common/Random.h"
 
 #include "CrossCorrelation/CrossCorrelationData.h"
 

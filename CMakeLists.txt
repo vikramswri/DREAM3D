@@ -70,6 +70,15 @@ FIND_PACKAGE( Qt4 REQUIRED )
 # contains a path to CMake script)
 INCLUDE( ${QT_USE_FILE} )
 
+# --------------------------------------------------------------------
+# Find the ITK Package
+# --------------------------------------------------------------------
+FIND_PACKAGE(ITK)
+IF(ITK_FOUND)
+  INCLUDE(${USE_ITK_FILE})
+ELSE(ITK_FOUND)
+  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
+ENDIF(ITK_FOUND)
 
 # --------------------------------------------------------------------
 # Generate our ReadMe and License Files
@@ -81,7 +90,10 @@ IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/
 
    
 # Add our Qt based GUI project to the list of targets
+add_subdirectory(${TO79_CODE_DIR}/AIM ${TO79_BINARY_DIR}/AIMLib)
+add_subdirectory(${TO79_CODE_DIR}/QtSupport ${TO79_BINARY_DIR}/QtSupport)
 add_subdirectory(${TO79_CODE_DIR}/MXA ${TO79_BINARY_DIR}/MXA)
+
 add_subdirectory(${TO79_CODE_DIR}/TO79/Application ${TO79_BINARY_DIR}/Application)
 
 add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/EMMPM ${TO79_BINARY_DIR}/plugins/EMMPM)

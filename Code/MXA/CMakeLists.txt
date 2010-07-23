@@ -1,5 +1,9 @@
+#///////////////////////////////////////////////////////////////////////////////
+#  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
+#  All rights reserved.
+#  BSD License: http://www.opensource.org/licenses/bsd-license.html
+#///////////////////////////////////////////////////////////////////////////////
 project(MXADataModel)
-
 
 set (Project_SRCS "")
 set (Project_HDRS "")
@@ -17,22 +21,9 @@ MXACompileDir(BMPIO)
 INCLUDE (${PROJECT_CMAKE_DIR}/MXACMakeCommon.cmake )
 
 
-# add some useful macros and variables
-# (QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that 
-# contains a path to CMake script)
-INCLUDE( ${QT_USE_FILE} )
-
-INCLUDE(${MXADataModel_SOURCE_DIR}/Qt/SourceList.cmake)
-INCLUDE(${TO79_CODE_DIR}/AIM/Common/SourceList.cmake)
-
-set (Project_SRCS ${Project_SRCS} 
-        ${MXA_QT_SRCS} 
-        ${MXA_QT_HDRS}
-        ${QMXA_Generated_UI_HDRS}
-        ${QMXA_Generated_MOC_SRCS}
-        ${AIM_COMMON_SRCS}
-        ${AIM_COMMON_HDRS}
-        )
+set (Project_SRCS 
+    ${Project_SRCS} 
+    )
 
 include_directories(${MXADataModel_SOURCE_DIR}/..)
 include_directories(${MXADataModel_BINARY_DIR})

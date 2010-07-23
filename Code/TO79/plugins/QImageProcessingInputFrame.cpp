@@ -16,10 +16,10 @@
 #include <QtGui/QStringListModel>
 
 // Our Project wide includes
-//#include "MXA/Qt/QFileCompleter.h"
-//#include "MXA/Qt/MXAImageGraphicsDelegate.h"
-#include "MXA/Qt/ProcessQueueController.h"
-#include "MXA/Qt/ProcessQueueDialog.h"
+//#include "QtSupport/QFileCompleter.h"
+//#include "QtSupport/MXAImageGraphicsDelegate.h"
+#include "QtSupport/ProcessQueueController.h"
+#include "QtSupport/ProcessQueueDialog.h"
 
 // -----------------------------------------------------------------------------
 //

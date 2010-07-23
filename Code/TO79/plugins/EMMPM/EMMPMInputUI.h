@@ -1,9 +1,10 @@
-/*
- * EMMPMInputUI.h
- *
- *  Created on: Jul 16, 2010
- *      Author: mjackson
- */
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
+//  All rights reserved.
+//  BSD License: http://www.opensource.org/licenses/bsd-license.html
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #ifndef EMMPMPLUGININPUTUI_H_
 #define EMMPMPLUGININPUTUI_H_
@@ -19,11 +20,7 @@
 #include <QtCore/QList>
 #include <QtCore/QStringList>
 #include <QtCore/QSettings>
-//#include <QtGui/QFrame>
-//#include <QtGui/QWidget>
-//#include <QtGui/QMainWindow>
-//#include <QtGui/QResizeEvent>
-//#include <QtGui/QSortFilterProxyModel>
+
 
 class ProcessQueueDialog;
 class ProcessQueueController;

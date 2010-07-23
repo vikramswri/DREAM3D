@@ -45,6 +45,9 @@ class AIMArray
     MXA_STATIC_NEW_MACRO(AIMArray)
     MXA_TYPE_MACRO(AIMArray)
 
+    /**
+     * @brief
+     */
     virtual ~AIMArray()
     {
       if (this->_imageBuffer != NULL && this->_managememory == true)
@@ -53,40 +56,73 @@ class AIMArray
       }
     }
 
-//    MXA_INSTANCE_2DVECTOR_PROPERTY(int, ImagePixelSize, _pixelSize)
-    MXA_INSTANCE_PROPERTY_m(size_t, NumElements);
+//    void setNumElements(size_t value) { this->m_NumElements = value; }
+    size_t  getNumElements() { return m_NumElements; }
 
+    /**
+     * @brief Sets the dimensions of the array. Does NOT allocate or deallocate
+     * any memory. The new dimensions must have the same total number of elements
+     * as the previous dimensions.
+     * @param dims
+     */
     void setDimensions(std::vector<size_t> dims)
     {
-      m_Dimensions = dims;
+      size_t _tot = 1;
+      for (std::vector<size_t>::iterator dim = m_Dimensions.begin(); dim != m_Dimensions.end(); ++dim )
+      {
+        _tot *= *dim;
+      }
+
+      size_t dtot = 1;
+      for (std::vector<size_t>::iterator d = dims.begin(); d != dims.end(); ++d )
+      {
+        dtot *= *d;
+      }
+      if (_tot == dtot) {
+        m_Dimensions = dims;
+      }
     }
 
+    /**
+     * @brief Returns the dimensions of the array
+     * @return
+     */
     std::vector<size_t> getDimensions()
     {
       return m_Dimensions;
     }
 
-    // -----------------------------------------------------------------------------
-    //
-    // -----------------------------------------------------------------------------
+    /**
+     * @brief
+     * @param dims
+     */
+    void reform(std::vector<size_t> dims)
+    {
+      setDimensions(dims);
+    }
+
+  /**
+   * @brief Adds one array to another array. Note that both arrays MUST contain
+   * the same number of elements.
+   * @param v1 Another AIMArray to add to this one
+   * @return New AIM Array that is the sum of this array and the v1 array.
+   */
     template <typename K, typename J>
     typename AIMArray<J>::Pointer add(typename AIMArray<K>::Pointer v1)
     {
       T* v0Ptr = _imageBuffer;
       K* v1Ptr = v1->getPointer(0);
 
-//      size_t nEl0 = getNumElements();
-//      size_t nEl1 = v1->getNumElements();
       if (getNumElements() != v1->getNumElements())
       {
         std::cout << "Number of elements in Arrays do not match. " << __FILE__ << "(" << __LINE__ << ")" << std::endl;
         return AIMArray<J>::NullPointer();
       }
 
-      typename AIMArray<J>::Pointer h =  AIMArray<J>::New();
+      typename AIMArray<J>::Pointer outVector =  AIMArray<J>::New();
 
       size_t numElements = getNumElements();
-      J* outPtr = h->allocateDataArray(numElements, true);
+      J* outPtr = outVector->allocateDataArray(numElements, true);
       if (NULL == outPtr)
       {
         std::cout << "Could not Allocate new array. " << __FILE__ << "(" << __LINE__ << ")" << std::endl;
@@ -98,19 +134,21 @@ class AIMArray
         *outPtr = static_cast<J>(*v0Ptr) + static_cast<J>(*v1Ptr);
         ++outPtr; ++v0Ptr; ++v1Ptr;
       }
-
-      return h;
+      return outVector;
     }
 
-    // -----------------------------------------------------------------------------
-    //
-    // -----------------------------------------------------------------------------
+    /**
+     * @brief Applies a right or left bit shift to each element
+     * @param shift The number of bits to shift where positive is a left and negative
+     * is a right shift
+     * @return New AIM Array that is bit shifted
+     */
     template <typename K>
-    typename AIMArray<K>::Pointer ishft( int shift)
+    typename AIMArray<K>::Pointer bitShift( int shift)
     {
       T* inPtr = getPointer(0);
-      typename AIMArray<K>::Pointer h = AIMArray<K>::New();
-      K* outPtr = h->allocateDataArray(getNumElements(), true);
+      typename AIMArray<K>::Pointer outArray = AIMArray<K>::New();
+      K* outPtr = outArray->allocateDataArray(getNumElements(), true);
 
       if (NULL == outPtr)
       {
@@ -136,12 +174,14 @@ class AIMArray
           ++outPtr; ++inPtr;
         }
       }
-      return h;
+      return outArray;
     }
 
-    // -----------------------------------------------------------------------------
-    //
-    // -----------------------------------------------------------------------------
+    /**
+     * @brief Computes the min and max values of the array
+     * @param min
+     * @param max
+     */
     void minMax(T &min, T &max)
     {
       size_t nelements = getNumElements();
@@ -155,9 +195,10 @@ class AIMArray
       }
     }
 
-    // -----------------------------------------------------------------------------
-    //
-    // -----------------------------------------------------------------------------
+    /**
+     * @brief Computes the sum of all the elements in the array
+     * @return
+     */
     template<typename K>
     K sumElements()
     {
@@ -236,6 +277,7 @@ class AIMArray
     {
       return _imageBuffer[index];
     }
+
     // -----------------------------------------------------------------------------
     // Tested
     // -----------------------------------------------------------------------------
@@ -249,7 +291,7 @@ class AIMArray
         _imageBuffer = new T[numElements];
 #endif
       this->_managememory = manageMemory;
-      this->setNumElements(numElements);
+      m_NumElements = numElements;
       m_Dimensions.clear();
       m_Dimensions.push_back(numElements);
       return _imageBuffer;
@@ -346,6 +388,7 @@ class AIMArray
     }
 
   private:
+    size_t      m_NumElements;
     T* _imageBuffer;
     std::vector<size_t> m_Dimensions;
     AIMArray(const AIMArray&); // Copy Constructor Not Implemented

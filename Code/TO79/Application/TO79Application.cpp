@@ -6,7 +6,7 @@
 //
 
 ///////////////////////////////////////////////////////////////////////////////
-#include "TO79MainWindow.h"
+#include "TO79Application.h"
 
 //-- C++ includes
 #include <iostream>
@@ -32,12 +32,12 @@
 #include <QtGui/QLineEdit>
 
 // Our Project wide includes
-#include "MXA/Qt/ApplicationAboutBoxDialog.h"
-#include "MXA/Qt/QRecentFileList.h"
-#include "MXA/Qt/QFileCompleter.h"
-#include "MXA/Qt/MXAImageGraphicsDelegate.h"
-#include "MXA/Qt/ProcessQueueController.h"
-#include "MXA/Qt/ProcessQueueDialog.h"
+#include "QtSupport/ApplicationAboutBoxDialog.h"
+#include "QtSupport/QRecentFileList.h"
+#include "QtSupport/QFileCompleter.h"
+#include "QtSupport/MXAImageGraphicsDelegate.h"
+#include "QtSupport/ProcessQueueController.h"
+#include "QtSupport/ProcessQueueDialog.h"
 
 
 #include "TO79/Common/TO79Version.h"
@@ -77,7 +77,7 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-TO79MainWindow::TO79MainWindow(QWidget *parent) :
+TO79Application::TO79Application(QWidget *parent) :
 QMainWindow(parent),
 pluginActionGroup(NULL),
 m_ActivePlugin(NULL),
@@ -106,7 +106,7 @@ m_OpenDialogLastDirectory("~/")
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-TO79MainWindow::~TO79MainWindow()
+TO79Application::~TO79Application()
 {
   // TODO Auto-generated destructor stub
 }
@@ -114,7 +114,7 @@ TO79MainWindow::~TO79MainWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_actionExit_triggered()
+void TO79Application::on_actionExit_triggered()
 {
   this->close();
 }
@@ -122,7 +122,7 @@ void TO79MainWindow::on_actionExit_triggered()
 // -----------------------------------------------------------------------------
 //  Called when the main window is closed.
 // -----------------------------------------------------------------------------
-void TO79MainWindow::closeEvent(QCloseEvent *event)
+void TO79Application::closeEvent(QCloseEvent *event)
 {
   qint32 err = checkDirtyDocument();
   if (err < 0)
@@ -139,7 +139,7 @@ void TO79MainWindow::closeEvent(QCloseEvent *event)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::resizeEvent ( QResizeEvent * event )
+void TO79Application::resizeEvent ( QResizeEvent * event )
 {
   QSize osize = originalImageFrame->size();
 //  std::cout << "originalImageFrame.size: " << osize.width() << " x " << osize.height() << std::endl;
@@ -165,7 +165,7 @@ void TO79MainWindow::resizeEvent ( QResizeEvent * event )
 // -----------------------------------------------------------------------------
 //  Read the prefs from the local storage file
 // -----------------------------------------------------------------------------
-void TO79MainWindow::readSettings()
+void TO79Application::readSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
@@ -181,7 +181,7 @@ void TO79MainWindow::readSettings()
 // -----------------------------------------------------------------------------
 //  Write our prefs to file
 // -----------------------------------------------------------------------------
-void TO79MainWindow::writeSettings()
+void TO79Application::writeSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
@@ -198,7 +198,7 @@ void TO79MainWindow::writeSettings()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::setupGui()
+void TO79Application::setupGui()
 {
 
 #ifdef Q_WS_MAC
@@ -260,7 +260,7 @@ void TO79MainWindow::setupGui()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_modeComboBox_currentIndexChanged()
+void TO79Application::on_modeComboBox_currentIndexChanged()
 {
   if (NULL == m_ProcessedGDelegate) { return; }
   int index = modeComboBox->currentIndex();
@@ -301,7 +301,7 @@ void TO79MainWindow::on_modeComboBox_currentIndexChanged()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::setWidgetListEnabled(bool b)
+void TO79Application::setWidgetListEnabled(bool b)
 {
   foreach (QWidget* w, m_WidgetList)
   {
@@ -313,7 +313,7 @@ void TO79MainWindow::setWidgetListEnabled(bool b)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_compositeWithOriginal_stateChanged(int state)
+void TO79Application::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
   if (NULL != m_OriginalGDelegate) {
@@ -330,7 +330,7 @@ void TO79MainWindow::on_compositeWithOriginal_stateChanged(int state)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool TO79MainWindow::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
+bool TO79Application::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   QDir parent(fileinfo.dir());
@@ -340,7 +340,7 @@ bool TO79MainWindow::verifyOutputPathParentExists(QString outFilePath, QLineEdit
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool TO79MainWindow::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool TO79Application::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   if (false == fileinfo.exists())
@@ -357,7 +357,7 @@ bool TO79MainWindow::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 TO79MainWindow::checkDirtyDocument()
+qint32 TO79Application::checkDirtyDocument()
 {
   qint32 err = -1;
   {
@@ -369,7 +369,7 @@ qint32 TO79MainWindow::checkDirtyDocument()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::updateRecentFileList(const QString &file)
+void TO79Application::updateRecentFileList(const QString &file)
 {
   // std::cout << "TO79MainWindow::updateRecentFileList" << std::endl;
 
@@ -392,7 +392,7 @@ void TO79MainWindow::updateRecentFileList(const QString &file)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::openRecentFile()
+void TO79Application::openRecentFile()
 {
   //std::cout << "QRecentFileList::openRecentFile()" << std::endl;
 
@@ -409,7 +409,7 @@ void TO79MainWindow::openRecentFile()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::openFile(QString imageFile)
+void TO79Application::openFile(QString imageFile)
 {
   if ( true == imageFile.isEmpty() ) // User cancelled the operation
   {
@@ -426,7 +426,7 @@ void TO79MainWindow::openFile(QString imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_aboutBtn_clicked()
+void TO79Application::on_aboutBtn_clicked()
 {
   ApplicationAboutBoxDialog about(this);
   QString an = QCoreApplication::applicationName();
@@ -439,7 +439,7 @@ void TO79MainWindow::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_processBtn_clicked()
+void TO79Application::on_processBtn_clicked()
 {
   int err = m_ActivePlugin->startProcessing(this);
   if (err == 0)
@@ -451,7 +451,7 @@ void TO79MainWindow::on_processBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::processingStarted()
+void TO79Application::processingStarted()
 {
   std::cout << "TO79MainWindow::processingStarted()" << std::endl;
   processBtn->setText("Cancel");
@@ -463,7 +463,7 @@ void TO79MainWindow::processingStarted()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::processingFinished()
+void TO79Application::processingFinished()
 {
   std::cout << "TO79MainWindow::processingFinished()" << std::endl;
   /* Code that cleans up anything from the processing */
@@ -481,7 +481,7 @@ void TO79MainWindow::processingFinished()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_actionOpen_Processed_Image_triggered()
+void TO79Application::on_actionOpen_Processed_Image_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Processed Image File"),
@@ -498,7 +498,7 @@ void TO79MainWindow::on_actionOpen_Processed_Image_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_actionOpen_triggered()
+void TO79Application::on_actionOpen_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
@@ -516,7 +516,7 @@ void TO79MainWindow::on_actionOpen_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::loadImageFile(const QString &imageFile)
+void TO79Application::loadImageFile(const QString &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -529,7 +529,7 @@ void TO79MainWindow::loadImageFile(const QString &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::loadProcessedImageFile(const QString  &imageFile)
+void TO79Application::loadProcessedImageFile(const QString  &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -543,7 +543,7 @@ void TO79MainWindow::loadProcessedImageFile(const QString  &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_actionSave_triggered()
+void TO79Application::on_actionSave_triggered()
 {
   saveProcessedImage();
 }
@@ -552,7 +552,7 @@ void TO79MainWindow::on_actionSave_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_actionSave_As_triggered()
+void TO79Application::on_actionSave_As_triggered()
 {
   m_CurrentProcessedFile = QString();
   saveProcessedImage();
@@ -561,7 +561,7 @@ void TO79MainWindow::on_actionSave_As_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::on_actionClose_triggered() {
+void TO79Application::on_actionClose_triggered() {
   // std::cout << "AIMMountMaker::on_actionClose_triggered" << std::endl;
   qint32 err = -1;
   err = checkDirtyDocument();
@@ -584,7 +584,7 @@ void TO79MainWindow::on_actionClose_triggered() {
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::openProcessedImage(QString processedImage)
+void TO79Application::openProcessedImage(QString processedImage)
 {
   if ( true == processedImage.isEmpty() ) // User cancelled the operation
   {
@@ -601,7 +601,7 @@ void TO79MainWindow::openProcessedImage(QString processedImage)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 TO79MainWindow::saveProcessedImage()
+qint32 TO79Application::saveProcessedImage()
 {
   QImage image = m_ProcessedGDelegate->getCachedImage();
   int err = 0;
@@ -635,7 +635,7 @@ qint32 TO79MainWindow::saveProcessedImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer TO79MainWindow::loadImage(QString filePath)
+AIMImage::Pointer TO79Application::loadImage(QString filePath)
 {
 //  std::cout << " loadImage(): filePath: " << filePath.toStdString() << std::endl;
   QImage image;
@@ -669,7 +669,7 @@ AIMImage::Pointer TO79MainWindow::loadImage(QString filePath)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 TO79MainWindow::initImageViews()
+qint32 TO79Application::initImageViews()
 {
   qint32 err = 0;
   QImage image;
@@ -819,7 +819,7 @@ qint32 TO79MainWindow::initImageViews()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::initWithFile(const QString imageFile, QString processedImage)
+void TO79Application::initWithFile(const QString imageFile, QString processedImage)
 {
   QFileInfo fileInfo(imageFile);
   this->m_OpenDialogLastDirectory = fileInfo.path();
@@ -860,7 +860,7 @@ void TO79MainWindow::initWithFile(const QString imageFile, QString processedImag
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer TO79MainWindow::convertQImageToGrayScaleAIMImage(QImage image)
+AIMImage::Pointer TO79Application::convertQImageToGrayScaleAIMImage(QImage image)
 {
   AIMImage::Pointer aimImage = AIMImage::New();
   quint8* oImage = aimImage->allocateImageBuffer(image.width(), image.height(), true);
@@ -889,7 +889,7 @@ AIMImage::Pointer TO79MainWindow::convertQImageToGrayScaleAIMImage(QImage image)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::disableFixedFitToWindow()
+void TO79Application::disableFixedFitToWindow()
 {
   this->fixedFitToWindowBtn->setChecked(false);
 }
@@ -897,7 +897,7 @@ void TO79MainWindow::disableFixedFitToWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::disableProcessedFitToWindow()
+void TO79Application::disableProcessedFitToWindow()
 {
   this->processedFitToWindowBtn->setChecked(false);
 }
@@ -905,7 +905,7 @@ void TO79MainWindow::disableProcessedFitToWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::loadPlugins()
+void TO79Application::loadPlugins()
  {
      foreach (QObject *plugin, QPluginLoader::staticInstances())
          populateMenus(plugin);
@@ -943,7 +943,7 @@ void TO79MainWindow::loadPlugins()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
- void TO79MainWindow::populateMenus(QObject *plugin)
+ void TO79Application::populateMenus(QObject *plugin)
 {
   std::cout << "Found Plugin..." << std::endl;
   QImageProcessingInterface* ipPlugin = qobject_cast<QImageProcessingInterface * > (plugin);
@@ -961,7 +961,7 @@ void TO79MainWindow::loadPlugins()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::addToPluginMenu(QObject *plugin, const QString &text,
+void TO79Application::addToPluginMenu(QObject *plugin, const QString &text,
                                      QMenu *menu, const char *member,
                                      QActionGroup *actionGroup)
 {
@@ -979,7 +979,7 @@ void TO79MainWindow::addToPluginMenu(QObject *plugin, const QString &text,
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79MainWindow::setInputUI()
+void TO79Application::setInputUI()
 {
   // Get the current QWidget
   if (NULL != m_ActivePlugin) {

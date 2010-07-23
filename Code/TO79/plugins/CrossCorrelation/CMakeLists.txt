@@ -1,3 +1,8 @@
+#///////////////////////////////////////////////////////////////////////////////
+#  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
+#  All rights reserved.
+#  BSD License: http://www.opensource.org/licenses/bsd-license.html
+#///////////////////////////////////////////////////////////////////////////////
 project(CrossCorrelationPlugin)
 
 # --------------------------------------------------------------------
@@ -10,10 +15,12 @@ ELSE(ITK_FOUND)
   MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
-include_directories( ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/..)
-include_directories( ${TO79_CODE_DIR} )
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/..)
+include_directories(${TO79_CODE_DIR} )
+include_directories(${TO79_CODE_DIR}/QtSupport )
+
 include_directories(${TO79_BINARY_DIR})
-include_directories(${TO79_BINARY_DIR}/MXA)
+include_directories(${TO79_BINARY_DIR}/QtSupport)
 
 set (CrossCorrelationPlugin_HDRS
     ${PROJECT_SOURCE_DIR}/CrossCorrelationPlugin.h
@@ -39,9 +46,6 @@ set (CrossCorrelationPlugin_PROJECT_SRCS
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelation.cpp
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelationData.cpp
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelationTable.cpp
-    ${CrossCorrelationPlugin_SOURCE_DIR}/ImageFilters/R3DImageFilter.cpp
-    ${CrossCorrelationPlugin_SOURCE_DIR}/ImageFilters/R3DCropGrayScaleImage.cpp
-    ${CrossCorrelationPlugin_SOURCE_DIR}/ImageFilters/R3DImagePadFilter.cpp
     ${CrossCorrelationPlugin_SRCS}
     ${CrossCorrelationPlugin_HDRS}
     ${CrossCorrelationPlugin_Generated_MOC_SRCS} 
@@ -51,7 +55,12 @@ set (CrossCorrelationPlugin_PROJECT_SRCS
 # ---------- Setup output Directories -------------------------
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin/plugins  )
 add_library(CrossCorrelationPlugin MODULE ${CrossCorrelationPlugin_PROJECT_SRCS})
-target_link_libraries(CrossCorrelationPlugin ${QT_LIBRARIES} ${ITK_LIBRARIES} MXADataModel)
+target_link_libraries(CrossCorrelationPlugin 
+                    ${QT_LIBRARIES} 
+                    ${ITK_LIBRARIES} 
+                    QtSupport
+                    MXADataModel 
+                    AIMLib)
 PluginProperties(CrossCorrelationPlugin "_debug")
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin  )
 
