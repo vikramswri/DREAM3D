@@ -25,9 +25,7 @@ class ProcessQueueDialog;
 class ProcessQueueController;
 class QListView;
 
-/*
- *
- */
+
 class QImageProcessingInputFrame : public QFrame
 {
     Q_OBJECT;
@@ -54,6 +52,10 @@ class QImageProcessingInputFrame : public QFrame
     MXA_INSTANCE_PROPERTY_m(ProcessQueueController*, QueueController)
     MXA_INSTANCE_PROPERTY_m(ProcessQueueDialog*, QueueDialog)
     MXA_INSTANCE_PROPERTY_m(QString, OpenDialogLastDirectory)
+
+
+  protected slots:
+
 
     protected:
 

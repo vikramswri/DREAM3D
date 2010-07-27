@@ -33,7 +33,15 @@ class ProcessQueueDialog;
 class ProcessQueueController;
 class CrossCorrelationTask;
 
-
+/**
+ * @class CrossCorrelationInputUI CrossCorrelationInputUI.h CrossCorrelation/CrossCorrelationInputUI.h
+ * @brief This class contais the GUI code that presents the input widgets for the
+ * cross correlation plugin. It is derived from the QImageProcessingInputFrame base
+ * class so that standard functionality is reused.
+ * @author Michael A. Jackson for BlueQuartz Software
+ * @date Jul 08, 2010
+ * @version 1.0
+ */
 class CrossCorrelationInputUI : public QImageProcessingInputFrame, private Ui::CrossCorrelationInputUI
 {
   Q_OBJECT;
@@ -49,16 +57,15 @@ class CrossCorrelationInputUI : public QImageProcessingInputFrame, private Ui::C
 
     int processInputs(QObject* parentGUI);
 
+    /**
+    * @brief Reads the Preferences from the users pref file
+    */
+    void readSettings(QSettings* prefs);
 
     /**
-      * @brief Reads the Preferences from the users pref file
-      */
-     void readSettings(QSettings* prefs);
-
-     /**
-      * @brief Writes the preferences to the users pref file
-      */
-     void writeSettings(QSettings* prefs);
+    * @brief Writes the preferences to the users pref file
+    */
+    void writeSettings(QSettings* prefs);
 
   signals:
 

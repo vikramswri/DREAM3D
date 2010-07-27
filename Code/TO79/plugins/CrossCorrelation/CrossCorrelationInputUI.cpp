@@ -530,11 +530,12 @@ void CrossCorrelationInputUI::on_outputDirectoryBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+
 void CrossCorrelationInputUI::on_fixedImageButton_clicked()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile =
-      QFileDialog::getOpenFileName(this, tr("Select Fixed Image"), getOpenDialogLastDirectory(), tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)"));
+  QFileDialog::getOpenFileName(this, tr("Select Fixed Image"), getOpenDialogLastDirectory(), tr("Images (*.tif *.tiff *.bmp *.jpg *.jpeg *.png)"));
 
   if (true == imageFile.isEmpty())
   {
@@ -542,6 +543,8 @@ void CrossCorrelationInputUI::on_fixedImageButton_clicked()
   }
   fixedImageFile->setText(imageFile);
 }
+
+
 
 // -----------------------------------------------------------------------------
 //
