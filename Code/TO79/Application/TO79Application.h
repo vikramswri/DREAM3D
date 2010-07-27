@@ -28,7 +28,7 @@
 #include "AIM/Common/AIMImage.h"
 
 
-class MXAImageGraphicsDelegate;
+class ImageGraphicsDelegate;
 class ProcessQueueDialog;
 class ProcessQueueController;
 class QImageProcessingInterface;
@@ -183,8 +183,8 @@ class TO79Application : public QMainWindow, private Ui::TO79Application
     QGraphicsScene*             m_OriginalImageGScene;
     QGraphicsScene*             m_ProcessedImageGScene;
 
-    MXAImageGraphicsDelegate*      m_OriginalGDelegate;
-    MXAImageGraphicsDelegate*      m_ProcessedGDelegate;
+    ImageGraphicsDelegate*      m_OriginalGDelegate;
+    ImageGraphicsDelegate*      m_ProcessedGDelegate;
 
     QVector<QImageProcessingInterface*> m_LoadedPlugins;
 

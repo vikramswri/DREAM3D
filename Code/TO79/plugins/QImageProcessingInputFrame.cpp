@@ -17,7 +17,7 @@
 
 // Our Project wide includes
 //#include "QtSupport/QFileCompleter.h"
-//#include "QtSupport/MXAImageGraphicsDelegate.h"
+//#include "QtSupport/ImageGraphicsDelegate.h"
 #include "QtSupport/ProcessQueueController.h"
 #include "QtSupport/ProcessQueueDialog.h"
 

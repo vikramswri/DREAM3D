@@ -15,7 +15,7 @@
 #include <AIM/ImageFilters/AIMImageFilter.h>
 
 /**
-* @class R3DCropGrayScaleImage R3DCropGrayScaleImage.h AIM/ImageFilters/AIMCropGrayScaleImage.h
+* @class AIMCropGrayScaleImage AIMCropGrayScaleImage.h AIM/ImageFilters/AIMCropGrayScaleImage.h
 * @brief This class will crop an existing image using the supplied insets.
 * @author Michael A. Jackson for BlueQuartz Software
 * @date Mar 19, 2009

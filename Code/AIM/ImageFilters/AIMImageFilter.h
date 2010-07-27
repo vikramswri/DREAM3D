@@ -8,14 +8,14 @@
 //                           F33615-03-C-5220
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef R3DIMAGEFILTER_H_
-#define R3DIMAGEFILTER_H_
+#ifndef AIMIMAGEFILTER_H_
+#define AIMIMAGEFILTER_H_
 
 #include <itkImage.h>
 #include <itkImportImageFilter.h>
 #include <itkExtractImageFilter.h>
 
-namespace R3D
+namespace AIM
 {
 namespace ImageFilters
 {
@@ -23,13 +23,13 @@ const unsigned int Dimension = 2;
 }
 }
 typedef unsigned char PixelType;
-typedef itk::ImportImageFilter<PixelType, R3D::ImageFilters::Dimension> ImportFilterType;
-typedef itk::Image<PixelType, R3D::ImageFilters::Dimension> InputImageType;
-typedef itk::Image<PixelType, R3D::ImageFilters::Dimension> OutputImageType;
+typedef itk::ImportImageFilter<PixelType, AIM::ImageFilters::Dimension> ImportFilterType;
+typedef itk::Image<PixelType, AIM::ImageFilters::Dimension> InputImageType;
+typedef itk::Image<PixelType, AIM::ImageFilters::Dimension> OutputImageType;
 
 
 /**
-* @class R3DImageFilter R3DImageFilter.h R3D/ImageFilters/R3DImageFilter.h
+* @class AIMImageFilter AIMImageFilter.h AIM/ImageFilters/AIMImageFilter.h
 * @brief Base class for other filters
 * @author Michael A. Jackson for BlueQuartz Software
 * @date Mar 19, 2009
@@ -64,4 +64,4 @@ class AIMImageFilter
     void operator=(const AIMImageFilter&);  // Operator '=' Not Implemented
 };
 
-#endif /* R3DIMAGEFILTER_H_ */
+#endif /* AIMIMAGEFILTER_H_ */

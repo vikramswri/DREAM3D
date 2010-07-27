@@ -35,7 +35,7 @@
 #include "QtSupport/ApplicationAboutBoxDialog.h"
 #include "QtSupport/QRecentFileList.h"
 #include "QtSupport/QFileCompleter.h"
-#include "QtSupport/MXAImageGraphicsDelegate.h"
+#include "QtSupport/ImageGraphicsDelegate.h"
 #include "QtSupport/ProcessQueueController.h"
 #include "QtSupport/ProcessQueueDialog.h"
 
@@ -203,10 +203,7 @@ void TO79Application::setupGui()
 
 #ifdef Q_WS_MAC
   // Adjust for the size of the menu bar which is at the top of the screen not in the window
-  //  QSize minSize = minimumSize();
   QSize mySize = size();
-  //  std::cout << "minSize: " << minSize.width() << " x " << minSize.height() << std::endl;
-  //  std::cout << "mySize: " << mySize.width() << " x " << mySize.height() << std::endl;
   mySize.setHeight( mySize.height() -30);
   resize(mySize);
 #endif
@@ -295,7 +292,7 @@ void TO79Application::on_modeComboBox_currentIndexChanged()
 
   m_ProcessedGDelegate->setOverlayImage(m_OriginalGDelegate->getCachedImage());
   m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-  m_ProcessedGDelegate->updateGraphicsScene();
+  m_ProcessedGDelegate->updateGraphicsView();
 }
 
 // -----------------------------------------------------------------------------
@@ -321,7 +318,7 @@ void TO79Application::on_compositeWithOriginal_stateChanged(int state)
     if (cachedImage.isNull() != true) {
       m_ProcessedGDelegate->setOverlayImage(cachedImage);
       m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-      m_ProcessedGDelegate->updateGraphicsScene();
+      m_ProcessedGDelegate->updateGraphicsView();
     }
   }
 }
@@ -701,7 +698,7 @@ qint32 TO79Application::initImageViews()
       originalImageGView->setScene(m_OriginalImageGScene);
     }
     if (NULL == m_OriginalGDelegate) {
-      m_OriginalGDelegate = new MXAImageGraphicsDelegate(this);
+      m_OriginalGDelegate = new ImageGraphicsDelegate(this);
       m_OriginalGDelegate->setDelegateName(QString("Original Image"));
       m_OriginalGDelegate->setGraphicsView(originalImageGView);
       m_OriginalGDelegate->setGraphicsScene(m_OriginalImageGScene);
@@ -709,7 +706,7 @@ qint32 TO79Application::initImageViews()
     }
 
     m_OriginalGDelegate->setCachedImage(image);
-    m_OriginalGDelegate->updateGraphicsScene(false);
+    m_OriginalGDelegate->updateGraphicsView(false);
 
     connect(this, SIGNAL(parentResized () ),
             m_OriginalGDelegate, SLOT(on_parentResized () ));
@@ -782,14 +779,14 @@ qint32 TO79Application::initImageViews()
     }
 
     if (NULL == m_ProcessedGDelegate) {
-      m_ProcessedGDelegate = new MXAImageGraphicsDelegate(this);
+      m_ProcessedGDelegate = new ImageGraphicsDelegate(this);
       m_ProcessedGDelegate->setDelegateName(QString("Processed Image"));
       m_ProcessedGDelegate->setGraphicsView(processedImageGView);
       m_ProcessedGDelegate->setGraphicsScene(m_ProcessedImageGScene);
       m_ProcessedGDelegate->setMainWindow(this);
     }
     m_ProcessedGDelegate->setCachedImage(processedImage);
-    m_ProcessedGDelegate->updateGraphicsScene(false);
+    m_ProcessedGDelegate->updateGraphicsView(false);
 
     connect(this, SIGNAL(parentResized () ),
             m_ProcessedGDelegate, SLOT(on_parentResized () ) );

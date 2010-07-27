@@ -23,7 +23,7 @@ set (QtSupport_SRCS
     ${QtSupport_SOURCE_DIR}/ApplicationAboutBoxDialog.cpp
     ${QtSupport_SOURCE_DIR}/QRecentFileList.cpp
     ${QtSupport_SOURCE_DIR}/QFileCompleter.cpp
-    ${QtSupport_SOURCE_DIR}/MXAImageGraphicsDelegate.cpp
+    ${QtSupport_SOURCE_DIR}/ImageGraphicsDelegate.cpp
     ${QtSupport_SOURCE_DIR}/QFSDroppableGraphicsView.cpp
     ${QtSupport_SOURCE_DIR}/ProcessQueueDialog.cpp
     ${QtSupport_SOURCE_DIR}/ProcessQueueController.cpp
@@ -33,7 +33,7 @@ set (QtSupport_HDRS
     ${QtSupport_SOURCE_DIR}/ApplicationAboutBoxDialog.h
     ${QtSupport_SOURCE_DIR}/QRecentFileList.h
     ${QtSupport_SOURCE_DIR}/QFileCompleter.h
-    ${QtSupport_SOURCE_DIR}/MXAImageGraphicsDelegate.h
+    ${QtSupport_SOURCE_DIR}/ImageGraphicsDelegate.h
     ${QtSupport_SOURCE_DIR}/QFSDroppableGraphicsView.h
     ${QtSupport_SOURCE_DIR}/ProcessQueueDialog.h
     ${QtSupport_SOURCE_DIR}/ProcessQueueController.h

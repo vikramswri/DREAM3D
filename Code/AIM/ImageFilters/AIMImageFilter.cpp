@@ -43,13 +43,13 @@ void AIMImageFilter::initializeImportFilter(ImportFilterType::Pointer importFilt
   region.SetSize(size);
   importFilter->SetRegion(region);
 
-  double origin[R3D::ImageFilters::Dimension];
+  double origin[AIM::ImageFilters::Dimension];
   origin[0] = 0.0; // X coordinate
   origin[1] = 0.0; // Y coordinate
 //  origin[2] = 0.0; // Z coordinate
   importFilter->SetOrigin(origin);
 
-  double spacing[R3D::ImageFilters::Dimension];
+  double spacing[AIM::ImageFilters::Dimension];
   spacing[0] = 1.0; //  /xScale * 1000.0; // pixels per millimeter along X direction
   spacing[1] = 1.0; //  /yScale * 1000.0; // pixels per millimeter along Y direction
  // spacing[2] = 1.0; // along Z direction

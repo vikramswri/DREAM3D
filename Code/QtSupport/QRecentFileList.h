@@ -24,14 +24,12 @@ class QMenu;
  * to ensure there is only one list per application instance.
  * @author Michael A. Jackson for BlueQuartz Software
  * @date Oct 2008
- * @version $Revision: 1.2 $
+ * @version 1.2
  */
 class QRecentFileList: public QObject
 {
 
   Q_OBJECT
-    ;
-
   public:
     QRecentFileList(QObject* parent = 0);
 
@@ -106,9 +104,6 @@ class QRecentFileList: public QObject
     ~QRecentFileList();
 
     QStringList recentFiles;
-    // QList<QAction*> actions;
-    // QMenu* recentFileMenu;
-
 
     QRecentFileList(const QRecentFileList&); //Copy Constructor Not Implemented
     void operator=(const QRecentFileList&); //Copy Assignment Not Implemented

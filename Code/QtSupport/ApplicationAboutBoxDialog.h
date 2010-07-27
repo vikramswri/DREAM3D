@@ -39,6 +39,8 @@ class ApplicationAboutBoxDialog: public QDialog, private Ui::ApplicationAboutBox
      */
     void setApplicationInfo( QString appName, QString appVersion);
 
+    void setApplicationHelpText(const QString text);
+
   private:
     ApplicationAboutBoxDialog(const ApplicationAboutBoxDialog&); // Copy Constructor Not Implemented
     void operator=(const ApplicationAboutBoxDialog&); // Operator '=' Not Implemented

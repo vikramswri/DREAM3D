@@ -17,6 +17,19 @@
 #include <MXA/Common/MXASetGetMacros.h>
 #include "AIM/Common/AIMImage.h"
 
+/**
+ * @class ProcessQueueTask ProcessQueueTask.h QtSupport/ProcessQueueTask.h
+ * @brief This class is a QThread derived class which is meant to be subclassed
+ * by the developer and code implemented that the developer would like run on a
+ * separate thread. The developer should implement the "run()" method in their own
+ * class which contains the code to be executed. When the code is complete the developer
+ * should call the 'emit finished()' just before exiting the 'run' method. This way
+ * the proper signals are sent and dialogs and other objects are updated correctly.
+ * The developer can also emit various signals that indicate progress of the code.
+ * @author Michael A. Jackson for BlueQuartz Software
+ * @date Jul 26, 2010
+ * @version 1.0
+ */
 class ProcessQueueTask : public QThread
 {
     Q_OBJECT;
@@ -30,10 +43,18 @@ class ProcessQueueTask : public QThread
      * @return
      */
     bool isCanceled();
+
+
     MXA_INSTANCE_PROPERTY_m(bool, Debug);
     MXA_VIRTUAL_INSTANCE_PROPERTY_m(QString, InputFilePath);
     MXA_VIRTUAL_INSTANCE_PROPERTY_m(QString, OutputFilePath);
 
+    /**
+     * @brief Converts a QImage to a Gray Scale (8 bit) AIMImage object
+     * @param image The input QImage
+     * @return An AIMImage smart pointer. The Wrapped pointer will be NULL if there
+     * was an error during the conversion.
+     */
     AIMImage::Pointer convertQImageToGrayScaleAIMImage(QImage image);
 
     signals:
@@ -53,7 +74,12 @@ class ProcessQueueTask : public QThread
        * @brief Signal sent when the encoding task is complete
        */
       void finished();
-      void finished(QObject *);
+
+      /**
+       * @brief Signal sent when the encoding task is complete
+       * @param o A QObject to send with the signal
+       */
+      void finished(QObject *o);
 
     public slots:
 
@@ -62,6 +88,10 @@ class ProcessQueueTask : public QThread
        */
       void cancel();
 
+      /**
+       * @brief Pure Virtual method which should be implemented by sub-classes. The
+       * run method represents the entry point into this class.
+       */
       virtual void run() = 0;
 
     private:

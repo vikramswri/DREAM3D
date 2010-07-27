@@ -34,11 +34,14 @@ void ApplicationAboutBoxDialog::setApplicationInfo(QString applicationName, QStr
   QString title("About ");
   title.append(applicationName);
   setWindowTitle(title);
-
   appName->setText(applicationName);
-//  QString version("");
-//  version.append(TO79::Version::PackageComplete.c_str());
   appVersion->setText( version );
 }
 
-
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void ApplicationAboutBoxDialog::setApplicationHelpText(const QString text)
+{
+  this->appHelpText->setText(text);
+}

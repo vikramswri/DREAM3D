@@ -19,7 +19,6 @@ m_AutoDelete(true)
 {
   m_MaxThreads = QThread::idealThreadCount();
   m_ThreadCount = 1; // We need this to be 1 because the first time we will decrement the value
-//  std::cout << "m_MaxThreads: " << m_MaxThreads << std::endl;
 }
 
 // -----------------------------------------------------------------------------
@@ -27,7 +26,6 @@ m_AutoDelete(true)
 // -----------------------------------------------------------------------------
 ProcessQueueController::~ProcessQueueController()
 {
- // std::cout << "   ~ProcessQueueController()" << std::endl;
   for (int i = 0; i < m_CompletedTasks.count(); ++i)
   {
     QThread* t = m_CompletedTasks.at(i);
@@ -68,9 +66,7 @@ void ProcessQueueController::addTask(QThread* t)
 // -----------------------------------------------------------------------------
 void ProcessQueueController::processTask()
 {
-  // std::cout << "ProcessQueueController::processTask()" << std::endl;
   --m_ThreadCount; //decrement the value as this is called when another thread gets finished
-  // std::cout << "m_ThreadCount: " << m_ThreadCount << std::endl;
   while (m_ThreadCount < m_MaxThreads)
   {
     if (m_Tasks.count() > 0)
@@ -81,7 +77,6 @@ void ProcessQueueController::processTask()
       connect(task, SIGNAL(finished()), this, SLOT(processTask()));
       task->start();
       m_ThreadCount++;
-      //   std::cout << "m_ThreadCount: " << m_ThreadCount << std::endl;
     }
     else
     {

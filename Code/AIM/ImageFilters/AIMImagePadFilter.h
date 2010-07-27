@@ -6,14 +6,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef R3DIMAGEPADFILTER_H_
-#define R3DIMAGEPADFILTER_H_
+#ifndef AIMIMAGEPADFILTER_H_
+#define AIMIMAGEPADFILTER_H_
 
 #include "AIM/Common/AIMImage.h"
 #include "AIM/ImageFilters/AIMImageFilter.h"
 
 /**
-* @class R3DImagePadFilter R3DImagePadFilter.h AIM/ImageFilters/AIMImagePadFilter.h
+* @class AIMImagePadFilter AIMImagePadFilter.h AIM/ImageFilters/AIMImagePadFilter.h
 * @brief This class will pad an existing image by the amount given by the "pixelPad" value in
 * the constructor.
 * @author Michael A. Jackson for BlueQuartz Software
@@ -30,7 +30,7 @@ class AIMImagePadFilter : public AIMImageFilter
      * @param padValue The value of the pixel
      * @return
      */
-    AIMImagePadFilter(AIMImage::Pointer imageData, int32_t pixelPad[4], int32_t padValue);
+    AIMImagePadFilter(AIMImage::Pointer imageData, int32_t pixelPad[2], int32_t padValue);
     virtual ~AIMImagePadFilter();
 
     /**
@@ -60,4 +60,4 @@ class AIMImagePadFilter : public AIMImageFilter
 
 };
 
-#endif /* R3DIMAGEPADFILTER_H_ */
+#endif /* AIMIMAGEPADFILTER_H_ */

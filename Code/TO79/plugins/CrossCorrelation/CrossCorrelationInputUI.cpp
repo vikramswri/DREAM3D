@@ -30,7 +30,7 @@
 #include "QtSupport/ApplicationAboutBoxDialog.h"
 #include "QtSupport/QRecentFileList.h"
 #include "QtSupport/QFileCompleter.h"
-#include "QtSupport/MXAImageGraphicsDelegate.h"
+#include "QtSupport/ImageGraphicsDelegate.h"
 #include "QtSupport/ProcessQueueController.h"
 #include "QtSupport/ProcessQueueDialog.h"
 
