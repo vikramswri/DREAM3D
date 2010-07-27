@@ -185,7 +185,8 @@ MACRO_EXPANSION      = YES
 SEARCH_INCLUDES      = YES
 INCLUDE_PATH         =
 EXPAND_ONLY_PREDEF   = YES
-PREDEFINED  = "MXA_INSTANCE_PROPERTY_m(type, prpty)= \
+PREDEFINED  = "MXA_FILESYSTEM_BASE_CLASS=MXADir"\
+              "MXA_INSTANCE_PROPERTY_m(type, prpty)= \
                 /** Sets the prpty instance variable */ \
                  void set##prpty (type); \
                  /** Gets the prpty instance variable */ \
