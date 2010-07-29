@@ -45,9 +45,9 @@ class ProcessQueueTask : public QThread
     bool isCanceled();
 
 
-    MXA_INSTANCE_PROPERTY_m(bool, Debug);
-    MXA_VIRTUAL_INSTANCE_PROPERTY_m(QString, InputFilePath);
-    MXA_VIRTUAL_INSTANCE_PROPERTY_m(QString, OutputFilePath);
+    MXA_INSTANCE_PROPERTY(bool, Debug);
+    MXA_VIRTUAL_INSTANCE_PROPERTY(QString, InputFilePath);
+    MXA_VIRTUAL_INSTANCE_PROPERTY(QString, OutputFilePath);
 
     /**
      * @brief Converts a QImage to a Gray Scale (8 bit) AIMImage object

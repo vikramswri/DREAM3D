@@ -44,14 +44,14 @@ class QImageProcessingInputFrame : public QFrame
       */
     virtual void writeSettings(QSettings* prefs) = 0;
 
-    MXA_INSTANCE_PROPERTY_m(QString, CurrentImageFile)
-    MXA_INSTANCE_PROPERTY_m(QString, CurrentProcessedFile)
-    MXA_INSTANCE_PROPERTY_m(QSortFilterProxyModel*, ProxyModel)
-    MXA_INSTANCE_PROPERTY_m(QList<QWidget* >, WidgetList)
-    MXA_INSTANCE_PROPERTY_m(bool, OutputExistsCheck)
-    MXA_INSTANCE_PROPERTY_m(ProcessQueueController*, QueueController)
-    MXA_INSTANCE_PROPERTY_m(ProcessQueueDialog*, QueueDialog)
-    MXA_INSTANCE_PROPERTY_m(QString, OpenDialogLastDirectory)
+    MXA_INSTANCE_PROPERTY(QString, CurrentImageFile)
+    MXA_INSTANCE_PROPERTY(QString, CurrentProcessedFile)
+    MXA_INSTANCE_PROPERTY(QSortFilterProxyModel*, ProxyModel)
+    MXA_INSTANCE_PROPERTY(QList<QWidget* >, WidgetList)
+    MXA_INSTANCE_PROPERTY(bool, OutputExistsCheck)
+    MXA_INSTANCE_PROPERTY(ProcessQueueController*, QueueController)
+    MXA_INSTANCE_PROPERTY(ProcessQueueDialog*, QueueDialog)
+    MXA_INSTANCE_PROPERTY(QString, OpenDialogLastDirectory)
 
 
   protected slots:

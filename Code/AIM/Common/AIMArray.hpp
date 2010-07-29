@@ -50,7 +50,7 @@ class AIMArray
      */
     virtual ~AIMArray()
     {
-      if (this->_imageBuffer != NULL && this->_managememory == true)
+      if (this->m_ImageBuffer != NULL && this->m_ManageMemory == true)
       {
         this->deallocateArrayData();
       }
@@ -110,7 +110,7 @@ class AIMArray
     template <typename K, typename J>
     typename AIMArray<J>::Pointer add(typename AIMArray<K>::Pointer v1)
     {
-      T* v0Ptr = _imageBuffer;
+      T* v0Ptr = m_ImageBuffer;
       K* v1Ptr = v1->getPointer(0);
 
       if (getNumElements() != v1->getNumElements())
@@ -240,11 +240,11 @@ class AIMArray
     // -----------------------------------------------------------------------------
     void setArrayData(T* value, std::vector<size_t> dims, bool manageMemory = false)
     {
-      if (this->_imageBuffer != NULL && this->_managememory == true && value != this->_imageBuffer)
+      if (this->m_ImageBuffer != NULL && this->m_ManageMemory == true && value != this->m_ImageBuffer)
       {
         this->deallocateArrayData();
       }
-      this->_imageBuffer = value;
+      this->m_ImageBuffer = value;
       this->m_Dimensions = dims;
       m_NumElements = 1;
        for (std::vector<size_t>::iterator dim = m_Dimensions.begin(); dim != m_Dimensions.end(); ++dim )
@@ -258,7 +258,7 @@ class AIMArray
     // -----------------------------------------------------------------------------
     T* getArrayData()
     {
-      return _imageBuffer;
+      return m_ImageBuffer;
     }
 
     // -----------------------------------------------------------------------------
@@ -266,7 +266,7 @@ class AIMArray
     // -----------------------------------------------------------------------------
     T* getPointer(size_t index = 0)
     {
-      return &(_imageBuffer[index]);
+      return &(m_ImageBuffer[index]);
     }
 
     // -----------------------------------------------------------------------------
@@ -274,7 +274,7 @@ class AIMArray
     // -----------------------------------------------------------------------------
     void setValue(T value, size_t index)
     {
-      _imageBuffer[index] = value;
+      m_ImageBuffer[index] = value;
     }
 
     // -----------------------------------------------------------------------------
@@ -282,7 +282,7 @@ class AIMArray
     // -----------------------------------------------------------------------------
     T getValue(size_t index)
     {
-      return _imageBuffer[index];
+      return m_ImageBuffer[index];
     }
 
     // -----------------------------------------------------------------------------
@@ -293,15 +293,15 @@ class AIMArray
       this->deallocateArrayData();
 
 #if defined ( AIM_USE_SSE ) && defined ( __SSE2__ )
-      _imageBuffer = static_cast<T*>( _mm_malloc (numElements * sizeof(T), 16) );
+      m_imageBuffer = static_cast<T*>( _mm_malloc (numElements * sizeof(T), 16) );
 #else
-        _imageBuffer = new T[numElements];
+        m_ImageBuffer = new T[numElements];
 #endif
-      this->_managememory = manageMemory;
+      this->m_ManageMemory = manageMemory;
       m_NumElements = numElements;
       m_Dimensions.clear();
       m_Dimensions.push_back(numElements);
-      return _imageBuffer;
+      return m_ImageBuffer;
     }
 
     // -----------------------------------------------------------------------------
@@ -312,7 +312,7 @@ class AIMArray
     {
       allocateDataArray(array->getNumElements(), true);
       setDimensions( array->getDimensions() );
-      return _imageBuffer;
+      return m_ImageBuffer;
     }
 
     // -----------------------------------------------------------------------------
@@ -320,21 +320,21 @@ class AIMArray
     // -----------------------------------------------------------------------------
     void deallocateArrayData()
     {
-      if (this->_imageBuffer != NULL && this->_managememory == true)
+      if (this->m_ImageBuffer != NULL && this->m_ManageMemory == true)
       {
 #if defined ( AIM_USE_SSE ) && defined ( __SSE2__ )
-        _mm_free( this->_imageBuffer );
+        _mm_free( this->m_imageBuffer );
 #else
-        delete[] this->_imageBuffer;
+        delete[] this->m_ImageBuffer;
 #endif
       }
-      _imageBuffer = NULL;
+      m_ImageBuffer = NULL;
     }
 
     // -----------------------------------------------------------------------------
     // Tested
     // -----------------------------------------------------------------------------
-    MXA_INSTANCE_PROPERTY(bool, ManageMemory, _managememory)
+    MXA_INSTANCE_PROPERTY(bool, ManageMemory)
 
     // -----------------------------------------------------------------------------
     // Tested
@@ -343,8 +343,8 @@ class AIMArray
     {
       this->allocateDataArray(numElements, true);
 
-      T* b = static_cast<T*> (::memcpy(_imageBuffer, source, sizeof(T) * numElements));
-      return (b == _imageBuffer) ? 1 : -1;
+      T* b = static_cast<T*> (::memcpy(m_ImageBuffer, source, sizeof(T) * numElements));
+      return (b == m_ImageBuffer) ? 1 : -1;
     }
 
     // -----------------------------------------------------------------------------
@@ -353,8 +353,8 @@ class AIMArray
     int32_t zeroArrayData()
     {
      // size_t total = _pixelSize[0] * _pixelSize[1] * sizeof(T);
-      ::memset(_imageBuffer, 0, m_NumElements);
-      return (NULL != _imageBuffer) ? 1 : -1;
+      ::memset(m_ImageBuffer, 0, m_NumElements);
+      return (NULL != m_ImageBuffer) ? 1 : -1;
     }
 
     // -----------------------------------------------------------------------------
@@ -364,15 +364,15 @@ class AIMArray
     {
       //      out << "AIMImage Properties" << std::endl;
       //      out << "  ImagePixelSize:         " << _pixelSize[0] << " x " << _pixelSize[1] << std::endl;
-      //      out << "  ManageMemory:           " << _managememory << std::endl;
-      //      out << "  ImageBuffer:            " << *_imageBuffer << std::endl;
+      //      out << "  ManageMemory:           " << m_ManageMemory << std::endl;
+      //      out << "  ImageBuffer:            " << *m_ImageBuffer << std::endl;
       for (int y = 0; y < m_NumElements; ++y)
       {
         //   out << "[" << x << "]  ";
         //  printf ("[%04d]  ", y);
 
-        printf("%04d ", (int)_imageBuffer[y]);
-        //          out << (int)_imageBuffer[ (_pixelSize[0] * y) + x];
+        printf("%04d ", (int)m_ImageBuffer[y]);
+        //          out << (int)m_ImageBuffer[ (_pixelSize[0] * y) + x];
         /* if (x < _pixelSize[0] - 1) */
         {
           out << " ";
@@ -390,13 +390,13 @@ class AIMArray
     {
       m_Dimensions.push_back(0);
       m_NumElements = 0;
-      _managememory = false;
-      this->_imageBuffer = NULL;
+      m_ManageMemory = false;
+      this->m_ImageBuffer = NULL;
     }
 
   private:
     size_t      m_NumElements;
-    T* _imageBuffer;
+    T* m_ImageBuffer;
     std::vector<size_t> m_Dimensions;
     AIMArray(const AIMArray&); // Copy Constructor Not Implemented
     void operator=(const AIMArray&); // Operator '=' Not Implemented

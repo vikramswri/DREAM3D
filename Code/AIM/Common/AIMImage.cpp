@@ -5,9 +5,12 @@
 //  BSD License: http://www.opensource.org/licenses/bsd-license.html
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "AIMImage.h"
 
+//--C Includes
 #include <string.h>
+
+//-- Our own header
+#include "AIMImage.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -36,8 +39,8 @@ AIMImage::Pointer AIMImage::NewFromSourceMosaic(AIMImage::Pointer image, bool al
 AIMImage::AIMImage()
 {
   m_ImagePixelDimension[0] = -1; m_ImagePixelDimension[1] = -1;
-  _managememory = false;
-  this->_imageBuffer = NULL;
+  m_ManageMemory = false;
+  this->m_imageBuffer = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -45,10 +48,10 @@ AIMImage::AIMImage()
 // -----------------------------------------------------------------------------
 AIMImage::~AIMImage()
 {
-  if (this->_imageBuffer != NULL
-      && this->_managememory == true)
+  if (this->m_imageBuffer != NULL
+      && this->m_ManageMemory == true)
   {
-    delete[] this->_imageBuffer;
+    delete[] this->m_imageBuffer;
   }
 }
 
@@ -57,13 +60,13 @@ AIMImage::~AIMImage()
 // -----------------------------------------------------------------------------
 void AIMImage::setImageBuffer(unsigned char* value, bool manageMemory)
 {
-  if (this->_imageBuffer != NULL
-      && this->_managememory == true
-      && value != this->_imageBuffer )
+  if (this->m_imageBuffer != NULL
+      && this->m_ManageMemory == true
+      && value != this->m_imageBuffer )
   {
-    delete[] this->_imageBuffer;
+    delete[] this->m_imageBuffer;
   }
-  this->_imageBuffer = value;
+  this->m_imageBuffer = value;
 }
 
 // -----------------------------------------------------------------------------
@@ -73,11 +76,11 @@ uint8_t* AIMImage::allocateImageBuffer(int32_t width, int32_t height, bool manag
 {
   this->deallocateImageBuffer();
   size_t total = (size_t)width * (size_t)height;
-  _imageBuffer = new unsigned char[total];
-  this->_managememory = manageMemory;
+  m_imageBuffer = new unsigned char[total];
+  this->m_ManageMemory = manageMemory;
   this->setImagePixelDimension(width, height);
 
-  return _imageBuffer;
+  return m_imageBuffer;
 }
 
 // -----------------------------------------------------------------------------
@@ -95,12 +98,12 @@ int32_t AIMImage::initializeImageWithSourceData(int32_t width, int32_t height, u
 {
   this->deallocateImageBuffer();
   size_t total = width * height;
-  _imageBuffer = new unsigned char[total];
-  this->_managememory = true;
+  m_imageBuffer = new unsigned char[total];
+  this->m_ManageMemory = true;
   this->setImagePixelDimension(width, height);
 
-  uint8_t* b = static_cast<uint8_t*>(::memcpy(_imageBuffer, source, total));
-  return (b == _imageBuffer) ? 1 : -1;
+  uint8_t* b = static_cast<uint8_t*>(::memcpy(m_imageBuffer, source, total));
+  return (b == m_imageBuffer) ? 1 : -1;
 }
 
 // -----------------------------------------------------------------------------
@@ -109,8 +112,8 @@ int32_t AIMImage::initializeImageWithSourceData(int32_t width, int32_t height, u
 int32_t AIMImage::fillImageBuffer(uint8_t val)
 {
   size_t total = m_ImagePixelDimension[0] * m_ImagePixelDimension[1];
-  ::memset(_imageBuffer, val, total);
-  return (NULL != _imageBuffer) ? 1 : -1;
+  ::memset(m_imageBuffer, val, total);
+  return (NULL != m_imageBuffer) ? 1 : -1;
 }
 
 // -----------------------------------------------------------------------------
@@ -118,12 +121,12 @@ int32_t AIMImage::fillImageBuffer(uint8_t val)
 // -----------------------------------------------------------------------------
 void AIMImage::deallocateImageBuffer()
 {
-  if (this->_imageBuffer != NULL
-      && this->_managememory == true)
+  if (this->m_imageBuffer != NULL
+      && this->m_ManageMemory == true)
   {
-    delete[] this->_imageBuffer;
+    delete[] this->m_imageBuffer;
   }
-  _imageBuffer = NULL;
+  m_imageBuffer = NULL;
 }
 
 
@@ -132,7 +135,7 @@ void AIMImage::deallocateImageBuffer()
 // -----------------------------------------------------------------------------
 unsigned char* AIMImage::getImageBuffer()
 {
-  return _imageBuffer;
+  return m_imageBuffer;
 }
 
 // -----------------------------------------------------------------------------
@@ -140,7 +143,7 @@ unsigned char* AIMImage::getImageBuffer()
 // -----------------------------------------------------------------------------
 uint8_t* AIMImage::getPointer(size_t index)
 {
-  return &(_imageBuffer[index]);
+  return &(m_imageBuffer[index]);
 }
 
 // -----------------------------------------------------------------------------
@@ -154,8 +157,8 @@ void AIMImage::printSelf(std::ostream& out)
   //out << "  ImageMicronSize:        " << _micronSize[0] << " x " << _micronSize[1] << std::endl;
   out << "  ImagePixelDimension:         " << m_ImagePixelDimension[0] << " x " << m_ImagePixelDimension[1] << std::endl;
   //out << "  Scaling:                " << _scaling[0] << ", " << _scaling[1] << std::endl;
-  out << "  ManageMemory:           " << _managememory << std::endl;
-  out << "  ImageBuffer:            " << *_imageBuffer << std::endl;
+  out << "  ManageMemory:           " << m_ManageMemory << std::endl;
+  out << "  ImageBuffer:            " << *m_imageBuffer << std::endl;
 // _intersectedTile->printSelf(out);
 }
 

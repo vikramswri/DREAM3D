@@ -73,15 +73,15 @@ class CrossCorrelation
     virtual ~CrossCorrelation();
 
 
-    MXA_INSTANCE_PROPERTY_m(CrossCorrelationData::Pointer, CrossCorrelationData);
+    MXA_INSTANCE_PROPERTY(CrossCorrelationData::Pointer, CrossCorrelationData);
 
-    MXA_INSTANCE_PROPERTY_m(bool, Debug);
+    MXA_INSTANCE_PROPERTY(bool, Debug);
 
-    MXA_INSTANCE_PROPERTY_m(int, ErrorCondition);
+    MXA_INSTANCE_PROPERTY(int, ErrorCondition);
 
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, FixedImage);
+    MXA_INSTANCE_PROPERTY(AIMImage::Pointer, FixedImage);
 
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, MovingImage);
+    MXA_INSTANCE_PROPERTY(AIMImage::Pointer, MovingImage);
 
     /**
      * @brief main entry point to register the 2 images. Use the getErrorCondition()

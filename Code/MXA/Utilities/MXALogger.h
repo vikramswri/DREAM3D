@@ -22,8 +22,6 @@
 #include <fstream>
 #include <sstream>
 
-//#include <boost/noncopyable.hpp>
-
 
 /**
  * @def MXALOGGER_METHOD_VARIABLE_INSTANCE
@@ -52,10 +50,10 @@
 
 
 #define CHECK_PRECONDITION( stuff )\
-  if(_isFileBased == false){\
+  if(m_IsFileBased == false){\
     std::cout << stuff; return std::cout;}\
     else {\
-      _out << (stuff);  return _out; }
+      m_OutStream << (stuff);  return m_OutStream; }
 
 
 /**
@@ -66,15 +64,15 @@
 * @date May 22, 2009
 * @version $Revision$
 */
-class MXA_EXPORT MXALogger_Implementation 
+class MXA_EXPORT MXALogger_Implementation
 {
 
   public:
 	  MXALogger_Implementation();
     virtual ~MXALogger_Implementation();
 
-    MXA_INSTANCE_PROPERTY(bool, IsFileBased, _isFileBased)
-    MXA_INSTANCE_STRING_PROPERTY(FileName, _fileName)
+    MXA_INSTANCE_PROPERTY(bool, IsFileBased)
+    MXA_INSTANCE_STRING_PROPERTY(FileName)
 
     bool open(const std::string &fn, std::ios::openmode mode = std::ios::trunc);
     bool close();
@@ -94,7 +92,7 @@ class MXA_EXPORT MXALogger_Implementation
     std::ostream& operator<<(const char* v) { CHECK_PRECONDITION(v) }
 
   private:
-    std::ofstream _out;
+    std::ofstream m_OutStream;
     MXALogger_Implementation(const MXALogger_Implementation&);   //Copy Constructor Not Implemented
     void operator=(const MXALogger_Implementation&);  // Operator '=' Not Implemented
 

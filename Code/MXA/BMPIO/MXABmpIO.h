@@ -11,16 +11,14 @@
 #ifndef MXA_BMP_IO_H
 #define MXA_BMP_IO_H
 
-//MXA Includes
-#include <MXA/MXATypes.h>
-//#include <MXA/Common/MXATypeDefs.h>
-#include <MXA/Common/DLLExport.h>
-#include <MXA/BMPIO/MXABmpHeaders.h>
-
 //STL includes
 #include <string>
 #include <vector>
 
+//MXA Includes
+#include <MXA/MXATypes.h>
+#include <MXA/Common/DLLExport.h>
+#include <MXA/BMPIO/MXABmpHeaders.h>
 
 namespace MXA
 {

@@ -15,23 +15,23 @@
 //
 // -----------------------------------------------------------------------------
 CrossCorrelationData::CrossCorrelationData() :
-  fixedSlice(0),
-  movingSlice(0),
+  m_FixedSlice(0),
+  m_MovingSlice(0),
 //  fixedImageNum(1),
 //  movingImageNum(0.0f),
-  costFuncValue(0),
-  numIterations(0),
-  xTrans(0.0),
-  yTrans(0.0),
-  xFixedOrigin(0.0),
-  yFixedOrigin(0.0),
-  xMovingOrigin(0.0),
-  yMovingOrigin(0.0),
-  scaling(1.0),
-  imageWidth(0),
-  imageHeight(0),
+  m_CostFuncValue(0),
+  m_NumIterations(0),
+  m_XTrans(0.0),
+  m_YTrans(0.0),
+  m_XFixedOrigin(0.0),
+  m_YFixedOrigin(0.0),
+  m_XMovingOrigin(0.0),
+  m_YMovingOrigin(0.0),
+  m_Scaling(1.0),
+  m_ImageWidth(0),
+  m_ImageHeight(0),
  // imageColorChannels(0),
-  complete(0)
+  m_Complete(0)
 {
 }
 
@@ -47,23 +47,23 @@ CrossCorrelationData::~CrossCorrelationData()
 // -----------------------------------------------------------------------------
 void CrossCorrelationData::initValues()
 {
-  fixedSlice = 0;
-  movingSlice = 0;
+  m_FixedSlice = 0;
+  m_MovingSlice = 0;
 //  fixedImageNum = 1;
 //  movingImageNum = 0.0f;
-  costFuncValue = 0;
-  numIterations = 0;
-  xTrans = 0.0;
-  yTrans = 0.0;
-  xFixedOrigin = 0.0;
-  yFixedOrigin = 0.0;
-  xMovingOrigin = 0.0;
-  yMovingOrigin = 0.0;
-  scaling = 0;
-  imageWidth = 0;
-  imageHeight = 0;
+  m_CostFuncValue = 0;
+  m_NumIterations = 0;
+  m_XTrans = 0.0;
+  m_YTrans = 0.0;
+  m_XFixedOrigin = 0.0;
+  m_YFixedOrigin = 0.0;
+  m_XMovingOrigin = 0.0;
+  m_YMovingOrigin = 0.0;
+  m_Scaling = 0;
+  m_ImageWidth = 0;
+  m_ImageHeight = 0;
 //  imageColorChannels = 0;
-  complete = 0;
+  m_Complete = 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -72,20 +72,20 @@ void CrossCorrelationData::initValues()
 int32_t CrossCorrelationData::writeToFile(MXAFileWriter64 &writer)
 {
   bool ok = false;
-  ok = writer.writeValue<int>( &fixedSlice); if( !ok ) { return -1; }
-  ok = writer.writeValue<int32_t>( &movingSlice);if( !ok ) { return -1; }
-  ok = writer.writeValue<float>( &costFuncValue);if( !ok ) { return -1; }
-  ok = writer.writeValue<uint32_t>( &numIterations);if( !ok ) { return -1; }
-  ok = writer.writeValue<double>( &xTrans);if( !ok ) { return -1; }
-  ok = writer.writeValue<double>( &yTrans);if( !ok ) { return -1; }
-  ok = writer.writeValue<double>( &xFixedOrigin);if( !ok ) { return -1; }
-  ok = writer.writeValue<double>( &yFixedOrigin);if( !ok ) { return -1; }
-  ok = writer.writeValue<double>( &xMovingOrigin);if( !ok ) { return -1; }
-  ok = writer.writeValue<double>( &yMovingOrigin);if( !ok ) { return -1; }
-  ok = writer.writeValue<double>( &scaling);if( !ok ) { return -1; }
-  ok = writer.writeValue<int32_t>( &imageWidth);if( !ok ) { return -1; }
-  ok = writer.writeValue<int32_t>( &imageHeight);if( !ok ) { return -1; }
-  ok = writer.writeValue<int32_t>( &complete);if( !ok ) { return -1; }
+  ok = writer.writeValue<int>( &m_FixedSlice); if( !ok ) { return -1; }
+  ok = writer.writeValue<int32_t>( &m_MovingSlice);if( !ok ) { return -1; }
+  ok = writer.writeValue<float>( &m_CostFuncValue);if( !ok ) { return -1; }
+  ok = writer.writeValue<uint32_t>( &m_NumIterations);if( !ok ) { return -1; }
+  ok = writer.writeValue<double>( &m_XTrans);if( !ok ) { return -1; }
+  ok = writer.writeValue<double>( &m_YTrans);if( !ok ) { return -1; }
+  ok = writer.writeValue<double>( &m_XFixedOrigin);if( !ok ) { return -1; }
+  ok = writer.writeValue<double>( &m_YFixedOrigin);if( !ok ) { return -1; }
+  ok = writer.writeValue<double>( &m_XMovingOrigin);if( !ok ) { return -1; }
+  ok = writer.writeValue<double>( &m_YMovingOrigin);if( !ok ) { return -1; }
+  ok = writer.writeValue<double>( &m_Scaling);if( !ok ) { return -1; }
+  ok = writer.writeValue<int32_t>( &m_ImageWidth);if( !ok ) { return -1; }
+  ok = writer.writeValue<int32_t>( &m_ImageHeight);if( !ok ) { return -1; }
+  ok = writer.writeValue<int32_t>( &m_Complete);if( !ok ) { return -1; }
   return 1;
 }
 
@@ -95,37 +95,37 @@ int32_t CrossCorrelationData::writeToFile(MXAFileWriter64 &writer)
 int32_t CrossCorrelationData::readFromFile(MXAFileReader64 &reader, bool swap)
 {
   bool ok = false;
-  ok = reader.readValue<int32_t>( fixedSlice); if( !ok ) { return -1; }
-  ok = reader.readValue<int32_t>( movingSlice);if( !ok ) { return -1; }
-  ok = reader.readValue<float>( costFuncValue);if( !ok ) { return -1; }
-  ok = reader.readValue<uint32_t>( numIterations);if( !ok ) { return -1; }
-  ok = reader.readValue<double>( xTrans);if( !ok ) { return -1; }
-  ok = reader.readValue<double>( yTrans);if( !ok ) { return -1; }
-  ok = reader.readValue<double>( xFixedOrigin);if( !ok ) { return -1; }
-  ok = reader.readValue<double>( yFixedOrigin);if( !ok ) { return -1; }
-  ok = reader.readValue<double>( xMovingOrigin);if( !ok ) { return -1; }
-  ok = reader.readValue<double>( yMovingOrigin);if( !ok ) { return -1; }
-  ok = reader.readValue<double>( scaling);if( !ok ) { return -1; }
-  ok = reader.readValue<int32_t>( imageWidth);if( !ok ) { return -1; }
-  ok = reader.readValue<int32_t>( imageHeight);if( !ok ) { return -1; }
-  ok = reader.readValue<int32_t>( complete);if( !ok ) { return -1; }
+  ok = reader.readValue<int32_t>( m_FixedSlice); if( !ok ) { return -1; }
+  ok = reader.readValue<int32_t>( m_MovingSlice);if( !ok ) { return -1; }
+  ok = reader.readValue<float>( m_CostFuncValue);if( !ok ) { return -1; }
+  ok = reader.readValue<uint32_t>( m_NumIterations);if( !ok ) { return -1; }
+  ok = reader.readValue<double>( m_XTrans);if( !ok ) { return -1; }
+  ok = reader.readValue<double>( m_YTrans);if( !ok ) { return -1; }
+  ok = reader.readValue<double>( m_XFixedOrigin);if( !ok ) { return -1; }
+  ok = reader.readValue<double>( m_YFixedOrigin);if( !ok ) { return -1; }
+  ok = reader.readValue<double>( m_XMovingOrigin);if( !ok ) { return -1; }
+  ok = reader.readValue<double>( m_YMovingOrigin);if( !ok ) { return -1; }
+  ok = reader.readValue<double>( m_Scaling);if( !ok ) { return -1; }
+  ok = reader.readValue<int32_t>( m_ImageWidth);if( !ok ) { return -1; }
+  ok = reader.readValue<int32_t>( m_ImageHeight);if( !ok ) { return -1; }
+  ok = reader.readValue<int32_t>( m_Complete);if( !ok ) { return -1; }
 
   if (swap)
   {
-    MXA::Endian::reverseBytes<int32_t>( fixedSlice);
-    MXA::Endian::reverseBytes<int32_t>( movingSlice);
-    MXA::Endian::reverseBytes<float>( costFuncValue);
-    MXA::Endian::reverseBytes<uint32_t>( numIterations);
-    MXA::Endian::reverseBytes<double>( xTrans);
-    MXA::Endian::reverseBytes<double>( yTrans);
-    MXA::Endian::reverseBytes<double>( xFixedOrigin);
-    MXA::Endian::reverseBytes<double>( yFixedOrigin);
-    MXA::Endian::reverseBytes<double>( xMovingOrigin);
-    MXA::Endian::reverseBytes<double>( yMovingOrigin);
-    MXA::Endian::reverseBytes<double>( scaling);
-    MXA::Endian::reverseBytes<int32_t>( imageWidth);
-    MXA::Endian::reverseBytes<int32_t>( imageHeight);
-    MXA::Endian::reverseBytes<int32_t>( complete);
+    MXA::Endian::reverseBytes<int32_t>( m_FixedSlice);
+    MXA::Endian::reverseBytes<int32_t>( m_MovingSlice);
+    MXA::Endian::reverseBytes<float>( m_CostFuncValue);
+    MXA::Endian::reverseBytes<uint32_t>( m_NumIterations);
+    MXA::Endian::reverseBytes<double>( m_XTrans);
+    MXA::Endian::reverseBytes<double>( m_YTrans);
+    MXA::Endian::reverseBytes<double>( m_XFixedOrigin);
+    MXA::Endian::reverseBytes<double>( m_YFixedOrigin);
+    MXA::Endian::reverseBytes<double>( m_XMovingOrigin);
+    MXA::Endian::reverseBytes<double>( m_YMovingOrigin);
+    MXA::Endian::reverseBytes<double>( m_Scaling);
+    MXA::Endian::reverseBytes<int32_t>( m_ImageWidth);
+    MXA::Endian::reverseBytes<int32_t>( m_ImageHeight);
+    MXA::Endian::reverseBytes<int32_t>( m_Complete);
   }
   return 1;
 }
@@ -137,20 +137,20 @@ int32_t CrossCorrelationData::readFromFile(MXAFileReader64 &reader, bool swap)
 void CrossCorrelationData::print(std::ostream &out, const std::string &delimiter)
 {
 
-  out << fixedSlice << delimiter;
-  out << movingSlice << delimiter;
-  out << costFuncValue << delimiter;
-  out << numIterations << delimiter;
-  out << xTrans << delimiter;
-  out << yTrans << delimiter;
-  out << xFixedOrigin << delimiter;
-  out << yFixedOrigin << delimiter;
-  out << xMovingOrigin << delimiter;
-  out << yMovingOrigin << delimiter;
-  out << scaling << delimiter;
-  out << imageWidth << delimiter;
-  out << imageHeight << delimiter;
-  out << complete << delimiter;
+  out << m_FixedSlice << delimiter;
+  out << m_MovingSlice << delimiter;
+  out << m_CostFuncValue << delimiter;
+  out << m_NumIterations << delimiter;
+  out << m_XTrans << delimiter;
+  out << m_YTrans << delimiter;
+  out << m_XFixedOrigin << delimiter;
+  out << m_YFixedOrigin << delimiter;
+  out << m_XMovingOrigin << delimiter;
+  out << m_YMovingOrigin << delimiter;
+  out << m_Scaling << delimiter;
+  out << m_ImageWidth << delimiter;
+  out << m_ImageHeight << delimiter;
+  out << m_Complete << delimiter;
   out << std::endl;
 }
 
@@ -172,8 +172,8 @@ void CrossCorrelationData::PrintAsciiHeader(std::ostream &out, const std::string
 // -----------------------------------------------------------------------------
 void CrossCorrelationData::getTranslations(double trans[2])
 {
-  trans[0] = xTrans;
-  trans[1] = yTrans;
+  trans[0] = m_XTrans;
+  trans[1] = m_YTrans;
 }
 
 // -----------------------------------------------------------------------------
@@ -181,8 +181,8 @@ void CrossCorrelationData::getTranslations(double trans[2])
 // -----------------------------------------------------------------------------
 void CrossCorrelationData::setTranslations(double trans[2])
 {
-  xTrans = trans[0];
-  yTrans = trans[1];
+  m_XTrans = trans[0];
+  m_YTrans = trans[1];
 }
 
 // -----------------------------------------------------------------------------
@@ -190,8 +190,8 @@ void CrossCorrelationData::setTranslations(double trans[2])
 // -----------------------------------------------------------------------------
 void CrossCorrelationData::setFixedOrigin(float origin[2])
 {
-  xFixedOrigin = origin[0];
-  yFixedOrigin = origin[1];
+  m_XFixedOrigin = origin[0];
+  m_YFixedOrigin = origin[1];
 }
 
 // -----------------------------------------------------------------------------
@@ -199,8 +199,8 @@ void CrossCorrelationData::setFixedOrigin(float origin[2])
 // -----------------------------------------------------------------------------
 void CrossCorrelationData::getFixedOrigin(float origin[2])
 {
-  origin[0] = xFixedOrigin;
-  origin[1] = yFixedOrigin;
+  origin[0] = m_XFixedOrigin;
+  origin[1] = m_YFixedOrigin;
 }
 
 // -----------------------------------------------------------------------------
@@ -208,8 +208,8 @@ void CrossCorrelationData::getFixedOrigin(float origin[2])
 // -----------------------------------------------------------------------------
 void CrossCorrelationData::setMovingOrigin(float origin[2])
 {
-  xMovingOrigin = static_cast<double>(origin[0]);
-  yMovingOrigin = static_cast<double>(origin[1]);
+  m_XMovingOrigin = static_cast<double>(origin[0]);
+  m_YMovingOrigin = static_cast<double>(origin[1]);
 }
 
 // -----------------------------------------------------------------------------
@@ -217,7 +217,7 @@ void CrossCorrelationData::setMovingOrigin(float origin[2])
 // -----------------------------------------------------------------------------
 void CrossCorrelationData::getMovingOrigin(float origin[2])
 {
-  origin[0] = static_cast<float>(xMovingOrigin);
-  origin[1] = static_cast<float>(yMovingOrigin);
+  origin[0] = static_cast<float>(m_XMovingOrigin);
+  origin[1] = static_cast<float>(m_YMovingOrigin);
 }
 

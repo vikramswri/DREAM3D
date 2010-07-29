@@ -8,10 +8,10 @@
 #ifndef _AIM_IMAGE_H_
 #define _AIM_IMAGE_H_
 
+#include <iostream>
+
 #include "MXA/MXATypes.h"
 #include "MXA/Common/MXASetGetMacros.h"
-
-#include <iostream>
 
 /**
 * @class AIMImage AIMImage.h AIM/Common/AIMImage.h
@@ -40,7 +40,7 @@ class AIMImage
   */
   static AIMImage::Pointer NewFromSourceMosaic(AIMImage::Pointer image, bool allocateBuffer = true);
 
-  MXA_INSTANCE_2DVECTOR_PROPERTY_m(int, ImagePixelDimension);
+  MXA_INSTANCE_2DVECTOR_PROPERTY(int, ImagePixelDimension);
   const int32_t* getImagePixelDimension()
   {
     return m_ImagePixelDimension;
@@ -59,7 +59,7 @@ class AIMImage
   uint8_t* getPointer(size_t index = 0);
 
   void deallocateImageBuffer();
-  MXA_INSTANCE_PROPERTY(bool, ManageMemory, _managememory);
+  MXA_INSTANCE_PROPERTY(bool, ManageMemory);
 
   int32_t initializeImageWithSourceData(int32_t width, int32_t height, uint8_t* source);
 
@@ -73,7 +73,7 @@ class AIMImage
     AIMImage();
 
   private:
-    uint8_t*      _imageBuffer;
+    uint8_t*      m_imageBuffer;
     AIMImage(const AIMImage&);    // Copy Constructor Not Implemented
     void operator=(const AIMImage&);  // Operator '=' Not Implemented
 };

@@ -18,10 +18,12 @@
 #if defined(QT_CORE_LIB)
 //-- Qt includes
 #include <QtCore/QSharedPointer>
+#define RAW_PTR  data
 #else
 //-- Boost Includes
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#define RAW_PTR  data
 #endif
 
 #define SHARED_IS_NULL(ptr)\
@@ -111,59 +113,32 @@ static Pointer New(void) \
 /**
 * @brief Creates a "setter" method to set the property.
 */
-#define MXA_SET_PROPERTY(type, prpty, varname) \
-  void set##prpty(type value) { varname = value; }
-
-/**
-* @brief Creates a "getter" method to retrieve the value of the property.
-*/
-#define MXA_GET_PROPERTY(type, prpty, varname) \
-  type get##prpty() { return varname; }
-
-/**
-* @brief Convenience macro to create both the setter and getter methods.
-*/
-#define MXA_PROPERTY(type, prpty, varname) \
-  MXA_SET_PROPERTY(type, prpty, varname)\
-  MXA_GET_PROPERTY(type, prpty, varname)
-
-/**
-* @brief Convenience macro to create both the setter and getter methods in addition
-* to the instance variable.
-*/
-#define MXA_INSTANCE_PROPERTY(type, prpty, varname)\
-  private:\
-      type   varname;\
-  public:\
-    MXA_SET_PROPERTY(type, prpty, varname)\
-    MXA_GET_PROPERTY(type, prpty, varname)
-
-#define MXA_VIRTUAL_INSTANCE_PROPERTY_m(type, prpty)\
-  private:\
-      type   m_##prpty;\
-  public:\
-    virtual MXA_SET_PROPERTY_m(type, prpty)\
-    virtual MXA_GET_PROPERTY_m(type, prpty)
-
-/**
-* @brief Creates a "setter" method to set the property.
-*/
-#define MXA_SET_PROPERTY_m(type, prpty) \
+#define MXA_SET_PROPERTY(type, prpty) \
   void set##prpty(type value) { this->m_##prpty = value; }
 
 /**
 * @brief Creates a "getter" method to retrieve the value of the property.
 */
-#define MXA_GET_PROPERTY_m(type, prpty) \
+#define MXA_GET_PROPERTY(type, prpty) \
   type get##prpty() { return m_##prpty; }
 
 
-#define MXA_INSTANCE_PROPERTY_m(type, prpty)\
+
+#define MXA_VIRTUAL_INSTANCE_PROPERTY(type, prpty)\
   private:\
       type   m_##prpty;\
   public:\
-    MXA_SET_PROPERTY_m(type, prpty)\
-    MXA_GET_PROPERTY_m(type, prpty)
+    virtual MXA_SET_PROPERTY(type, prpty)\
+    virtual MXA_GET_PROPERTY(type, prpty)
+
+
+
+#define MXA_INSTANCE_PROPERTY(type, prpty)\
+  private:\
+      type   m_##prpty;\
+  public:\
+    MXA_SET_PROPERTY(type, prpty)\
+    MXA_GET_PROPERTY(type, prpty)
 
 
 
@@ -179,16 +154,8 @@ static Pointer New(void) \
   void get##prpty(type &value_0, type &value_1) {\
       value_0 = varname[0]; value_1 = varname[1]; }
 
-#define MXA_INSTANCE_2DVECTOR_PROPERTY(type, prpty, varname)\
-  private:\
-    type   varname[2];\
-  public:\
-    MXA_SET_2DVECTOR_PROPERTY(type, prpty, varname)\
-    MXA_GET_2DVECTOR_PROPERTY(type, prpty, varname)
 
-
-
-#define MXA_INSTANCE_2DVECTOR_PROPERTY_m(type, prpty)\
+#define MXA_INSTANCE_2DVECTOR_PROPERTY(type, prpty)\
   private:\
     type   m_##prpty[2];\
   public:\
@@ -210,18 +177,7 @@ static Pointer New(void) \
 /**
  * @brief Creates setters and getters in the form of 'setXXX()' and 'getXXX()' methods
  */
-#define MXA_STRING_PROPERTY(prpty, varname)\
-  MXA_SET_STRING_PROPERTY(prpty, varname)\
-  MXA_GET_STRING_PROPERTY(prpty, varname)
-
-#define MXA_INSTANCE_STRING_PROPERTY(prpty, varname)\
-  private:\
-  std::string      varname;\
-  public:\
-  MXA_SET_STRING_PROPERTY(prpty, varname)\
-  MXA_GET_STRING_PROPERTY(prpty, varname)
-
-#define MXA_INSTANCE_STRING_PROPERTY_m(prpty)\
+#define MXA_INSTANCE_STRING_PROPERTY(prpty)\
   private:\
   std::string      m_##prpty;\
   public:\

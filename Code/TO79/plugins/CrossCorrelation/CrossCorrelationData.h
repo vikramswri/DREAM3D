@@ -44,34 +44,34 @@ class CrossCorrelationData
 
 
     /* The fixed Slice number */
-    MXA_INSTANCE_PROPERTY(int32_t, FixedSlice, fixedSlice);
+    MXA_INSTANCE_PROPERTY(int32_t, FixedSlice);
     /*
      * @brief The Moving Slice Number
      */
-    MXA_INSTANCE_PROPERTY(int32_t, MovingSlice, movingSlice);
+    MXA_INSTANCE_PROPERTY(int32_t, MovingSlice);
 
-    MXA_INSTANCE_STRING_PROPERTY_m(FixedImagePath);
-    MXA_INSTANCE_STRING_PROPERTY_m(MovingImagePath);
+    MXA_INSTANCE_STRING_PROPERTY(FixedImagePath);
+    MXA_INSTANCE_STRING_PROPERTY(MovingImagePath);
 
 
     /*
-     * @brief The const function value
+     * @brief The cost function value
      */
-    MXA_INSTANCE_PROPERTY(float, ConstFuncValue, costFuncValue);
+    MXA_INSTANCE_PROPERTY(float, CostFuncValue);
     /*
      * @brief The number of iterations that were used to get the output
      */
-    MXA_INSTANCE_PROPERTY(uint32_t, NumIterations, numIterations);
+    MXA_INSTANCE_PROPERTY(uint32_t, NumIterations);
 
     /*
      * @brief The horizontal translation computed by the registration method. The value will be in physical units.
      */
-    MXA_INSTANCE_PROPERTY(double, XTrans, xTrans);
+    MXA_INSTANCE_PROPERTY(double, XTrans);
 
     /*
      * @brief The vertical translation computed by the registration method in physical units.
      */
-    MXA_INSTANCE_PROPERTY(double, YTrans, yTrans);
+    MXA_INSTANCE_PROPERTY(double, YTrans);
 
     /**
      * @brief Get the translations
@@ -88,38 +88,37 @@ class CrossCorrelationData
     /*
      * @brief The Horizontal origin of the fixed image
      */
-    MXA_INSTANCE_PROPERTY(double, XFixedOrigin, xFixedOrigin);
+    MXA_INSTANCE_PROPERTY(double, XFixedOrigin);
     /*
      * @brief The vertical origin of the fixed image
      */
-    MXA_INSTANCE_PROPERTY(double, YFixedOrigin, yFixedOrigin);
+    MXA_INSTANCE_PROPERTY(double, YFixedOrigin);
     /*
     * @brief The horizontal origin of the moving image
      */
-    MXA_INSTANCE_PROPERTY(double, XMovingOrigin, xMovingOrigin);
+    MXA_INSTANCE_PROPERTY(double, XMovingOrigin);
     /*
      * @brief The vertical origin of the moving image
      */
-    MXA_INSTANCE_PROPERTY(double, YMovingOrigin, yMovingOrigin);
-
+    MXA_INSTANCE_PROPERTY(double, YMovingOrigin);
     /*
      * @brief The scaling factor (Microns/pixel) value of the image
      */
-    MXA_INSTANCE_PROPERTY(double, Scaling, scaling);
+    MXA_INSTANCE_PROPERTY(double, Scaling);
 
     /*
      * @brief The Width of the FFT image in pixels
      */
-    MXA_INSTANCE_PROPERTY(int, ImageWidth, imageWidth);
+    MXA_INSTANCE_PROPERTY(int, ImageWidth);
     /*
      * @brief The Height of the FFT image in pixels
      */
-    MXA_INSTANCE_PROPERTY(int, ImageHeight, imageHeight);
+    MXA_INSTANCE_PROPERTY(int, ImageHeight);
 
     /*
      * @brief Is this slice pair complete.
      */
-    MXA_INSTANCE_PROPERTY(int, Complete, complete);
+    MXA_INSTANCE_PROPERTY(int, Complete);
 
 
     /**

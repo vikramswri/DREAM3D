@@ -52,8 +52,8 @@ class CrossCorrelationInputUI : public QImageProcessingInputFrame, private Ui::C
     virtual ~CrossCorrelationInputUI();
 
 
-    MXA_INSTANCE_PROPERTY_m(QString, CurrentImageFile)
-    MXA_INSTANCE_PROPERTY_m(QString, CurrentProcessedFile)
+    MXA_INSTANCE_PROPERTY(QString, CurrentImageFile)
+    MXA_INSTANCE_PROPERTY(QString, CurrentProcessedFile)
 
     int processInputs(QObject* parentGUI);
 

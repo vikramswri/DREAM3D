@@ -4,24 +4,19 @@
 //  All rights reserved.
 //  BSD License: http://www.opensource.org/licenses/bsd-license.html
 //
-//  This code was written under United States Air Force Contract number
+//  This code was written under United States Air Force Contract number 
 //                           FA8650-04-C-5229
 //
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef MXA_BMP_HEADERS_H
 #define MXA_BMP_HEADERS_H
 
-#if MXA_HAVE_STDINT_H
-#include <stdint.h>
-#endif
-
 #include <MXA/MXATypes.h>
 
-
 enum CompressionType {
-  BMP_BI_RGB=0,
-  BMP_BI_RLE8,
-  BMP_BI_RLE4
+  BMP_BI_RGB=0, 
+  BMP_BI_RLE8, 
+  BMP_BI_RLE4 
   };
 
 /**

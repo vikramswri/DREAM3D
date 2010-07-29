@@ -40,13 +40,13 @@ class ImageGraphicsDelegate : public QObject
     ImageGraphicsDelegate(QObject* parent = 0);
     virtual ~ImageGraphicsDelegate();
 
-    MXA_INSTANCE_PROPERTY_m(QString, DelegateName)
-    MXA_INSTANCE_PROPERTY_m(QMainWindow*, MainWindow)
-    MXA_INSTANCE_PROPERTY_m(QGraphicsView*, GraphicsView)
-    MXA_INSTANCE_PROPERTY_m(QGraphicsScene*, GraphicsScene)
-    MXA_INSTANCE_PROPERTY_m(QImage, CachedImage)
-    MXA_INSTANCE_PROPERTY_m(QImage, OverlayImage)
-    MXA_INSTANCE_PROPERTY_m(bool, CompositeImages)
+    MXA_INSTANCE_PROPERTY(QString, DelegateName)
+    MXA_INSTANCE_PROPERTY(QMainWindow*, MainWindow)
+    MXA_INSTANCE_PROPERTY(QGraphicsView*, GraphicsView)
+    MXA_INSTANCE_PROPERTY(QGraphicsScene*, GraphicsScene)
+    MXA_INSTANCE_PROPERTY(QImage, CachedImage)
+    MXA_INSTANCE_PROPERTY(QImage, OverlayImage)
+    MXA_INSTANCE_PROPERTY(bool, CompositeImages)
 
     /**
      * @brief Displays a Text message in the graphics view. This is typically used

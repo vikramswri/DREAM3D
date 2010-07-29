@@ -42,11 +42,11 @@ class TO79Application : public QMainWindow, private Ui::TO79Application
     virtual ~TO79Application();
     void initWithFile(const QString imageFile, QString mountImage);
 
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, OriginalImage)
-    MXA_INSTANCE_PROPERTY_m(AIMImage::Pointer, ProcessedImage)
+    MXA_INSTANCE_PROPERTY(AIMImage::Pointer, OriginalImage)
+    MXA_INSTANCE_PROPERTY(AIMImage::Pointer, ProcessedImage)
 
-    MXA_INSTANCE_PROPERTY_m(QString, CurrentImageFile)
-    MXA_INSTANCE_PROPERTY_m(QString, CurrentProcessedFile)
+    MXA_INSTANCE_PROPERTY(QString, CurrentImageFile)
+    MXA_INSTANCE_PROPERTY(QString, CurrentProcessedFile)
 
     qint32 saveProcessedImage();
 

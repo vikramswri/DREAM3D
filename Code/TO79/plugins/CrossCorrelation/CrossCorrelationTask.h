@@ -45,8 +45,8 @@ class CrossCorrelationTask : public ProcessQueueTask
     CrossCorrelationTask(QObject* parent = 0);
     virtual ~CrossCorrelationTask();
 
-    MXA_INSTANCE_PROPERTY_m(QString, MovingImagePath);
-    MXA_INSTANCE_PROPERTY_m(CrossCorrelationData::Pointer, CrossCorrelationData)
+    MXA_INSTANCE_PROPERTY(QString, MovingImagePath);
+    MXA_INSTANCE_PROPERTY(CrossCorrelationData::Pointer, CrossCorrelationData)
 
     virtual void run();
 

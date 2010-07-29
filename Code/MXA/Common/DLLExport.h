@@ -54,5 +54,24 @@ building the MXADatModel DLL on windows.
   #define MXA_EXPORT
 #endif
 
+#if 0
+#if defined (_WIN32) || defined __CYGWIN__
+
+  #if defined (MXA_BUILT_AS_DYNAMIC_LIB)
+    #if defined(MXADataModel_EXPORTS)
+      #define  MXA_EXPORT __declspec(dllexport)
+    #else
+      #define  MXA_EXPORT __declspec(dllimport)
+    #endif /* MXADataModel_EXPORTS */
+  #else
+    #define MXA_EXPORT
+  #endif
+#elif __GNUC__ >= 4
+ #define FLOW_DLL __attribute__ ((visibility("default")))
+ #define DLL_LOCAL  __attribute__ ((visibility("hidden")
+#else /* defined (_WIN32) && defined (MXA_BUILD_SHARED_LIBS)  */
+ #define MXA_EXPORT
+#endif
+#endif
 
 #endif /* _MXA_DLL_EXPORT_H_ */

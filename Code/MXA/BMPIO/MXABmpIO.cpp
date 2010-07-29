@@ -1,19 +1,26 @@
-#include "MXABmpIO.h"
-#include <iostream>
-
-//-- MXA Includes
-#include <MXA/Common/LogTime.h>
-#include <MXA/Common/MXAEndian.h>
-#include <MXA/MXATypes.h>
-#include <MXA/Common/DLLExport.h>
-#include <MXA/Common/IO/MXAFileReader64.h>
-#include <MXA/BMPIO/MXABmpHeaders.h>
-
+///////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2010, Michael A. Jackson. BlueQuartz Software
+//  All rights reserved.
+//  BSD License: http://www.opensource.org/licenses/bsd-license.html
+//
+///////////////////////////////////////////////////////////////////////////////
 //-- C Includes
 #include <stdio.h>
 #include <math.h>
 #include <memory.h>
 #include <string.h>
+
+//-- C++ includes
+#include <iostream>
+
+//-- MXA Includes
+#include <MXA/Common/LogTime.h>
+#include <MXA/Common/MXAEndian.h>
+#include <MXA/Common/IO/MXAFileReader64.h>
+
+//-- our own includes
+#include "MXABmpIO.h"
 
 // -----------------------------------------------------------------------------
 //

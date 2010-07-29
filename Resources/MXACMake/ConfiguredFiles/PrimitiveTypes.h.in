@@ -11,6 +11,9 @@
 
 #include "@MXA_PROJECT_PREFIX@Configuration.h"
 
+#if @MXA_PROJECT_PREFIX@_HAVE_STDINT_H
+#include <stdint.h>
+#endif
 
 /*--------------------------------------------------------------------------*/
 /* Define named types and constants corresponding to specific integer
