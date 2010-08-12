@@ -16,7 +16,6 @@ endMacro()
 MXACompileDir(Common)
 MXACompileDir(BMPIO)
 MXACompileDir(Utilities)
-MXACompileDir(BMPIO)
 
 INCLUDE (${PROJECT_CMAKE_DIR}/MXACMakeCommon.cmake )
 

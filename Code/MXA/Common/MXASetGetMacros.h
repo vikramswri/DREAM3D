@@ -23,7 +23,7 @@
 //-- Boost Includes
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-#define RAW_PTR  data
+#define RAW_PTR  get
 #endif
 
 #define SHARED_IS_NULL(ptr)\

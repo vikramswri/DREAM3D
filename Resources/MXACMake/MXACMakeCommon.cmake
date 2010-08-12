@@ -8,7 +8,7 @@
 
 INCLUDE (${PROJECT_CMAKE_DIR}/CMakeMacros.cmake )
 INCLUDE (${PROJECT_CMAKE_DIR}/CoreTests/ConfigureChecks.cmake)
-MXA_ConfigureHeaderFiles( ${TO79_BINARY_DIR} )
+MXA_ConfigureHeaderFiles( ${PROJECT_BINARY_DIR} )
 
 # --------------------------------------------------------------------
 # Add in some compiler definitions

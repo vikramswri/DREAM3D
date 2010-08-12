@@ -51,7 +51,7 @@ include_directories(${PROJECT_BINARY_DIR})
 # --------------------------------------------------------------------
 # Generate a Header file with Compile Version variables
 # --------------------------------------------------------------------
-GenerateVersionString( ${PROJECT_NAME} "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h" "${PROJECT_PREFIX}" )
+GenerateVersionString( ${PROJECT_NAME} "${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h" "${PROJECT_PREFIX}" )
 
 # ------------------------------------------------------------------------------
 #  Qt 4 Section
@@ -86,19 +86,19 @@ configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
                 ${PROJECT_BINARY_DIR}/License.txt )
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 ${PROJECT_BINARY_DIR}/ReadMe.txt )
-IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${TO79_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
+IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
 
    
 # Add our Qt based GUI project to the list of targets
-add_subdirectory(${TO79_CODE_DIR}/AIM ${TO79_BINARY_DIR}/AIMLib)
-add_subdirectory(${TO79_CODE_DIR}/QtSupport ${TO79_BINARY_DIR}/QtSupport)
-add_subdirectory(${TO79_CODE_DIR}/MXA ${TO79_BINARY_DIR}/MXA)
+add_subdirectory(${TO79_CODE_DIR}/AIM ${PROJECT_BINARY_DIR}/AIMLib)
+add_subdirectory(${TO79_CODE_DIR}/QtSupport ${PROJECT_BINARY_DIR}/QtSupport)
+add_subdirectory(${TO79_CODE_DIR}/MXA ${PROJECT_BINARY_DIR}/MXA)
 
-add_subdirectory(${TO79_CODE_DIR}/TO79/Application ${TO79_BINARY_DIR}/Application)
+add_subdirectory(${TO79_CODE_DIR}/TO79/Application ${PROJECT_BINARY_DIR}/Application)
 
-add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/EMMPM ${TO79_BINARY_DIR}/plugins/EMMPM)
-add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/CrossCorrelation ${TO79_BINARY_DIR}/plugins/CrossCorrelation)
-add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/MutualInformation ${TO79_BINARY_DIR}/plugins/MutualInformation)
+add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/EMMPM ${PROJECT_BINARY_DIR}/plugins/EMMPM)
+add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/CrossCorrelation ${PROJECT_BINARY_DIR}/plugins/CrossCorrelation)
+add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/MutualInformation ${PROJECT_BINARY_DIR}/plugins/MutualInformation)
 
 option(TO79_BUILD_API_DOCS "Use Doxygen to create the HTML based API documentation" OFF)
 if(TO79_BUILD_API_DOCS)
@@ -107,8 +107,8 @@ if(TO79_BUILD_API_DOCS)
     message(FATAL_ERROR "Doxygen is needed to build the documentation. Please install it correctly")
   endif()
   configure_file(${PROJECT_RESOURCES_DIR}/TO79.doxyfile.in 
-                 ${TO79_BINARY_DIR}/Doxyfile  @ONLY IMMEDIATE)
-  add_custom_target(docs COMMAND ${DOXYGEN_EXECUTABLE} ${TO79_BINARY_DIR}/Doxyfile)
+                 ${PROJECT_BINARY_DIR}/Doxyfile  @ONLY IMMEDIATE)
+  add_custom_target(docs COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile)
 
 endif()
 
