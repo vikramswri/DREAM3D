@@ -28,8 +28,8 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#ifndef TO79MAINWINDOW_H_
-#define TO79MAINWINDOW_H_
+#ifndef _IPHELPER_MAINWINDOW_H_
+#define _IPHELPER_MAINWINDOW_H_
 
 //-- Qt Includes
 #include <QtCore/QObject>
@@ -44,7 +44,7 @@
 #include <QtGui/QSortFilterProxyModel>
 
 //-- UIC generated Header
-#include <ui_IPHelper.h>
+#include <ui_IPHelperApp.h>
 
 
 #include "AIM/Common/AIMImage.h"
@@ -55,13 +55,13 @@ class ProcessQueueDialog;
 class ProcessQueueController;
 class QImageProcessingInterface;
 
-class IPHelper : public QMainWindow, private Ui::IPHelper
+class IPHelperApp : public QMainWindow, private Ui::IPHelperApp
 {
   Q_OBJECT;
 
   public:
-    IPHelper(QWidget *parent = 0);
-    virtual ~IPHelper();
+    IPHelperApp(QWidget *parent = 0);
+    virtual ~IPHelperApp();
     void initWithFile(const QString imageFile, QString mountImage);
 
     MXA_INSTANCE_PROPERTY(AIMImage::Pointer, OriginalImage)
@@ -216,8 +216,8 @@ class IPHelper : public QMainWindow, private Ui::IPHelper
  //   bool            m_OutputExistsCheck;
 
 
-    IPHelper(const IPHelper&); // Copy Constructor Not Implemented
-    void operator=(const IPHelper&); // Operator '=' Not Implemented
+    IPHelperApp(const IPHelperApp&); // Copy Constructor Not Implemented
+    void operator=(const IPHelperApp&); // Operator '=' Not Implemented
 };
 
-#endif /* TO79MAINWINDOW_H_ */
+#endif /* _IPHELPER_MAINWINDOW_H_ */

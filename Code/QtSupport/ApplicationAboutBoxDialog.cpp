@@ -28,7 +28,7 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 #include "ApplicationAboutBoxDialog.h"
-#include "TO79/Common/TO79Version.h"
+
 
 #include <iostream>
 

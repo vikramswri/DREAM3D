@@ -28,7 +28,7 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "TO79Application.h"
+#include "IPHelperApp.h"
 
 //-- Qt Headers
 #include <QtGui/QApplication>
@@ -41,12 +41,12 @@ int main (int argc, char *argv[])
   QApplication app(argc, argv);
   QCoreApplication::setOrganizationName("BlueQuartz Software");
   QCoreApplication::setOrganizationDomain("bluequartz.net");
-  QCoreApplication::setApplicationName("TO79Application");
+  QCoreApplication::setApplicationName("IPHelperApp");
 #if defined( Q_WS_MAC )
   //Needed for typical Mac program behavior.
   app.setQuitOnLastWindowClosed( true );
 #endif //APPLE
-  IPHelper *viewer = new IPHelper;
+  IPHelperApp *viewer = new IPHelperApp;
   viewer->show();
   int app_return = app.exec();
   return app_return;

@@ -57,7 +57,7 @@
 // Our Own Includes
 #include "EMMPMTask.h"
 
-#include "TO79/Common/TO79Version.h"
+#include "IPHelper/Common/IPHelperVersion.h"
 
 #define READ_STRING_SETTING(prefs, var, emptyValue)\
   var->setText( prefs->value(#var).toString() );\

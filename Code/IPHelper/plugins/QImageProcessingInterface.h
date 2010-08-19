@@ -36,7 +36,7 @@
 #include <QtPlugin>
 
 /**
- * @class QImageProcessingInterface QImageProcessingInterface.h TO79/plugins/QImageProcessingInterface.h
+ * @class QImageProcessingInterface QImageProcessingInterface.h IPHelper/plugins/QImageProcessingInterface.h
  * @brief This class defines the interface used by plugins that would like to process
  * images and display their output.
  * @author Michael A. Jackson for BlueQuartz Software
@@ -44,7 +44,7 @@
  * @version 1.0
  *
  * @section intro Introduction
- *  In order to develop a plugin for the TO79Application there are several classes that need to be
+ *  In order to develop a plugin for the IPHelper there are several classes that need to be
  *  implemeneted by the developer.
  *  @li [Plugin Name]Plugin
  *  @li [Plugin Name]InputUI

@@ -35,7 +35,7 @@
 #include "ui_CrossCorrelationInputUI.h"
 #include "AIM/Common/AIMImage.h"
 #include "CrossCorrelation/CrossCorrelationTable.h"
-#include "TO79/plugins/QImageProcessingInputFrame.h"
+#include "IPHelper/plugins/QImageProcessingInputFrame.h"
 
 
 //-- Qt Includes

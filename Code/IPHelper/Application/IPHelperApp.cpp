@@ -27,7 +27,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-#include "TO79Application.h"
+#include "IPHelperApp.h"
 
 //-- C++ includes
 #include <iostream>
@@ -61,9 +61,9 @@
 #include "QtSupport/ProcessQueueDialog.h"
 
 
-#include "TO79/Common/TO79Version.h"
+#include "IPHelper/Common/IPHelperVersion.h"
 
-#include "TO79/plugins/QImageProcessingInterface.h"
+#include "IPHelper/plugins/QImageProcessingInterface.h"
 
 
 
@@ -98,7 +98,7 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-IPHelper::IPHelper(QWidget *parent) :
+IPHelperApp::IPHelperApp(QWidget *parent) :
 QMainWindow(parent),
 pluginActionGroup(NULL),
 m_ActivePlugin(NULL),
@@ -127,7 +127,7 @@ m_OpenDialogLastDirectory("~/")
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-IPHelper::~IPHelper()
+IPHelperApp::~IPHelperApp()
 {
   // TODO Auto-generated destructor stub
 }
@@ -135,7 +135,7 @@ IPHelper::~IPHelper()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_actionExit_triggered()
+void IPHelperApp::on_actionExit_triggered()
 {
   this->close();
 }
@@ -143,7 +143,7 @@ void IPHelper::on_actionExit_triggered()
 // -----------------------------------------------------------------------------
 //  Called when the main window is closed.
 // -----------------------------------------------------------------------------
-void IPHelper::closeEvent(QCloseEvent *event)
+void IPHelperApp::closeEvent(QCloseEvent *event)
 {
   qint32 err = checkDirtyDocument();
   if (err < 0)
@@ -160,7 +160,7 @@ void IPHelper::closeEvent(QCloseEvent *event)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::resizeEvent ( QResizeEvent * event )
+void IPHelperApp::resizeEvent ( QResizeEvent * event )
 {
   QSize osize = originalImageFrame->size();
 //  std::cout << "originalImageFrame.size: " << osize.width() << " x " << osize.height() << std::endl;
@@ -186,7 +186,7 @@ void IPHelper::resizeEvent ( QResizeEvent * event )
 // -----------------------------------------------------------------------------
 //  Read the prefs from the local storage file
 // -----------------------------------------------------------------------------
-void IPHelper::readSettings()
+void IPHelperApp::readSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
@@ -202,7 +202,7 @@ void IPHelper::readSettings()
 // -----------------------------------------------------------------------------
 //  Write our prefs to file
 // -----------------------------------------------------------------------------
-void IPHelper::writeSettings()
+void IPHelperApp::writeSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
@@ -219,7 +219,7 @@ void IPHelper::writeSettings()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::setupGui()
+void IPHelperApp::setupGui()
 {
 
 #ifdef Q_WS_MAC
@@ -278,7 +278,7 @@ void IPHelper::setupGui()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_modeComboBox_currentIndexChanged()
+void IPHelperApp::on_modeComboBox_currentIndexChanged()
 {
   if (NULL == m_ProcessedGDelegate) { return; }
   int index = modeComboBox->currentIndex();
@@ -319,7 +319,7 @@ void IPHelper::on_modeComboBox_currentIndexChanged()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::setWidgetListEnabled(bool b)
+void IPHelperApp::setWidgetListEnabled(bool b)
 {
   foreach (QWidget* w, m_WidgetList)
   {
@@ -331,7 +331,7 @@ void IPHelper::setWidgetListEnabled(bool b)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_compositeWithOriginal_stateChanged(int state)
+void IPHelperApp::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
   if (NULL != m_OriginalGDelegate) {
@@ -348,7 +348,7 @@ void IPHelper::on_compositeWithOriginal_stateChanged(int state)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool IPHelper::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
+bool IPHelperApp::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   QDir parent(fileinfo.dir());
@@ -358,7 +358,7 @@ bool IPHelper::verifyOutputPathParentExists(QString outFilePath, QLineEdit* line
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool IPHelper::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool IPHelperApp::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   if (false == fileinfo.exists())
@@ -375,7 +375,7 @@ bool IPHelper::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 IPHelper::checkDirtyDocument()
+qint32 IPHelperApp::checkDirtyDocument()
 {
   qint32 err = -1;
   {
@@ -387,9 +387,9 @@ qint32 IPHelper::checkDirtyDocument()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::updateRecentFileList(const QString &file)
+void IPHelperApp::updateRecentFileList(const QString &file)
 {
-  // std::cout << "TO79MainWindow::updateRecentFileList" << std::endl;
+  // std::cout << "IPHelperMainWindow::updateRecentFileList" << std::endl;
 
   // Clear the Recent Items Menu
   this->menu_RecentFiles->clear();
@@ -410,7 +410,7 @@ void IPHelper::updateRecentFileList(const QString &file)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::openRecentFile()
+void IPHelperApp::openRecentFile()
 {
   //std::cout << "QRecentFileList::openRecentFile()" << std::endl;
 
@@ -427,7 +427,7 @@ void IPHelper::openRecentFile()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::openFile(QString imageFile)
+void IPHelperApp::openFile(QString imageFile)
 {
   if ( true == imageFile.isEmpty() ) // User cancelled the operation
   {
@@ -444,12 +444,12 @@ void IPHelper::openFile(QString imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_aboutBtn_clicked()
+void IPHelperApp::on_aboutBtn_clicked()
 {
   ApplicationAboutBoxDialog about(this);
   QString an = QCoreApplication::applicationName();
   QString version("");
-  version.append(TO79::Version::PackageComplete.c_str());
+  version.append(IPHelper::Version::PackageComplete.c_str());
   about.setApplicationInfo(an, version);
   about.exec();
 }
@@ -457,7 +457,7 @@ void IPHelper::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_processBtn_clicked()
+void IPHelperApp::on_processBtn_clicked()
 {
   int err = m_ActivePlugin->startProcessing(this);
   if (err == 0)
@@ -469,7 +469,7 @@ void IPHelper::on_processBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::processingStarted()
+void IPHelperApp::processingStarted()
 {
   std::cout << "TO79MainWindow::processingStarted()" << std::endl;
   processBtn->setText("Cancel");
@@ -481,7 +481,7 @@ void IPHelper::processingStarted()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::processingFinished()
+void IPHelperApp::processingFinished()
 {
   std::cout << "TO79MainWindow::processingFinished()" << std::endl;
   /* Code that cleans up anything from the processing */
@@ -499,7 +499,7 @@ void IPHelper::processingFinished()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_actionOpen_Processed_Image_triggered()
+void IPHelperApp::on_actionOpen_Processed_Image_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Processed Image File"),
@@ -516,7 +516,7 @@ void IPHelper::on_actionOpen_Processed_Image_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_actionOpen_triggered()
+void IPHelperApp::on_actionOpen_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
@@ -534,7 +534,7 @@ void IPHelper::on_actionOpen_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::loadImageFile(const QString &imageFile)
+void IPHelperApp::loadImageFile(const QString &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -547,7 +547,7 @@ void IPHelper::loadImageFile(const QString &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::loadProcessedImageFile(const QString  &imageFile)
+void IPHelperApp::loadProcessedImageFile(const QString  &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -561,7 +561,7 @@ void IPHelper::loadProcessedImageFile(const QString  &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_actionSave_triggered()
+void IPHelperApp::on_actionSave_triggered()
 {
   saveProcessedImage();
 }
@@ -570,7 +570,7 @@ void IPHelper::on_actionSave_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_actionSave_As_triggered()
+void IPHelperApp::on_actionSave_As_triggered()
 {
   m_CurrentProcessedFile = QString();
   saveProcessedImage();
@@ -579,7 +579,7 @@ void IPHelper::on_actionSave_As_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::on_actionClose_triggered() {
+void IPHelperApp::on_actionClose_triggered() {
   // std::cout << "AIMMountMaker::on_actionClose_triggered" << std::endl;
   qint32 err = -1;
   err = checkDirtyDocument();
@@ -602,7 +602,7 @@ void IPHelper::on_actionClose_triggered() {
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::openProcessedImage(QString processedImage)
+void IPHelperApp::openProcessedImage(QString processedImage)
 {
   if ( true == processedImage.isEmpty() ) // User cancelled the operation
   {
@@ -619,7 +619,7 @@ void IPHelper::openProcessedImage(QString processedImage)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 IPHelper::saveProcessedImage()
+qint32 IPHelperApp::saveProcessedImage()
 {
   QImage image = m_ProcessedGDelegate->getCachedImage();
   int err = 0;
@@ -653,7 +653,7 @@ qint32 IPHelper::saveProcessedImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer IPHelper::loadImage(QString filePath)
+AIMImage::Pointer IPHelperApp::loadImage(QString filePath)
 {
 //  std::cout << " loadImage(): filePath: " << filePath.toStdString() << std::endl;
   QImage image;
@@ -687,7 +687,7 @@ AIMImage::Pointer IPHelper::loadImage(QString filePath)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 IPHelper::initImageViews()
+qint32 IPHelperApp::initImageViews()
 {
   qint32 err = 0;
   QImage image;
@@ -837,7 +837,7 @@ qint32 IPHelper::initImageViews()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::initWithFile(const QString imageFile, QString processedImage)
+void IPHelperApp::initWithFile(const QString imageFile, QString processedImage)
 {
   QFileInfo fileInfo(imageFile);
   this->m_OpenDialogLastDirectory = fileInfo.path();
@@ -878,7 +878,7 @@ void IPHelper::initWithFile(const QString imageFile, QString processedImage)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer IPHelper::convertQImageToGrayScaleAIMImage(QImage image)
+AIMImage::Pointer IPHelperApp::convertQImageToGrayScaleAIMImage(QImage image)
 {
   AIMImage::Pointer aimImage = AIMImage::New();
   quint8* oImage = aimImage->allocateImageBuffer(image.width(), image.height(), true);
@@ -907,7 +907,7 @@ AIMImage::Pointer IPHelper::convertQImageToGrayScaleAIMImage(QImage image)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::disableFixedFitToWindow()
+void IPHelperApp::disableFixedFitToWindow()
 {
   this->fixedFitToWindowBtn->setChecked(false);
 }
@@ -915,7 +915,7 @@ void IPHelper::disableFixedFitToWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::disableProcessedFitToWindow()
+void IPHelperApp::disableProcessedFitToWindow()
 {
   this->processedFitToWindowBtn->setChecked(false);
 }
@@ -923,7 +923,7 @@ void IPHelper::disableProcessedFitToWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::loadPlugins()
+void IPHelperApp::loadPlugins()
  {
      foreach (QObject *plugin, QPluginLoader::staticInstances())
          populateMenus(plugin);
@@ -961,7 +961,7 @@ void IPHelper::loadPlugins()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
- void IPHelper::populateMenus(QObject *plugin)
+ void IPHelperApp::populateMenus(QObject *plugin)
 {
   std::cout << "Found Plugin..." << std::endl;
   QImageProcessingInterface* ipPlugin = qobject_cast<QImageProcessingInterface * > (plugin);
@@ -979,7 +979,7 @@ void IPHelper::loadPlugins()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::addToPluginMenu(QObject *plugin, const QString &text,
+void IPHelperApp::addToPluginMenu(QObject *plugin, const QString &text,
                                      QMenu *menu, const char *member,
                                      QActionGroup *actionGroup)
 {
@@ -997,7 +997,7 @@ void IPHelper::addToPluginMenu(QObject *plugin, const QString &text,
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void IPHelper::setInputUI()
+void IPHelperApp::setInputUI()
 {
   // Get the current QWidget
   if (NULL != m_ActivePlugin) {

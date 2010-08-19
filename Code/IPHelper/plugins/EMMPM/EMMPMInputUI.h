@@ -34,7 +34,7 @@
 
 #include "ui_EMMPMInputUI.h"
 #include "AIM/Common/AIMImage.h"
-#include "TO79/plugins/QImageProcessingInputFrame.h"
+#include "IPHelper/plugins/QImageProcessingInputFrame.h"
 
 //-- Qt Includes
 #include <QtCore/QObject>

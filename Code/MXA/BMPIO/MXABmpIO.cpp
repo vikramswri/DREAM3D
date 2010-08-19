@@ -571,8 +571,8 @@ LOAD_TEXTUREBMP_RESULT MXABmpIO::readBitmapData4Bit()
     for (int j=0;j<height;j++)
     {
       int32_t index = j*width*3;
-      unsigned char byteValue;
-      unsigned char color;
+      unsigned char byteValue = 0;
+      unsigned char color = 0;
       for (int i=0;i<width;i++)
       {
         if (i%2==0)

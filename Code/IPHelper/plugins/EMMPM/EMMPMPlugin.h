@@ -33,7 +33,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
-#include "TO79/plugins/QImageProcessingInterface.h"
+#include "IPHelper/plugins/QImageProcessingInterface.h"
 
 class EMMPMInputUI;
 
