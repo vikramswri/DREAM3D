@@ -75,7 +75,7 @@ endif()
 
 # Install MinGW support libraries if those are needed
 IF (MINGW)
-    INCLUDE ( ${PROJECT_RESOURCES_DIR}/CMake/SHPFindMinGW.cmake )
+    INCLUDE ( ${PROJECT_RESOURCES_DIR}/CMake/FindMinGW.cmake )
     IF (MINGW_FOUND)
         INSTALL(FILES ${MINGW_LIBRARIES}
                 DESTINATION ./

@@ -197,7 +197,7 @@ class IPHelperApp : public QMainWindow, private Ui::IPHelperApp
 
 
   private:
-    QDir pluginsDir;
+    QStringList m_PluginDirs;
     QStringList pluginFileNames;
     QActionGroup* pluginActionGroup;
     QImageProcessingInterface* m_ActivePlugin;

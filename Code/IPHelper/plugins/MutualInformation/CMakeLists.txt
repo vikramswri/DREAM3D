@@ -40,7 +40,7 @@ set (MutualInformation_PROJECT_SRCS
 )
 
 # ---------- Setup output Directories -------------------------
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/plugins  )
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/Plugins  )
 #add_library(MutualInformation STATIC ${MutualInformation_PROJECT_SRCS})
 add_executable(MITest ${MutualInformation_PROJECT_SRCS})
 target_link_libraries(MITest ${QT_LIBRARIES} MXADataModel AIMLib)

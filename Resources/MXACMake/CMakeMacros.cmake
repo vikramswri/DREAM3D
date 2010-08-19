@@ -242,15 +242,18 @@ macro(PluginProperties targetName DEBUG_EXTENSION)
     #-- Set the Debug and Release names for the libraries
     SET_TARGET_PROPERTIES( ${targetName} 
         PROPERTIES
-        DEBUG_POSTFIX ${DEBUG_EXTENSION} )
+        DEBUG_POSTFIX ${DEBUG_EXTENSION}
+        SUFFIX ".plugin" )
     
     IF (APPLE AND BUILD_SHARED_LIBS)
-      SET_TARGET_PROPERTIES(${MXADATAMODEL_LIB_NAME}
+      SET_TARGET_PROPERTIES(${targetName}
          PROPERTIES
          LINK_FLAGS "-current_version ${${PROJECT_NAME}_VERSION} -compatibility_version ${${PROJECT_NAME}_VERSION}"
       )
-   ENDIF (APPLE AND BUILD_SHARED_LIBS)
-
+    ENDIF (APPLE AND BUILD_SHARED_LIBS)
+    
+    # Add the plugin to our list of plugins that will need to be installed
+    file(APPEND ${IPHelper_BINARY_DIR}/plugins.txt "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}${DEBUG_EXTENSION}.plugin;")
 endmacro(PluginProperties DEBUG_EXTENSION)
 
 #-------------------------------------------------------------------------------

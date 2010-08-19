@@ -39,6 +39,9 @@ SET (EXE_DEBUG_EXTENSION "_debug")
 SET (MXA_INSTALL_FILES "0")
 SET (MXA_SOURCE_DIR ${IPHelper_CODE_DIR})
 
+file(WRITE ${IPHelper_BINARY_DIR}/plugins.txt "")
+file(WRITE ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${IPHelper_BINARY_DIR}/Bin/plugins;")
+file(APPEND ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${IPHelper_BINARY_DIR}/Bin;")
 # --------------------------------------------------------------------
 # including this file will kick off all the type, header and other configuration
 # checks that need to be performed in order to include all the MXA Files
@@ -90,16 +93,22 @@ IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${PROJECT_BINARY_DIR}/${PROJECT_PREFI
 
    
 # Add our Qt based GUI project to the list of targets
+
+# Compile the support libraries
 add_subdirectory(${IPHelper_CODE_DIR}/AIM ${PROJECT_BINARY_DIR}/AIMLib)
 add_subdirectory(${IPHelper_CODE_DIR}/QtSupport ${PROJECT_BINARY_DIR}/QtSupport)
 add_subdirectory(${IPHelper_CODE_DIR}/MXA ${PROJECT_BINARY_DIR}/MXA)
 
-add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/Application ${PROJECT_BINARY_DIR}/Application)
-
+# Compile the image processing plugins
 add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/EMMPM ${PROJECT_BINARY_DIR}/plugins/EMMPM)
 add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/CrossCorrelation ${PROJECT_BINARY_DIR}/plugins/CrossCorrelation)
 add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/MutualInformation ${PROJECT_BINARY_DIR}/plugins/MutualInformation)
 
+# Compile the main Application - this MUST be last due to how some variables are built up.
+add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/Application ${PROJECT_BINARY_DIR}/Application)
+
+
+# Should we build the HTML documentation
 option(IPHelper_BUILD_API_DOCS "Use Doxygen to create the HTML based API documentation" OFF)
 if(IPHelper_BUILD_API_DOCS)
   FIND_PACKAGE(Doxygen)

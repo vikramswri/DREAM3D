@@ -1,3 +1,14 @@
+# -----------------------------------------------------------------------------------
+# This file was auto generated from the template file "CompleteBundle.cmake.in", if you 
+# need to make changes edit the template file NOT this one. Your changes will be 
+# lost the next time CMake is run. You have been warned.
+#   This file is called from CMake's installation generated scripts. It is added
+# via a CMake call 
+#   install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}")
+# which can be sometime found in the macro 'MakeOSXBundleApp' which is sometimes located
+# in the file OSX_BundleTools.cmake
+# -----------------------------------------------------------------------------------
+
 message (STATUS "#------------ Starting OS X Bundle Fixup --------------------------")
 cmake_minimum_required(VERSION 2.6)
 
@@ -44,17 +55,26 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   # then looking through each list for the currect library being fixed up.
   # Embed .dylibs right next to the main bundle executable:
   #
+  
+  if(item MATCHES "\\.plugin$")
+    set(path "@executable_path/../Plugins")
+    set(overridden 1)
+  endif(item MATCHES "\\.plugin$")
+  
+  # Embed .so right next to the main bundle executable:
+  #
+  message(STATUS "item: ${item}")
+  if(item MATCHES "libq*\\.dylib$")
+    set(path "@executable_path/../Plugins/imageformats")
+    set(overridden 1)
+  endif(item MATCHES "libq*\\.dylib$")
+  
   if(item MATCHES "\\.dylib$")
-    set(path "@executable_path/../PlugIns/imageformats")
+    set(path "@executable_path/../lib")
     set(overridden 1)
   endif(item MATCHES "\\.dylib$")
 
-  # Embed .so right next to the main bundle executable:
-  #
-  if(item MATCHES "\\.so$")
-    set(path "@executable_path/../Plugins/imageformats")
-    set(overridden 1)
-  endif(item MATCHES "\\.so$")
+
   
   # Embed frameworks in the embedded "Frameworks" directory (sibling of MacOS):
   #
@@ -73,7 +93,7 @@ endfunction(gp_item_default_embedded_path_override)
 #file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Libraries")
 file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Plugins")
 file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Frameworks")
-#file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Support")
+file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/lib")
 
 #--------------------------------------------------------------------------------
 # install a qt.conf file
@@ -87,10 +107,10 @@ if ("@QT_MAC_USE_COCOA@" STREQUAL "1")
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "@QT_LIBRARY_DIR@/QtGui.framework/Resources/qt_menu.nib" "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Resources/qt_menu.nib")
 endif()
 
-set (QTPLUGINS "@QTPLUGINS@")
+# set (QTPLUGINS "@QTPLUGINS@")
 
 # -- Run the BundleUtilities cmake code
 include(BundleUtilities)
-fixup_bundle("@CMAKE_INSTALL_PREFIX@/@target@.app" "${QTPLUGINS}" "@QT_PLUGINS_DIR@/imageformats")
+fixup_bundle("@CMAKE_INSTALL_PREFIX@/@target@.app" "@COMPLETE_PLUGIN_LIST@" "@PLUGIN_SEARCH_DIRS@")
 
 message (STATUS "#------------ End OS X Bundle Fixup --------------------------")

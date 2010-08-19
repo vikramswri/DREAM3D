@@ -928,22 +928,41 @@ void IPHelperApp::loadPlugins()
      foreach (QObject *plugin, QPluginLoader::staticInstances())
          populateMenus(plugin);
 
-     pluginsDir = QDir(qApp->applicationDirPath());
+     m_PluginDirs.clear();
+     m_PluginDirs << qApp->applicationDirPath();
+
+     QDir aPluginDir = QDir(qApp->applicationDirPath());
+     QString thePath;
 
  #if defined(Q_OS_WIN)
-     if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-         pluginsDir.cdUp();
- #elif defined(Q_OS_MAC)
-     if (pluginsDir.dirName() == "MacOS") {
-         pluginsDir.cdUp();
-         pluginsDir.cdUp();
-         pluginsDir.cdUp();
+     if (aPluginDir.dirName().toLower() == "debug" || aPluginDir.dirName().toLower() == "release")
+     {
+       aPluginDir.cdUp();
+       m_PluginDirs << aPluginDir.absolutePath();
      }
- #endif
-     pluginsDir.cd("plugins");
+ #elif defined(Q_OS_MAC)
+     if (aPluginDir.dirName() == "MacOS") {
+         aPluginDir.cdUp();
+         thePath = aPluginDir.absolutePath() + "/Plugins";
+         m_PluginDirs << thePath;
+         aPluginDir.cdUp();
+         thePath = aPluginDir.absolutePath() + "/Plugins";
+         m_PluginDirs << thePath;
+         aPluginDir.cdUp();
+     }
+     aPluginDir.cd("Plugins");
+     thePath = aPluginDir.absolutePath() + "/Plugins";
+     m_PluginDirs << thePath;
+#else
+     aPluginDir.cd("Plugins");
+#endif
 
-     foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+
+foreach (QString pluginDirString, m_PluginDirs) {
+  std::cout << "Plugin Directory being Searched: " << pluginDirString.toStdString() << std::endl;
+    aPluginDir = QDir(pluginDirString);
+     foreach (QString fileName, aPluginDir.entryList(QDir::Files)) {
+         QPluginLoader loader(aPluginDir.absoluteFilePath(fileName));
          QObject *plugin = loader.instance();
          if (plugin) {
              populateMenus(plugin);
@@ -956,6 +975,7 @@ void IPHelperApp::loadPlugins()
      if (pluginActionGroup->actions().size() > 0) {
        pluginActionGroup->actions().at(0)->activate(QAction::Trigger);
      }
+  }
  }
 
 // -----------------------------------------------------------------------------

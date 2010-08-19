@@ -53,7 +53,7 @@ set (CrossCorrelationPlugin_PROJECT_SRCS
 )
 
 # ---------- Setup output Directories -------------------------
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/plugins  )
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/Plugins  )
 add_library(CrossCorrelationPlugin MODULE ${CrossCorrelationPlugin_PROJECT_SRCS})
 target_link_libraries(CrossCorrelationPlugin 
                     ${QT_LIBRARIES} 
@@ -62,5 +62,6 @@ target_link_libraries(CrossCorrelationPlugin
                     MXADataModel 
                     AIMLib)
 PluginProperties(CrossCorrelationPlugin "_debug")
+
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
 

@@ -9,7 +9,7 @@ macro(MakeOSXBundleApp target binary_dir osx_tools_dir)
 
   CONFIGURE_FILE("${osx_tools_dir}/CompleteBundle.cmake.in"
     "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
- 
+
   install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}")
                     
 endmacro(MakeOSXBundleApp)
