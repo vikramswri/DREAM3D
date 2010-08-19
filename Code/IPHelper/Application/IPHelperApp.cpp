@@ -665,7 +665,7 @@ AIMImage::Pointer IPHelperApp::loadImage(QString filePath)
     {
       QString m("Error loading image from ");
       m.append(filePath);
-      qDebug(m.toAscii());
+      qDebug(m.toAscii(), "%s");
       return aimImage;
     }
     QVector<QRgb> colorTable(256);
@@ -989,7 +989,7 @@ foreach (QString pluginDirString, m_PluginDirs) {
   {
     m_LoadedPlugins.push_back(ipPlugin);
   //  QWidget* activeInputWidget = ipPlugin->getInputWidget(NULL);
-    qWarning(ipPlugin->getPluginName().toAscii());
+    qWarning(ipPlugin->getPluginName().toAscii(), "%s");
     addToPluginMenu(plugin, ipPlugin->getPluginName(), menuPlugins, SLOT(setInputUI()), pluginActionGroup);
     //m_ActivePlugin = ipPlugin;
   }

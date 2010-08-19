@@ -5,6 +5,15 @@
 #  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #
 #///////////////////////////////////////////////////////////////////////////////
+
+# ------------------------------------------------------------------------------
+# This project has dependencies on ITK. If you build ITK as Dynamic Libraries then
+# the app bundling cmake code (at least for OS X) will most likely NOT be able to
+# find those libraries. Building ITK as STATIC libraries will alleviate this 
+# problem and allow you to create a self contained OS X app bundle with out any
+# additional issues.
+# ------------------------------------------------------------------------------
+
 project (IPHelper)
 cmake_minimum_required(VERSION 2.6)
 

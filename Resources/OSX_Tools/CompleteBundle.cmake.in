@@ -56,25 +56,21 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   # Embed .dylibs right next to the main bundle executable:
   #
   
+  # First look for plugins that have a ".plugin" extension
   if(item MATCHES "\\.plugin$")
     set(path "@executable_path/../Plugins")
     set(overridden 1)
   endif(item MATCHES "\\.plugin$")
   
-  # Embed .so right next to the main bundle executable:
-  #
-  message(STATUS "item: ${item}")
-  if(item MATCHES "libq*\\.dylib$")
+  # Next look for the Qt Image Format Plugins in case those are needed
+  if ( item MATCHES "imageformats/libq?")
     set(path "@executable_path/../Plugins/imageformats")
     set(overridden 1)
-  endif(item MATCHES "libq*\\.dylib$")
-  
-  if(item MATCHES "\\.dylib$")
+  # Lastly ick up any plugins that simply have the ".dylib" extension
+  elseif(item MATCHES "\\.dylib$")
     set(path "@executable_path/../lib")
     set(overridden 1)
-  endif(item MATCHES "\\.dylib$")
-
-
+  endif(item MATCHES "imageformats/libq?")
   
   # Embed frameworks in the embedded "Frameworks" directory (sibling of MacOS):
   #

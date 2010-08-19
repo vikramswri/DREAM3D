@@ -13,8 +13,6 @@ include_directories(${IPHelper_CODE_DIR}/QtSupport )
 include_directories(${IPHelper_BINARY_DIR})
 include_directories(${IPHelper_BINARY_DIR}/QtSupport)
 
-
-
 set (EMMPMPlugin_HDRS
     ${PROJECT_SOURCE_DIR}/EMMPMPlugin.h
     ${PROJECT_SOURCE_DIR}/EMMPMInputUI.h
