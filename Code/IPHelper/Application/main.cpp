@@ -46,7 +46,7 @@ int main (int argc, char *argv[])
   //Needed for typical Mac program behavior.
   app.setQuitOnLastWindowClosed( true );
 #endif //APPLE
-  TO79Application *viewer = new TO79Application;
+  IPHelper *viewer = new IPHelper;
   viewer->show();
   int app_return = app.exec();
   return app_return;

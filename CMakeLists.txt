@@ -5,7 +5,7 @@
 #  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #
 #///////////////////////////////////////////////////////////////////////////////
-project (TO79)
+project (IPHelper)
 cmake_minimum_required(VERSION 2.6)
 
 # ---------- Setup output Directories -------------------------
@@ -29,15 +29,15 @@ SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
   "Single Directory for all static libraries."
   )
 
-SET (TO79_PROJECT_DIR ${TO79_SOURCE_DIR})
-SET (TO79_CODE_DIR ${TO79_SOURCE_DIR}/Code)
-SET (PROJECT_RESOURCES_DIR ${TO79_SOURCE_DIR}/Resources)
+SET (IPHelper_PROJECT_DIR ${IPHelper_SOURCE_DIR})
+SET (IPHelper_CODE_DIR ${IPHelper_SOURCE_DIR}/Code)
+SET (PROJECT_RESOURCES_DIR ${IPHelper_SOURCE_DIR}/Resources)
 SET (PROJECT_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/MXACMake)
 SET (OSX_TOOLS_DIR ${PROJECT_RESOURCES_DIR}/OSX_Tools)
-SET (PROJECT_PREFIX "TO79" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
+SET (PROJECT_PREFIX "IPHelper" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
 SET (EXE_DEBUG_EXTENSION "_debug")
 SET (MXA_INSTALL_FILES "0")
-SET (MXA_SOURCE_DIR ${TO79_CODE_DIR})
+SET (MXA_SOURCE_DIR ${IPHelper_CODE_DIR})
 
 # --------------------------------------------------------------------
 # including this file will kick off all the type, header and other configuration
@@ -90,23 +90,23 @@ IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${PROJECT_BINARY_DIR}/${PROJECT_PREFI
 
    
 # Add our Qt based GUI project to the list of targets
-add_subdirectory(${TO79_CODE_DIR}/AIM ${PROJECT_BINARY_DIR}/AIMLib)
-add_subdirectory(${TO79_CODE_DIR}/QtSupport ${PROJECT_BINARY_DIR}/QtSupport)
-add_subdirectory(${TO79_CODE_DIR}/MXA ${PROJECT_BINARY_DIR}/MXA)
+add_subdirectory(${IPHelper_CODE_DIR}/AIM ${PROJECT_BINARY_DIR}/AIMLib)
+add_subdirectory(${IPHelper_CODE_DIR}/QtSupport ${PROJECT_BINARY_DIR}/QtSupport)
+add_subdirectory(${IPHelper_CODE_DIR}/MXA ${PROJECT_BINARY_DIR}/MXA)
 
-add_subdirectory(${TO79_CODE_DIR}/TO79/Application ${PROJECT_BINARY_DIR}/Application)
+add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/Application ${PROJECT_BINARY_DIR}/Application)
 
-add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/EMMPM ${PROJECT_BINARY_DIR}/plugins/EMMPM)
-add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/CrossCorrelation ${PROJECT_BINARY_DIR}/plugins/CrossCorrelation)
-add_subdirectory(${TO79_CODE_DIR}/TO79/plugins/MutualInformation ${PROJECT_BINARY_DIR}/plugins/MutualInformation)
+add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/EMMPM ${PROJECT_BINARY_DIR}/plugins/EMMPM)
+add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/CrossCorrelation ${PROJECT_BINARY_DIR}/plugins/CrossCorrelation)
+add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/MutualInformation ${PROJECT_BINARY_DIR}/plugins/MutualInformation)
 
-option(TO79_BUILD_API_DOCS "Use Doxygen to create the HTML based API documentation" OFF)
-if(TO79_BUILD_API_DOCS)
+option(IPHelper_BUILD_API_DOCS "Use Doxygen to create the HTML based API documentation" OFF)
+if(IPHelper_BUILD_API_DOCS)
   FIND_PACKAGE(Doxygen)
   if (NOT DOXYGEN_FOUND)
     message(FATAL_ERROR "Doxygen is needed to build the documentation. Please install it correctly")
   endif()
-  configure_file(${PROJECT_RESOURCES_DIR}/TO79.doxyfile.in 
+  configure_file(${PROJECT_RESOURCES_DIR}/IPHelper.doxyfile.in 
                  ${PROJECT_BINARY_DIR}/Doxyfile  @ONLY IMMEDIATE)
   add_custom_target(docs COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile)
 

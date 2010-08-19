@@ -98,7 +98,7 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-TO79Application::TO79Application(QWidget *parent) :
+IPHelper::IPHelper(QWidget *parent) :
 QMainWindow(parent),
 pluginActionGroup(NULL),
 m_ActivePlugin(NULL),
@@ -127,7 +127,7 @@ m_OpenDialogLastDirectory("~/")
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-TO79Application::~TO79Application()
+IPHelper::~IPHelper()
 {
   // TODO Auto-generated destructor stub
 }
@@ -135,7 +135,7 @@ TO79Application::~TO79Application()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_actionExit_triggered()
+void IPHelper::on_actionExit_triggered()
 {
   this->close();
 }
@@ -143,7 +143,7 @@ void TO79Application::on_actionExit_triggered()
 // -----------------------------------------------------------------------------
 //  Called when the main window is closed.
 // -----------------------------------------------------------------------------
-void TO79Application::closeEvent(QCloseEvent *event)
+void IPHelper::closeEvent(QCloseEvent *event)
 {
   qint32 err = checkDirtyDocument();
   if (err < 0)
@@ -160,7 +160,7 @@ void TO79Application::closeEvent(QCloseEvent *event)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::resizeEvent ( QResizeEvent * event )
+void IPHelper::resizeEvent ( QResizeEvent * event )
 {
   QSize osize = originalImageFrame->size();
 //  std::cout << "originalImageFrame.size: " << osize.width() << " x " << osize.height() << std::endl;
@@ -186,7 +186,7 @@ void TO79Application::resizeEvent ( QResizeEvent * event )
 // -----------------------------------------------------------------------------
 //  Read the prefs from the local storage file
 // -----------------------------------------------------------------------------
-void TO79Application::readSettings()
+void IPHelper::readSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
@@ -202,7 +202,7 @@ void TO79Application::readSettings()
 // -----------------------------------------------------------------------------
 //  Write our prefs to file
 // -----------------------------------------------------------------------------
-void TO79Application::writeSettings()
+void IPHelper::writeSettings()
 {
 #if defined (Q_OS_MAC)
   QSettings prefs(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::organizationDomain(), QCoreApplication::applicationName());
@@ -219,7 +219,7 @@ void TO79Application::writeSettings()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::setupGui()
+void IPHelper::setupGui()
 {
 
 #ifdef Q_WS_MAC
@@ -278,7 +278,7 @@ void TO79Application::setupGui()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_modeComboBox_currentIndexChanged()
+void IPHelper::on_modeComboBox_currentIndexChanged()
 {
   if (NULL == m_ProcessedGDelegate) { return; }
   int index = modeComboBox->currentIndex();
@@ -319,7 +319,7 @@ void TO79Application::on_modeComboBox_currentIndexChanged()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::setWidgetListEnabled(bool b)
+void IPHelper::setWidgetListEnabled(bool b)
 {
   foreach (QWidget* w, m_WidgetList)
   {
@@ -331,7 +331,7 @@ void TO79Application::setWidgetListEnabled(bool b)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_compositeWithOriginal_stateChanged(int state)
+void IPHelper::on_compositeWithOriginal_stateChanged(int state)
 {
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
   if (NULL != m_OriginalGDelegate) {
@@ -348,7 +348,7 @@ void TO79Application::on_compositeWithOriginal_stateChanged(int state)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool TO79Application::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
+bool IPHelper::verifyOutputPathParentExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   QDir parent(fileinfo.dir());
@@ -358,7 +358,7 @@ bool TO79Application::verifyOutputPathParentExists(QString outFilePath, QLineEdi
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool TO79Application::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
+bool IPHelper::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
   if (false == fileinfo.exists())
@@ -375,7 +375,7 @@ bool TO79Application::verifyPathExists(QString outFilePath, QLineEdit* lineEdit)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 TO79Application::checkDirtyDocument()
+qint32 IPHelper::checkDirtyDocument()
 {
   qint32 err = -1;
   {
@@ -387,7 +387,7 @@ qint32 TO79Application::checkDirtyDocument()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::updateRecentFileList(const QString &file)
+void IPHelper::updateRecentFileList(const QString &file)
 {
   // std::cout << "TO79MainWindow::updateRecentFileList" << std::endl;
 
@@ -410,7 +410,7 @@ void TO79Application::updateRecentFileList(const QString &file)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::openRecentFile()
+void IPHelper::openRecentFile()
 {
   //std::cout << "QRecentFileList::openRecentFile()" << std::endl;
 
@@ -427,7 +427,7 @@ void TO79Application::openRecentFile()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::openFile(QString imageFile)
+void IPHelper::openFile(QString imageFile)
 {
   if ( true == imageFile.isEmpty() ) // User cancelled the operation
   {
@@ -444,7 +444,7 @@ void TO79Application::openFile(QString imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_aboutBtn_clicked()
+void IPHelper::on_aboutBtn_clicked()
 {
   ApplicationAboutBoxDialog about(this);
   QString an = QCoreApplication::applicationName();
@@ -457,7 +457,7 @@ void TO79Application::on_aboutBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_processBtn_clicked()
+void IPHelper::on_processBtn_clicked()
 {
   int err = m_ActivePlugin->startProcessing(this);
   if (err == 0)
@@ -469,7 +469,7 @@ void TO79Application::on_processBtn_clicked()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::processingStarted()
+void IPHelper::processingStarted()
 {
   std::cout << "TO79MainWindow::processingStarted()" << std::endl;
   processBtn->setText("Cancel");
@@ -481,7 +481,7 @@ void TO79Application::processingStarted()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::processingFinished()
+void IPHelper::processingFinished()
 {
   std::cout << "TO79MainWindow::processingFinished()" << std::endl;
   /* Code that cleans up anything from the processing */
@@ -499,7 +499,7 @@ void TO79Application::processingFinished()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_actionOpen_Processed_Image_triggered()
+void IPHelper::on_actionOpen_Processed_Image_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Processed Image File"),
@@ -516,7 +516,7 @@ void TO79Application::on_actionOpen_Processed_Image_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_actionOpen_triggered()
+void IPHelper::on_actionOpen_triggered()
 {
   //std::cout << "on_actionOpen_triggered" << std::endl;
   QString imageFile = QFileDialog::getOpenFileName(this, tr("Open Image File"),
@@ -534,7 +534,7 @@ void TO79Application::on_actionOpen_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::loadImageFile(const QString &imageFile)
+void IPHelper::loadImageFile(const QString &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -547,7 +547,7 @@ void TO79Application::loadImageFile(const QString &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::loadProcessedImageFile(const QString  &imageFile)
+void IPHelper::loadProcessedImageFile(const QString  &imageFile)
 {
   if ( true == imageFile.isEmpty() )
   {
@@ -561,7 +561,7 @@ void TO79Application::loadProcessedImageFile(const QString  &imageFile)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_actionSave_triggered()
+void IPHelper::on_actionSave_triggered()
 {
   saveProcessedImage();
 }
@@ -570,7 +570,7 @@ void TO79Application::on_actionSave_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_actionSave_As_triggered()
+void IPHelper::on_actionSave_As_triggered()
 {
   m_CurrentProcessedFile = QString();
   saveProcessedImage();
@@ -579,7 +579,7 @@ void TO79Application::on_actionSave_As_triggered()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::on_actionClose_triggered() {
+void IPHelper::on_actionClose_triggered() {
   // std::cout << "AIMMountMaker::on_actionClose_triggered" << std::endl;
   qint32 err = -1;
   err = checkDirtyDocument();
@@ -602,7 +602,7 @@ void TO79Application::on_actionClose_triggered() {
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::openProcessedImage(QString processedImage)
+void IPHelper::openProcessedImage(QString processedImage)
 {
   if ( true == processedImage.isEmpty() ) // User cancelled the operation
   {
@@ -619,7 +619,7 @@ void TO79Application::openProcessedImage(QString processedImage)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 TO79Application::saveProcessedImage()
+qint32 IPHelper::saveProcessedImage()
 {
   QImage image = m_ProcessedGDelegate->getCachedImage();
   int err = 0;
@@ -653,7 +653,7 @@ qint32 TO79Application::saveProcessedImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer TO79Application::loadImage(QString filePath)
+AIMImage::Pointer IPHelper::loadImage(QString filePath)
 {
 //  std::cout << " loadImage(): filePath: " << filePath.toStdString() << std::endl;
   QImage image;
@@ -687,7 +687,7 @@ AIMImage::Pointer TO79Application::loadImage(QString filePath)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-qint32 TO79Application::initImageViews()
+qint32 IPHelper::initImageViews()
 {
   qint32 err = 0;
   QImage image;
@@ -837,7 +837,7 @@ qint32 TO79Application::initImageViews()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::initWithFile(const QString imageFile, QString processedImage)
+void IPHelper::initWithFile(const QString imageFile, QString processedImage)
 {
   QFileInfo fileInfo(imageFile);
   this->m_OpenDialogLastDirectory = fileInfo.path();
@@ -878,7 +878,7 @@ void TO79Application::initWithFile(const QString imageFile, QString processedIma
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AIMImage::Pointer TO79Application::convertQImageToGrayScaleAIMImage(QImage image)
+AIMImage::Pointer IPHelper::convertQImageToGrayScaleAIMImage(QImage image)
 {
   AIMImage::Pointer aimImage = AIMImage::New();
   quint8* oImage = aimImage->allocateImageBuffer(image.width(), image.height(), true);
@@ -907,7 +907,7 @@ AIMImage::Pointer TO79Application::convertQImageToGrayScaleAIMImage(QImage image
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::disableFixedFitToWindow()
+void IPHelper::disableFixedFitToWindow()
 {
   this->fixedFitToWindowBtn->setChecked(false);
 }
@@ -915,7 +915,7 @@ void TO79Application::disableFixedFitToWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::disableProcessedFitToWindow()
+void IPHelper::disableProcessedFitToWindow()
 {
   this->processedFitToWindowBtn->setChecked(false);
 }
@@ -923,7 +923,7 @@ void TO79Application::disableProcessedFitToWindow()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::loadPlugins()
+void IPHelper::loadPlugins()
  {
      foreach (QObject *plugin, QPluginLoader::staticInstances())
          populateMenus(plugin);
@@ -961,7 +961,7 @@ void TO79Application::loadPlugins()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
- void TO79Application::populateMenus(QObject *plugin)
+ void IPHelper::populateMenus(QObject *plugin)
 {
   std::cout << "Found Plugin..." << std::endl;
   QImageProcessingInterface* ipPlugin = qobject_cast<QImageProcessingInterface * > (plugin);
@@ -979,7 +979,7 @@ void TO79Application::loadPlugins()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::addToPluginMenu(QObject *plugin, const QString &text,
+void IPHelper::addToPluginMenu(QObject *plugin, const QString &text,
                                      QMenu *menu, const char *member,
                                      QActionGroup *actionGroup)
 {
@@ -997,7 +997,7 @@ void TO79Application::addToPluginMenu(QObject *plugin, const QString &text,
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void TO79Application::setInputUI()
+void IPHelper::setInputUI()
 {
   // Get the current QWidget
   if (NULL != m_ActivePlugin) {

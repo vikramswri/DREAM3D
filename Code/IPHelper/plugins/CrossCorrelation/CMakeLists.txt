@@ -16,11 +16,11 @@ ELSE(ITK_FOUND)
 ENDIF(ITK_FOUND)
 
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/..)
-include_directories(${TO79_CODE_DIR} )
-include_directories(${TO79_CODE_DIR}/QtSupport )
+include_directories(${IPHelper_CODE_DIR} )
+include_directories(${IPHelper_CODE_DIR}/QtSupport )
 
-include_directories(${TO79_BINARY_DIR})
-include_directories(${TO79_BINARY_DIR}/QtSupport)
+include_directories(${IPHelper_BINARY_DIR})
+include_directories(${IPHelper_BINARY_DIR}/QtSupport)
 
 set (CrossCorrelationPlugin_HDRS
     ${PROJECT_SOURCE_DIR}/CrossCorrelationPlugin.h
@@ -53,7 +53,7 @@ set (CrossCorrelationPlugin_PROJECT_SRCS
 )
 
 # ---------- Setup output Directories -------------------------
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin/plugins  )
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/plugins  )
 add_library(CrossCorrelationPlugin MODULE ${CrossCorrelationPlugin_PROJECT_SRCS})
 target_link_libraries(CrossCorrelationPlugin 
                     ${QT_LIBRARIES} 
@@ -62,5 +62,5 @@ target_link_libraries(CrossCorrelationPlugin
                     MXADataModel 
                     AIMLib)
 PluginProperties(CrossCorrelationPlugin "_debug")
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin  )
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
 

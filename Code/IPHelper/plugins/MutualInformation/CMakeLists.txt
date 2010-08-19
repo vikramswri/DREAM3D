@@ -6,9 +6,9 @@
 project(MutualInformation)
 
 include_directories(${PROJECT_SOURCE_DIR}  ${PROJECT_BINARY_DIR})
-include_directories(${TO79_CODE_DIR} )
-include_directories(${TO79_BINARY_DIR})
-include_directories(${TO79_BINARY_DIR}/MXA)
+include_directories(${IPHelper_CODE_DIR} )
+include_directories(${IPHelper_BINARY_DIR})
+include_directories(${IPHelper_BINARY_DIR}/MXA)
 
 
 set (MutualInformation_HDRS
@@ -40,10 +40,10 @@ set (MutualInformation_PROJECT_SRCS
 )
 
 # ---------- Setup output Directories -------------------------
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin/plugins  )
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/plugins  )
 #add_library(MutualInformation STATIC ${MutualInformation_PROJECT_SRCS})
 add_executable(MITest ${MutualInformation_PROJECT_SRCS})
 target_link_libraries(MITest ${QT_LIBRARIES} MXADataModel AIMLib)
 #PluginProperties(MutualInformation "_debug")
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${TO79_BINARY_DIR}/Bin  )
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
 
