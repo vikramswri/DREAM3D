@@ -87,20 +87,20 @@ endfunction(gp_item_default_embedded_path_override)
 
 #-- Be sure all the internal directories are created first before calling the 'fixup_bundle'
 #file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Libraries")
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Plugins")
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Frameworks")
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/lib")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}@target@.app/Contents/Plugins")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Frameworks")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/lib")
 
 #--------------------------------------------------------------------------------
 # install a qt.conf file
 # this inserts some cmake code into the install script to write the file
-file(WRITE "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Resources/qt.conf" "")
+file(WRITE "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Resources/qt.conf" "")
 
 #-- Check for Qt4 stuff
 if ("@QT_MAC_USE_COCOA@" STREQUAL "1")
   message(STATUS "Copying qt_menu.nib into @target@.app/Contents/Resources")
-  file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Resources/qt_menu.nib")
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "@QT_LIBRARY_DIR@/QtGui.framework/Resources/qt_menu.nib" "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Resources/qt_menu.nib")
+  file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Resources/qt_menu.nib")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "@QT_LIBRARY_DIR@/QtGui.framework/Resources/qt_menu.nib" "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Resources/qt_menu.nib")
 endif()
 
 # set (QTPLUGINS "@QTPLUGINS@")
