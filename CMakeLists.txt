@@ -100,9 +100,6 @@ configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 ${PROJECT_BINARY_DIR}/ReadMe.txt )
 IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
 
-   
-# Add our Qt based GUI project to the list of targets
-
 # Compile the support libraries
 add_subdirectory(${IPHelper_CODE_DIR}/AIM ${PROJECT_BINARY_DIR}/AIMLib)
 add_subdirectory(${IPHelper_CODE_DIR}/QtSupport ${PROJECT_BINARY_DIR}/QtSupport)
@@ -116,7 +113,6 @@ add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/MutualInformation ${PROJE
 # Compile the main Application - this MUST be last due to how some variables are built up.
 add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/Application ${PROJECT_BINARY_DIR}/Application)
 
-
 # Should we build the HTML documentation
 option(IPHelper_BUILD_API_DOCS "Use Doxygen to create the HTML based API documentation" OFF)
 if(IPHelper_BUILD_API_DOCS)
@@ -127,7 +123,6 @@ if(IPHelper_BUILD_API_DOCS)
   configure_file(${PROJECT_RESOURCES_DIR}/IPHelper.doxyfile.in 
                  ${PROJECT_BINARY_DIR}/Doxyfile  @ONLY IMMEDIATE)
   add_custom_target(docs COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile)
-
 endif()
 
 include(${PROJECT_CMAKE_DIR}/InstallationSupport/InstallSupportLibraries.cmake)

@@ -6,8 +6,8 @@ projects.
 The source codes listed in the following directories relative to this file are provided
 with a BSD open source license:
 
-Source/MXA/ - All Files
-Source/AIM/ - All Files
+Code/MXA/ - All Files
+Code/AIM/ - All Files
 Resources/MXACMake - All Files
 Resources/OSX_Tools - All Files
 Resources/icons - All Files
@@ -15,12 +15,12 @@ Resources/icons - All Files
 
 Notes for Compilation:
 
-The Source/MXA directory is a subset of the full MXADataModel distribution. I only
+The Code/MXA directory is a subset of the full MXADataModel distribution. I only
 pulled in what was needed for this project. For the shared_pointers the implementation
 from Qt is being used instead of the boost implementation. This reduces the number of
 dependencies of the project.
 
-The Source/CrossCorrelation will depend on the libTiff library being present although
+The Code/IPHelper/plugins/CrossCorrelation will depend on the libTiff library being present although
 it is only needed for the bmp to tiff file conversion utility. If you do not need to 
 convert your bmp files to tiff files first then you will not need the libTiff library
 as the one from the Qt distribution will be used instead. The Cross Correlation is

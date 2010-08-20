@@ -107,6 +107,6 @@ endif()
 
 # -- Run the BundleUtilities cmake code
 include(BundleUtilities)
-fixup_bundle("@CMAKE_INSTALL_PREFIX@/@target@.app" "@COMPLETE_PLUGIN_LIST@" "@PLUGIN_SEARCH_DIRS@")
+fixup_bundle("${CMAKE_INSTALL_PREFIX}/@target@.app" "@COMPLETE_PLUGIN_LIST@" "@PLUGIN_SEARCH_DIRS@")
 
 message (STATUS "#------------ End OS X Bundle Fixup --------------------------")
