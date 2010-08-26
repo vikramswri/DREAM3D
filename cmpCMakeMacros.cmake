@@ -4,6 +4,9 @@
 #--  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #--////////////////////////////////////////////////////////////////////////////
 
+include(${CMP_OSX_TOOLS_SOURCE_DIR}/OSX_BundleTools.cmake)
+include(${CMP_OSX_TOOLS_SOURCE_DIR}/ToolUtilities.cmake)
+
 #-------------------------------------------------------------------------------
 MACRO (cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
     STRING(REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
@@ -19,14 +22,12 @@ ENDMACRO (cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
 
 #-------------------------------------------------------------------------------
 
-MACRO (IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES)
-    if ( DEFINED CMP_INSTALL_FILES)
-    if( ${CMP_INSTALL_FILES} EQUAL 1 )
-    INSTALL (FILES ${HEADERS}
-             DESTINATION include/${SOURCE_PATH}
-             COMPONENT Headers           
-    )
-    endif()
+MACRO (cmp_IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES INSTALL_FILES)
+    if (${INSTALL_FILES} EQUAL "1")
+        INSTALL (FILES ${HEADERS}
+                 DESTINATION include/${SOURCE_PATH}
+                 COMPONENT Headers           
+        )
     endif()
     STRING(REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
     source_group(${source_group_path} FILES ${HEADERS} ${SOURCES})
@@ -37,7 +38,7 @@ MACRO (IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES)
   #             PROPERTY MACOSX_PACKAGE_LOCATION Headers/${NAME}
   #)
 
-ENDMACRO (IDE_SOURCE_PROPERTIES NAME HEADERS SOURCES)
+ENDMACRO (cmp_IDE_SOURCE_PROPERTIES NAME HEADERS SOURCES INSTALL_FILES)
 
 
 # ------------------------------------------------------------------------------ 
@@ -124,36 +125,19 @@ macro(ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
         BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}/.
     )   
     
-    # --- If we are on OS X copy all the embedded libraries to the app bundle
-    if(DEFINED GUI_TYPE)
-      #  message(STATUS "Creating Install CMake file for GUI application ${EXE_NAME}")
-        if(${GUI_TYPE} STREQUAL "MACOSX_BUNDLE")
-            include (${OSX_TOOLS_DIR}/OSX_BundleTools.cmake)
-            if(CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXBundleApp( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
-                                    ${EXE_BINARY_DIR}
-                                    ${OSX_TOOLS_DIR} )
-            else (CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXBundleApp(${EXE_NAME} 
-                                 ${EXE_BINARY_DIR}
-                                 ${OSX_TOOLS_DIR} )
-            endif()
+    #   message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
+    if (APPLE)
+        if(CMAKE_BUILD_TYPE MATCHES "Debug")
+            MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
+                                ${EXE_BINARY_DIR}
+                                ${CMP_OSX_TOOLS_SOURCE_DIR} )
+        else (CMAKE_BUILD_TYPE MATCHES "Debug")
+            MakeOSXTool(${EXE_NAME} 
+                             ${EXE_BINARY_DIR}
+                             ${CMP_OSX_TOOLS_SOURCE_DIR} )
         endif()
-    else(DEFINED GUI_TYPE)
-     #   message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
-        if (APPLE)
-            include (${OSX_TOOLS_DIR}/OSX_BundleTools.cmake)
-            if(CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
-                                    ${EXE_BINARY_DIR}
-                                    ${OSX_TOOLS_DIR} )
-            else (CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXTool(${EXE_NAME} 
-                                 ${EXE_BINARY_DIR}
-                                 ${OSX_TOOLS_DIR} )
-            endif()
-        endif(APPLE)
-    endif(DEFINED GUI_TYPE)
+    endif(APPLE)
+
 endmacro(ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
 
 # --------------------------------------------------------------------
