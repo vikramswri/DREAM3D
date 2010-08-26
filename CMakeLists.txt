@@ -126,4 +126,4 @@ if(IPHelper_BUILD_API_DOCS)
 endif()
 
 include(${PROJECT_CMAKE_DIR}/InstallationSupport/InstallSupportLibraries.cmake)
-include(${PROJECT_RESOURCES_DIR}/CMake/PackageProject.cmake)
+include(${PROJECT_RESOURCES_DIR}/CPack/PackageProject.cmake)
