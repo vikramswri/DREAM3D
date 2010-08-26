@@ -20,8 +20,8 @@ ENDMACRO (IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
 #-------------------------------------------------------------------------------
 
 MACRO (IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES)
-    if ( DEFINED MXA_INSTALL_FILES)
-    if( ${MXA_INSTALL_FILES} EQUAL 1 )
+    if ( DEFINED CMP_INSTALL_FILES)
+    if( ${CMP_INSTALL_FILES} EQUAL 1 )
     INSTALL (FILES ${HEADERS}
              DESTINATION include/${SOURCE_PATH}
              COMPONENT Headers           
@@ -51,8 +51,8 @@ macro(InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
         RELEASE_OUTPUT_NAME ${EXE_NAME}
     )
     
-    if ( DEFINED MXA_INSTALL_FILES)
-        if ( ${MXA_INSTALL_FILES} EQUAL 1 )
+    if ( DEFINED CMP_INSTALL_FILES)
+        if ( ${CMP_INSTALL_FILES} EQUAL 1 )
             INSTALL(TARGETS ${EXE_NAME} 
                 RUNTIME
                 DESTINATION ./
@@ -172,16 +172,16 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
         DEBUG_POSTFIX ${DEBUG_EXTENSION} )
     
     IF (APPLE AND BUILD_SHARED_LIBS)
-      OPTION (MXA_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
-      IF(MXA_BUILD_WITH_INSTALL_NAME)
+      OPTION (CMP_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
+      IF(CMP_BUILD_WITH_INSTALL_NAME)
       
           SET_TARGET_PROPERTIES(${MXADATAMODEL_LIB_NAME}
              PROPERTIES
-             LINK_FLAGS "-current_version ${${PROJECT_NAME}_VERSION} -compatibility_version ${${PROJECT_NAME}_VERSION}"
+             LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VERSION} -compatibility_version ${${CMP_PROJECT_NAME}_VERSION}"
              INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-             BUILD_WITH_INSTALL_RPATH ${MXA_BUILD_WITH_INSTALL_NAME}
+             BUILD_WITH_INSTALL_RPATH ${CMP_BUILD_WITH_INSTALL_NAME}
           )
-     ENDIF(MXA_BUILD_WITH_INSTALL_NAME)
+     ENDIF(CMP_BUILD_WITH_INSTALL_NAME)
    ENDIF (APPLE AND BUILD_SHARED_LIBS)
 
 endmacro(LibraryProperties DEBUG_EXTENSION)
@@ -217,7 +217,7 @@ endmacro(StaticLibraryProperties)
 # --------------------------------------------------------------------
 #-- Copy all the dependent DLLs into the current build directory so that the test
 #-- can run.
-MACRO (MXA_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
+MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
   set (mxa_lib_list ${mxa_lib_list})
   SET (TYPES Debug Release)
   if (MSVC)
@@ -269,7 +269,7 @@ endmacro()
 # dependent DLL libraries (HDF5, Tiff, Expat, MXADataModel) will be
 # properly installed with your project.
 # --------------------------------------------------------------------
-MACRO (MXA_LIBRARIES_INSTALL_RULES mxa_lib_list destination)
+MACRO (CMP_LIBRARIES_INSTALL_RULES mxa_lib_list destination)
   set (mxa_lib_list ${mxa_lib_list})
   SET (TYPES Debug Release)
   if (MSVC)
@@ -315,21 +315,22 @@ ENDMACRO()
 #   EmInit_CMAKE_DIR - The path to the MXA CMake directory
 #  The following variables are set, all of which should have been already
 #  initialized to a default value
-#   ${PROJECT_NAME}_VERSION
-#   ${PROJECT_NAME}_VER_MAJOR
-#   ${PROJECT_NAME}_VER_MINOR
-#   ${PROJECT_NAME}_VER_PATCH
+#   ${CMP_PROJECT_NAME}_VERSION
+#   ${CMP_PROJECT_NAME}_VER_MAJOR
+#   ${CMP_PROJECT_NAME}_VER_MINOR
+#   ${CMP_PROJECT_NAME}_VER_PATCH
 #
 #-------------------------------------------------------------------------------
-macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
-    # message(STATUS "Generating Version Strings for ${PROJECT_NAME}")
+macro(cmpGenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE CMP_PROJECT_NAME)
+    INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
+    # message(STATUS "Generating Version Strings for ${CMP_PROJECT_NAME}")
     SET(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
     SET(CMAKE_REQUIRED_FLAGS_SAVE    ${CMAKE_REQUIRED_FLAGS})
     # Add MXADATAMODEL_INCLUDE_DIR to CMAKE_REQUIRED_INCLUDES
     SET(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${MXADATAMODEL_INCLUDE_DIRS}")
 
-    CHECK_SYMBOL_EXISTS( MXA_HAVE_TIME_GETTIMEOFDAY "MXA/MXAConfiguration.h" HAVE_TIME_GETTIMEOFDAY)
-    CHECK_SYMBOL_EXISTS( MXA_HAVE_SYS_TIME_GETTIMEOFDAY "MXA/MXAConfiguration.h" HAVE_SYS_TIME_GETTIMEOFDAY)
+    CHECK_SYMBOL_EXISTS( CMP_HAVE_TIME_GETTIMEOFDAY "MXA/MXAConfiguration.h" HAVE_TIME_GETTIMEOFDAY)
+    CHECK_SYMBOL_EXISTS( CMP_HAVE_SYS_TIME_GETTIMEOFDAY "MXA/MXAConfiguration.h" HAVE_SYS_TIME_GETTIMEOFDAY)
     # Restore CMAKE_REQUIRED_INCLUDES and CMAKE_REQUIRED_FLAGS variables
     SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
     SET(CMAKE_REQUIRED_FLAGS    ${CMAKE_REQUIRED_FLAGS_SAVE})
@@ -347,16 +348,16 @@ macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
       set( VERSION_GEN_VER_MINOR "0")
       set( VERSION_GEN_VER_PATCH "1")
       set (VERSION_GEN_COMPLETE "0.0.1" )
-      set (VERSION_GEN_NAME "${PROJECT_NAME}")
+      set (VERSION_GEN_NAME "${CMP_PROJECT_NAME}")
       set (VERSION_GEN_NAMESPACE "${NAMESPACE}")
-      set (${PROJECT_NAME}_VERSION   ${VERSION_GEN_COMPLETE}    CACHE STRING "Complete Version String")
-      set (${PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
-      set (${PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
-      set (${PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
+      set (${CMP_PROJECT_NAME}_VERSION   ${VERSION_GEN_COMPLETE}    CACHE STRING "Complete Version String")
+      set (${CMP_PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
+      set (${CMP_PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
+      set (${CMP_PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
     else()
     
       try_run(VERSION_RUN_RESULT VERSION_COMPILE_RESULT 
-              ${CMAKE_CURRENT_BINARY_DIR} ${MXADATAMODEL_RESOURCES_DIR}/CMake/GenerateVersionString.cpp
+              ${CMAKE_CURRENT_BINARY_DIR} ${CMP_CORE_TESTS_SOURCE_DIR}/cmpGenerateVersionString.cpp
               COMPILE_DEFINITIONS ${VERSION_COMPILE_FLAGS}
               COMPILE_OUTPUT_VARIABLE VERSION_COMPILE_OUTPUT
               RUN_OUTPUT_VARIABLE VERSION_RUN_OUTPUT )
@@ -380,18 +381,18 @@ macro(GenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE )
       STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_GEN_VER_PATCH "${VERSION_RUN_OUTPUT}")
 
       set (VERSION_GEN_COMPLETE ${VERSION_RUN_OUTPUT} )
-      set (VERSION_GEN_NAME "${PROJECT_NAME}")
+      set (VERSION_GEN_NAME "${CMP_PROJECT_NAME}")
       set (VERSION_GEN_NAMESPACE "${NAMESPACE}")
-      set (${PROJECT_NAME}_VERSION   ${VERSION_RUN_OUTPUT}    CACHE STRING "Complete Version String")
-      set (${PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
-      set (${PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
-      set (${PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
+      set (${CMP_PROJECT_NAME}_VERSION   ${VERSION_RUN_OUTPUT}    CACHE STRING "Complete Version String")
+      set (${CMP_PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
+      set (${CMP_PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
+      set (${CMP_PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
 
-#    MESSAGE(STATUS "${PROJECT_NAME}_VERSION: ${${PROJECT_NAME}_VERSION}")
+#    MESSAGE(STATUS "${CMP_PROJECT_NAME}_VERSION: ${${CMP_PROJECT_NAME}_VERSION}")
 #    message(STATUS "VERSION_RUN_OUTPUT: ${VERSION_RUN_OUTPUT}")
     endif()
-    configure_file(${MXADATAMODEL_RESOURCES_DIR}/CMake/Version.h.in   ${GENERATED_FILE_PATH}  )
-    MARK_AS_ADVANCED(${PROJECT_NAME}_VERSION ${PROJECT_NAME}_VER_MAJOR ${PROJECT_NAME}_VER_MINOR ${PROJECT_NAME}_VER_PATCH)
+    configure_file(${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in   ${GENERATED_FILE_PATH}  )
+    MARK_AS_ADVANCED(${CMP_PROJECT_NAME}_VERSION ${CMP_PROJECT_NAME}_VER_MAJOR ${CMP_PROJECT_NAME}_VER_MINOR ${CMP_PROJECT_NAME}_VER_PATCH)
 endmacro()
 
 
