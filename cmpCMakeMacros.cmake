@@ -5,7 +5,7 @@
 #--////////////////////////////////////////////////////////////////////////////
 
 #-------------------------------------------------------------------------------
-MACRO (IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
+MACRO (cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
     STRING(REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
     source_group(${source_group_path} FILES ${HEADERS} ${SOURCES})
 
@@ -15,7 +15,7 @@ MACRO (IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
   #             PROPERTY MACOSX_PACKAGE_LOCATION Headers/${NAME}
   #)
 
-ENDMACRO (IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
+ENDMACRO (cmp_IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
 
 #-------------------------------------------------------------------------------
 
@@ -321,7 +321,7 @@ ENDMACRO()
 #   ${CMP_PROJECT_NAME}_VER_PATCH
 #
 #-------------------------------------------------------------------------------
-macro(cmpGenerateVersionString PROJECT_NAME GENERATED_FILE_PATH NAMESPACE CMP_PROJECT_NAME)
+macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE CMP_PROJECT_NAME)
     INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
     # message(STATUS "Generating Version Strings for ${CMP_PROJECT_NAME}")
     SET(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
