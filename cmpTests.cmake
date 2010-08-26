@@ -38,9 +38,9 @@ if (NOT DEFINED CMP_PROJECT_NAME)
     set (CMP_PROJECT_NAME "CMP")
 endif()
 
-message(STATUS "CMP_HEADER_DIR: ${CMP_HEADER_DIR}")
-message(STATUS "CMP_CONFIGURATION_FILE_NAME: ${CMP_CONFIGURATION_FILE_NAME}")
-message(STATUS "CMP_TYPES_FILE_NAME: ${CMP_TYPES_FILE_NAME}")
+#message(STATUS "CMP_HEADER_DIR: ${CMP_HEADER_DIR}")
+#message(STATUS "CMP_CONFIGURATION_FILE_NAME: ${CMP_CONFIGURATION_FILE_NAME}")
+#message(STATUS "CMP_TYPES_FILE_NAME: ${CMP_TYPES_FILE_NAME}")
 
 # --------------------------------------------------------------------
 # Generate our header files
