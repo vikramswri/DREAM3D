@@ -1,9 +1,9 @@
 #!/bin/bash
 
-texFile=EmMpmGUI_PublicAffairs_Release.tex
-cd "/Users/mjackson/Contracts/AFRL-TO79/TO79-FCL Initial Package/EmMpmGUI"
-files=`find ./Code/TO79 -type f -name "*.h" -or -name "*.cpp" -or -name "*.c"`
-files="$files License.txt.in ReadMe.txt.in"
+texFile=IPHelper_PublicAffairs_Release.tex
+cd "/Users/mjackson/Contracts/AFRL-TO79/TO79-FCL Initial Package/IPHelper"
+files=`find ./Code/IPHelper -type f -name "*.h" -or -name "*.cpp" -or -name "*.c"`
+files="License.txt.in $files"
 
 echo "\documentclass[10pt,oneside]{book}" > $texFile
 echo "\usepackage{geometry}" >> $texFile

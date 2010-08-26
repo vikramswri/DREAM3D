@@ -4,8 +4,8 @@ under the BSD License.
 Copyright (c) <2010>, <Mary L. Comer>
 All rights reserved.
 
-[1] Comer, Mary L., and Delp, Edward J.,  ÒThe EM/MPM Algorithm for Segmentation
-of Textured Images: Analysis and Further Experimental Results,Ó IEEE Transactions
+[1] Comer, Mary L., and Delp, Edward J.,  Ã’The EM/MPM Algorithm for Segmentation
+of Textured Images: Analysis and Further Experimental Results,Ã“ IEEE Transactions
 on Image Processing, Vol. 9, No. 10, October 2000, pp. 1731-1744.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -68,7 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
 * @class EMMPMTask EMMPMTask.h EmMpm/GUI/EMMPMTask.h
-* @brief THis is the wrapper code for the code. This is called as a "worker" class from a separate thread
+* @brief This is the wrapper code for the code. This is called as a "worker" class from a separate thread
 * of execution in order to not lock up the GUI.
 * @author Michael A. Jackson for BlueQuartz Software
 * @date Dec 20, 2009
@@ -82,9 +82,7 @@ class EMMPMTask : public ProcessQueueTask
   public:
     EMMPMTask(QObject* parent = 0);
     virtual ~EMMPMTask();
-
-
-
+    
     void setBeta(float beta);
     void setGamma(float gamma);
     void setEmIterations(int emIterations);

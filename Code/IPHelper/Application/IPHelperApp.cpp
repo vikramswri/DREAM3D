@@ -947,10 +947,10 @@ void IPHelperApp::loadPlugins()
          m_PluginDirs << thePath;
          aPluginDir.cdUp();
          thePath = aPluginDir.absolutePath() + "/Plugins";
-         m_PluginDirs << thePath;
+        // m_PluginDirs << thePath;
          aPluginDir.cdUp();
      }
-     aPluginDir.cd("Plugins");
+    // aPluginDir.cd("Plugins");
      thePath = aPluginDir.absolutePath() + "/Plugins";
      m_PluginDirs << thePath;
 #else

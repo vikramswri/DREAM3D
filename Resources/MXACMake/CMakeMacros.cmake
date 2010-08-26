@@ -254,7 +254,7 @@ macro(PluginProperties targetName DEBUG_EXTENSION)
     
     # Add the plugin to our list of plugins that will need to be installed
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    file(APPEND ${IPHelper_BINARY_DIR}/plugins.txt "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}${DEBUG_EXTENSION}.plugin;")
+        file(APPEND ${IPHelper_BINARY_DIR}/plugins.txt "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}${DEBUG_EXTENSION}.plugin;")
     else()
         file(APPEND ${IPHelper_BINARY_DIR}/plugins.txt "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}.plugin;")
     endif()
