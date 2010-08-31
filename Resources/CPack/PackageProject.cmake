@@ -26,7 +26,7 @@ set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION  "The Gui Versions of the IPHelper 
 set(CPACK_COMPONENT_APPLICATIONS_REQUIRED 1)
 
 set(CPACK_PACKAGE_EXECUTABLES
-    QEmMpm QEmMpm
+    IPHelper IPHelper
 )
 
 # Create an NSID based installer for Windows Systems

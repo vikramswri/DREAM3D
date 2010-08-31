@@ -68,12 +68,11 @@ macro(InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
     
     
     INSTALL(TARGETS ${EXE_NAME} 
-        BUNDLE DESTINATION .
         COMPONENT Applications
         RUNTIME DESTINATION ./
-        COMPONENT Applications
         LIBRARY DESTINATION ./ 
         ARCHIVE DESTINATION ./        
+        BUNDLE DESTINATION ./
     )   
     
     # --- If we are on OS X copy all the embedded libraries to the app bundle
