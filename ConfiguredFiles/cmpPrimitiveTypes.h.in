@@ -6,11 +6,15 @@
  * --------------------------------------------------------------------------*/
 
 
-#ifndef _CMP_VERSION_HEADER_H_
-#define _CMP_VERSION_HEADER_H_
+#ifndef _@CMP_TYPES_HEADER_GUARD@_H_
+#define _@CMP_TYPES_HEADER_GUARD@_H_
 
 #include "@CMP_CONFIGURATION_FILE_NAME@"
+
+#cmakedefine CMP_EXTRA_CONFIGURATION_FILE @CMP_EXTRA_CONFIGURATION_FILE@
+#ifdef CMP_EXTRA_CONFIGURATION_FILE
 #include "@CMP_EXTRA_CONFIGURATION_FILE@"
+#endif
 
 #if CMP_HAVE_STDINT_H
 #include <stdint.h>
@@ -213,4 +217,4 @@ typedef double float64;
 
 #endif
 
-#endif
+#endif /* _@CMP_TYPES_HEADER_GUARD@_H_ */

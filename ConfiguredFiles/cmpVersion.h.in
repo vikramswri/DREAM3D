@@ -5,8 +5,8 @@
  * --------------------------------------------------------------------------*/
 
 
-#ifndef _@VERSION_GEN_NAME@_VERSION_H_
-#define _@VERSION_GEN_NAME@_VERSION_H_
+#ifndef _@CMP_VERSION_HEADER_GUARD@_VERSION_H_
+#define _@CMP_VERSION_HEADER_GUARD@_VERSION_H_
 
 /* Definition of version number for @VERSION_GEN_NAME@ */
 #define @VERSION_GEN_NAME@_PACKAGE_NAME     "@PROJECT_PREFIX@"
@@ -33,4 +33,4 @@ namespace @VERSION_GEN_NAMESPACE@
 
 #endif
 
-#endif /* _@PROJECT_PREFIX@_VERSION_H_ */
+#endif /* _@CMP_VERSION_HEADER_GUARD@_VERSION_H_ */

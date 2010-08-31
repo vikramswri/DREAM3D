@@ -4,10 +4,10 @@
  * during the cmake configuration of your project. If you need to make changes
  * edit the original file NOT THIS FILE.
  * --------------------------------------------------------------------------*/
-#ifndef _cmpCONFIGURATION_H_
-#define _cmpCONFIGURATION_H_
+#ifndef _@CMP_CONFIGURATION_HEADER_GUARD@_H_
+#define _@CMP_CONFIGURATION_HEADER_GUARD@_H_
 
-#if !defined(_CMP_VERSION_HEADER_H_)
+#if !defined(_@CMP_TYPES_HEADER_GUARD@_H_)
 <<<<<<<<<<<<< Please include @CMP_TYPES_FILE_NAME@ instead of this file in your code
 #endif
 
@@ -229,4 +229,4 @@
 # define CMP_WORDS_BIGENDIAN
 #endif
   
-#endif /* _cmpCONFIGURATION_H_ */
+#endif /* _@CMP_CONFIGURATION_HEADER_GUARD@_H_ */

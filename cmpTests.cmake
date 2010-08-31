@@ -43,6 +43,10 @@ endif()
 #message(STATUS "CMP_CONFIGURATION_FILE_NAME: ${CMP_CONFIGURATION_FILE_NAME}")
 #message(STATUS "CMP_TYPES_FILE_NAME: ${CMP_TYPES_FILE_NAME}")
 
+get_filename_component(CMP_CONFIGURATION_HEADER_GUARD ${CMP_CONFIGURATION_FILE_NAME} NAME_WE CACHE)
+get_filename_component(CMP_TYPES_HEADER_GUARD ${CMP_TYPES_FILE_NAME} NAME_WE CACHE)
+get_filename_component(CMP_VERSION_HEADER_GUARD ${CMP_VERSION_HEADER_FILE_NAME} NAME_WE CACHE)
+
 # --------------------------------------------------------------------
 # Generate our header files
 # --------------------------------------------------------------------
