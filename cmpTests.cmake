@@ -39,6 +39,15 @@ if (NOT DEFINED CMP_PROJECT_NAME)
     set (CMP_PROJECT_NAME "CMP")
 endif()
 
+if (NOT DEFINED CMP_PLUGIN_LIST_FILE)
+    set (CMP_PLUGIN_LIST_FILE ${PROJECT_BINARY_DIR}/plugins.txt)
+endif()
+
+if (NOT DEFINED CMP_PLUGIN_SEARCHDIR_FILE)
+    set (CMP_PLUGIN_SEARCHDIR_FILE ${PROJECT_BINARY_DIR}/libsearchdirs.txt)
+endif()
+
+
 #message(STATUS "CMP_HEADER_DIR: ${CMP_HEADER_DIR}")
 #message(STATUS "CMP_CONFIGURATION_FILE_NAME: ${CMP_CONFIGURATION_FILE_NAME}")
 #message(STATUS "CMP_TYPES_FILE_NAME: ${CMP_TYPES_FILE_NAME}")
@@ -65,6 +74,20 @@ cmpGenerateVersionString( "${CMP_HEADER_DIR}/${CMP_VERSION_HEADER_FILE_NAME}"
 cmp_IDE_GENERATED_PROPERTIES( "Generated" 
 "${CMP_HEADER_DIR}/${CMP_CONFIGURATION_FILE_NAME}" 
 "${CMP_HEADER_DIR}/${CMP_TYPES_FILE_NAME}" 
-"${CMP_HEADER_DIR}/${CMP_VERSION_HEADER_FILE_NAME}")  
+"${CMP_HEADER_DIR}/${CMP_VERSION_HEADER_FILE_NAME}")
+
+# --------------------------------------------------------------------
+# Enable the use of plugins that will get generated as part of the project
+# We are going to write the paths to the plugins into a file and then that
+# file will be used as input to set an actual cmake variable and then 
+# passed to the bundle utilities cmake macro.
+if (CMP_ENABLE_PLUGINS)
+
+file(WRITE ${CMP_PLUGIN_LIST_FILE} "")
+file(WRITE ${CMP_PLUGIN_SEARCHDIR_FILE} "${PROJECT_BINARY_DIR}/Bin/plugins;")
+file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${PROJECT_BINARY_DIR}/Bin;")
+
+endif()
+
 
    
