@@ -44,7 +44,7 @@ ENDMACRO (cmp_IDE_SOURCE_PROPERTIES NAME HEADERS SOURCES INSTALL_FILES)
 # ------------------------------------------------------------------------------ 
 # This CMake code installs the needed support libraries
 # ------------------------------------------------------------------------------ 
-macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
+macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNeedsPlugins)
 
     SET_TARGET_PROPERTIES( ${EXE_NAME} 
         PROPERTIES
@@ -65,6 +65,12 @@ macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
         endif()
     endif()
     
+    # --------------------------------------------------------------------
+    # Get the plugin list from the plugin file
+    if ( ${appNeedsPlugins})
+      file(READ ${IPHelper_BINARY_DIR}/plugins.txt CMP_COMPLETE_PLUGIN_LIST)
+      file(READ ${IPHelper_BINARY_DIR}/libsearchdirs.txt CMP_PLUGIN_SEARCH_DIRS)
+    endif()
     # --- If we are on OS X copy all the embedded libraries to the app bundle
    if (APPLE)
     if(DEFINED GUI_TYPE)
@@ -281,7 +287,8 @@ macro (FindQt4Plugins pluginlist)
         set (QTPLUGINS ${QTPLUGINS_RELEASE})
       endif()
   endif()
-
+  file(APPEND ${IPHelper_BINARY_DIR}/plugins.txt "${QTPLUGINS}")
+  file(APPEND ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${QT_PLUGINS_DIR}/imageformats;")
 endmacro(FindQt4Plugins pluginlist)
 
 
