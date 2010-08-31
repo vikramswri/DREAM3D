@@ -86,10 +86,10 @@ endfunction(gp_item_default_embedded_path_override)
 
 
 #-- Be sure all the internal directories are created first before calling the 'fixup_bundle'
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Libraries")
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Plugins")
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Frameworks")
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/@target@.app/Contents/Support")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Libraries")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Plugins")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Frameworks")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Support")
 
 #--------------------------------------------------------------------------------
 # Check for Qt4 stuff

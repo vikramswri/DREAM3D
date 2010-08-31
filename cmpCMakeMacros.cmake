@@ -54,13 +54,11 @@ macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNee
     if ( DEFINED CMP_INSTALL_FILES)
         if ( ${CMP_INSTALL_FILES} EQUAL 1 )
             INSTALL(TARGETS ${EXE_NAME} 
-                RUNTIME
-                DESTINATION ./
                 COMPONENT Applications
-                LIBRARY DESTINATION ./ 
-                ARCHIVE DESTINATION ./
                 RUNTIME DESTINATION ./
-                BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}/.
+                LIBRARY DESTINATION ./ 
+                ARCHIVE DESTINATION ./        
+                BUNDLE DESTINATION ./
             )   
         endif()
     endif()
@@ -90,16 +88,16 @@ macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNee
     else(DEFINED GUI_TYPE)
       #  message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
 
-            include (${OSX_TOOLS_DIR}/OSX_BundleTools.cmake)
-            if(CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
-                                    ${EXE_BINARY_DIR}
-                                    ${CMP_OSX_TOOLS_SOURCE_DIR} )
-            else (CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXTool(${EXE_NAME} 
-                                 ${EXE_BINARY_DIR}
-                                 ${CMP_OSX_TOOLS_SOURCE_DIR} )
-            endif()
+        include (${OSX_TOOLS_DIR}/OSX_BundleTools.cmake)
+        if(CMAKE_BUILD_TYPE MATCHES "Debug")
+            MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
+                                ${EXE_BINARY_DIR}
+                                ${CMP_OSX_TOOLS_SOURCE_DIR} )
+        else (CMAKE_BUILD_TYPE MATCHES "Debug")
+            MakeOSXTool(${EXE_NAME} 
+                             ${EXE_BINARY_DIR}
+                             ${CMP_OSX_TOOLS_SOURCE_DIR} )
+        endif()
  
     endif(DEFINED GUI_TYPE)
    endif(APPLE)
@@ -401,7 +399,7 @@ ENDMACRO()
 #   ${CMP_PROJECT_NAME}_VER_PATCH
 #
 #-------------------------------------------------------------------------------
-macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE CMP_PROJECT_NAME)
+macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE cmpProjectName)
     INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
     # message(STATUS "Generating Version Strings for ${CMP_PROJECT_NAME}")
     SET(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
@@ -415,60 +413,62 @@ macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE CMP_PROJECT_NAME)
     SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
     SET(CMAKE_REQUIRED_FLAGS    ${CMAKE_REQUIRED_FLAGS_SAVE})
     
-    if ( HAVE_TIME_GETTIMEOFDAY )
-      message(STATUS "Here")
+    if ( CMP_HAVE_TIME_GETTIMEOFDAY )
       set ( VERSION_COMPILE_FLAGS "-DHAVE_TIME_GETTIMEOFDAY")
     endif()
     
-    if ( HAVE_SYS_TIME_GETTIMEOFDAY )
-        message(STATUS "There")
+    if ( CMP_HAVE_SYS_TIME_GETTIMEOFDAY )
         set ( VERSION_COMPILE_FLAGS "-DHAVE_SYS_TIME_GETTIMEOFDAY")
     endif()
     
-    if (NOT HAVE_TIME_GETTIMEOFDAY AND NOT HAVE_SYS_TIME_GETTIMEOFDAY)
-      set( VERSION_GEN_VER_MAJOR "0")
-      set( VERSION_GEN_VER_MINOR "0")
-      set( VERSION_GEN_VER_PATCH "1")
+    if (NOT CMP_HAVE_TIME_GETTIMEOFDAY AND NOT CMP_HAVE_SYS_TIME_GETTIMEOFDAY)
+      set (VERSION_GEN_VER_MAJOR "0")
+      set (VERSION_GEN_VER_MINOR "0")
+      set (VERSION_GEN_VER_PATCH "1")
       set (VERSION_GEN_COMPLETE "0.0.1" )
       set (VERSION_GEN_NAME "${CMP_PROJECT_NAME}")
       set (VERSION_GEN_NAMESPACE "${NAMESPACE}")
-      set (${CMP_PROJECT_NAME}_VERSION   ${VERSION_GEN_COMPLETE}  CACHE STRING "Complete Version String")
-      set (${CMP_PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
-      set (${CMP_PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
-      set (${CMP_PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
+      set (${cmpProjectName}_VERSION   ${VERSION_GEN_COMPLETE}  CACHE STRING "Complete Version String")
+      set (${cmpProjectName}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
+      set (${cmpProjectName}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
+      set (${cmpProjectName}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
     else()
-    
-      try_run(VERSION_RUN_RESULT VERSION_COMPILE_RESULT 
-              ${CMAKE_CURRENT_BINARY_DIR} ${CMP_CORE_TESTS_SOURCE_DIR}/cmpGenerateVersionString.cpp
-              COMPILE_DEFINITIONS ${VERSION_COMPILE_FLAGS}
-              COMPILE_OUTPUT_VARIABLE VERSION_COMPILE_OUTPUT
-              RUN_OUTPUT_VARIABLE VERSION_RUN_OUTPUT )
-                 
-      if (NOT VERSION_RUN_OUTPUT) 
-          message(STATUS "VERSION_COMPILE_OUTPUT: ${VERSION_COMPILE_OUTPUT}")
-          message(STATUS "VERSION_RUN_OUTPUT: ${VERSION_RUN_OUTPUT}")
-          FILE(APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-              "Attempting to Generate a Version Number from a GetTimeofDay() function failed with the following output\n"
-              "----------- COMPILE OUTPUT ---------------------------------------------------\n"
-              "${VERSION_COMPILE_OUTPUT}\n"
-              "----------- RUN OUTPUT ---------------------------------------------------\n"
-              "${VERSION_RUN_OUTPUT}\n"
-              "--------------------------------------------------------------\n" )
-           message(FATAL_ERROR "The program to generate a version was not able to be run. Are we cross compiling? Do we have the GetTimeOfDay() function?")
-            
+      if (NOT VERSION_RUN_RESULT)
+          message(STATUS "Running version generation executable")
+          try_run(VERSION_RUN_RESULT VERSION_COMPILE_RESULT 
+                  ${CMAKE_CURRENT_BINARY_DIR} ${CMP_CORE_TESTS_SOURCE_DIR}/cmpGenerateVersionString.cpp
+                  COMPILE_DEFINITIONS ${VERSION_COMPILE_FLAGS}
+                  COMPILE_OUTPUT_VARIABLE VERSION_COMPILE_OUTPUT
+                  RUN_OUTPUT_VARIABLE VERSION_RUN_OUTPUT )
+          set(VERSION_RUN_RESULT "1" CACHE INTERNAL "")
+      
+                     
+          if (NOT VERSION_RUN_OUTPUT) 
+              message(STATUS "VERSION_COMPILE_OUTPUT: ${VERSION_COMPILE_OUTPUT}")
+              message(STATUS "VERSION_RUN_OUTPUT: ${VERSION_RUN_OUTPUT}")
+              FILE(APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
+                  "Attempting to Generate a Version Number from a GetTimeofDay() function failed with the following output\n"
+                  "----------- COMPILE OUTPUT ---------------------------------------------------\n"
+                  "${VERSION_COMPILE_OUTPUT}\n"
+                  "----------- RUN OUTPUT ---------------------------------------------------\n"
+                  "${VERSION_RUN_OUTPUT}\n"
+                  "--------------------------------------------------------------\n" )
+               message(FATAL_ERROR "The program to generate a version was not able to be run. Are we cross compiling? Do we have the GetTimeOfDay() function?")
+                
+          endif()
       endif()
       # and now the version string given by qmake
       STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MAJOR "${VERSION_RUN_OUTPUT}")
       STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MINOR "${VERSION_RUN_OUTPUT}")
       STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_GEN_VER_PATCH "${VERSION_RUN_OUTPUT}")
-
+    
       set (VERSION_GEN_COMPLETE ${VERSION_RUN_OUTPUT} )
-      set (VERSION_GEN_NAME "${CMP_PROJECT_NAME}")
+      set (VERSION_GEN_NAME "${cmpProjectName}")
       set (VERSION_GEN_NAMESPACE "${NAMESPACE}")
-      set (${CMP_PROJECT_NAME}_VERSION   ${VERSION_RUN_OUTPUT}    CACHE STRING "Complete Version String")
-      set (${CMP_PROJECT_NAME}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
-      set (${CMP_PROJECT_NAME}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
-      set (${CMP_PROJECT_NAME}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
+      set (${cmpProjectName}_VERSION   ${VERSION_RUN_OUTPUT}    CACHE STRING "Complete Version String")
+      set (${cmpProjectName}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
+      set (${cmpProjectName}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
+      set (${cmpProjectName}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
 
 #    MESSAGE(STATUS "${CMP_PROJECT_NAME}_VERSION: ${${CMP_PROJECT_NAME}_VERSION}")
 #    message(STATUS "VERSION_RUN_OUTPUT: ${VERSION_RUN_OUTPUT}")
