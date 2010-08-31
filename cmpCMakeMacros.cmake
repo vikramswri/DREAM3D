@@ -88,7 +88,7 @@ macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNee
     else(DEFINED GUI_TYPE)
       #  message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
 
-        include (${OSX_TOOLS_DIR}/OSX_BundleTools.cmake)
+        include (${CMP_OSX_TOOLS_SOURCE_DIR}/OSX_BundleTools.cmake)
         if(CMAKE_BUILD_TYPE MATCHES "Debug")
             MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
                                 ${EXE_BINARY_DIR}
