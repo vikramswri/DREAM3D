@@ -106,7 +106,7 @@ endmacro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
 # --------------------------------------------------------------------
 #
 # --------------------------------------------------------------------
-macro(ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
+macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
 
     SET_TARGET_PROPERTIES( ${EXE_NAME} 
         PROPERTIES
@@ -143,7 +143,7 @@ macro(ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
         endif()
     endif(APPLE)
 
-endmacro(ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
+endmacro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
 
 # --------------------------------------------------------------------
 
@@ -401,17 +401,17 @@ ENDMACRO()
 #-------------------------------------------------------------------------------
 macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE cmpProjectName)
     INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
-    # message(STATUS "Generating Version Strings for ${CMP_PROJECT_NAME}")
-    SET(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
-    SET(CMAKE_REQUIRED_FLAGS_SAVE    ${CMAKE_REQUIRED_FLAGS})
+   #  message(STATUS "Generating Version Strings for ${cmpProjectName}")
+ #   SET(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
+ #   SET(CMAKE_REQUIRED_FLAGS_SAVE    ${CMAKE_REQUIRED_FLAGS})
     # Add MXADATAMODEL_INCLUDE_DIR to CMAKE_REQUIRED_INCLUDES
-    SET(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${CMP_HEADER_DIR}")
+ #   SET(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${CMP_HEADER_DIR}")
 
    # CHECK_SYMBOL_EXISTS( CMP_HAVE_TIME_GETTIMEOFDAY "${CMP_CONFIGURATION_FILE}" HAVE_TIME_GETTIMEOFDAY)
    # CHECK_SYMBOL_EXISTS( CMP_HAVE_SYS_TIME_GETTIMEOFDAY "${CMP_CONFIGURATION_FILE}" HAVE_SYS_TIME_GETTIMEOFDAY)
     # Restore CMAKE_REQUIRED_INCLUDES and CMAKE_REQUIRED_FLAGS variables
-    SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
-    SET(CMAKE_REQUIRED_FLAGS    ${CMAKE_REQUIRED_FLAGS_SAVE})
+ #   SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
+  #  SET(CMAKE_REQUIRED_FLAGS    ${CMAKE_REQUIRED_FLAGS_SAVE})
     
     if ( CMP_HAVE_TIME_GETTIMEOFDAY )
       set ( VERSION_COMPILE_FLAGS "-DHAVE_TIME_GETTIMEOFDAY")
@@ -468,8 +468,10 @@ macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE cmpProjectName)
       set (${cmpProjectName}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
       set (${cmpProjectName}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
       set (${cmpProjectName}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
+      mark_as_advanced(${cmpProjectName}_VERSION ${cmpProjectName}_VER_MAJOR ${cmpProjectName}_VER_MINOR ${cmpProjectName}_VER_PATCH)
 
     endif()
+    set (PROJECT_PREFIX "${cmpProjectName}")
     configure_file(${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in   ${GENERATED_FILE_PATH}  )
     MARK_AS_ADVANCED(${CMP_PROJECT_NAME}_VERSION ${CMP_PROJECT_NAME}_VER_MAJOR ${CMP_PROJECT_NAME}_VER_MINOR ${CMP_PROJECT_NAME}_VER_PATCH)
 endmacro()
