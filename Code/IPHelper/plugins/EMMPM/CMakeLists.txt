@@ -38,8 +38,13 @@ set (EMMPMPlugin_PROJECT_SRCS
     ${EMMPMPlugin_Generated_UI_HDRS}
 )
 
+IDE_SOURCE_PROPERTIES("Code/" "${EMMPMPlugin_HDRS}" "${EMMPMPlugin_SRCS}")
+IDE_SOURCE_PROPERTIES("Generated" "${EMMPMPlugin_Generated_UI_HDRS}" "${EMMPMPlugin_Generated_MOC_SRCS}")
+
 # ---------- Setup output Directories -------------------------
+if(NOT MSVC)
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/Plugins  )
+endif()
 add_library(EMMPMPlugin MODULE ${EMMPMPlugin_PROJECT_SRCS})
 target_link_libraries(EMMPMPlugin 
                     MXADataModel 
@@ -48,5 +53,6 @@ target_link_libraries(EMMPMPlugin
                     QtSupport 
                     AIMLib )
 PluginProperties(EMMPMPlugin "_debug")
+if (NOT MSVC)
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
-
+endif()

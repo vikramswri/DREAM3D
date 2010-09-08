@@ -6,11 +6,10 @@
 project(AIMLib)
 
 set (Project_SRCS "")
-set (Project_HDRS "")
 
 Macro(MXACompileDir DirName)
     include(${AIMLib_SOURCE_DIR}/${DirName}/SourceList.cmake)
-    set (Project_SRCS ${Project_SRCS} ${AIM_${DirName}_SRCS})
+    set (Project_SRCS ${Project_SRCS} ${AIM_${DirName}_SRCS} ${AIM_${DirName}_HDRS})
 endmacro()
 
 MXACompileDir(Common)
@@ -34,7 +33,7 @@ ENDIF(ITK_FOUND)
 
 
 
-add_library(AIMLib SHARED ${Project_SRCS})
+add_library(AIMLib STATIC ${Project_SRCS})
 target_link_libraries(AIMLib ${ITK_LIBRARIES} ${QT_QTCORE_LIBRARY})
 
 LibraryProperties( AIMLib ${EXE_DEBUG_EXTENSION})

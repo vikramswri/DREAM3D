@@ -10,7 +10,7 @@ set (Project_HDRS "")
 
 Macro(MXACompileDir DirName)
     include(${MXADataModel_SOURCE_DIR}/${DirName}/SourceList.cmake)
-    set (Project_SRCS ${Project_SRCS} ${MXA_${DirName}_SRCS})
+    set (Project_SRCS ${Project_SRCS} ${MXA_${DirName}_SRCS} ${MXA_${DirName}_HDRS})
 endMacro()
 
 MXACompileDir(Common)
@@ -34,7 +34,7 @@ IF ( NOT DEFINED  MXADATAMODEL_LIB_NAME)
   SET (MXADATAMODEL_LIB_NAME MXADataModel)
 ENDIF ( NOT DEFINED MXADATAMODEL_LIB_NAME )
 
-add_library(${MXADATAMODEL_LIB_NAME} SHARED ${Project_SRCS})
+add_library(${MXADATAMODEL_LIB_NAME} STATIC ${Project_SRCS})
 target_link_libraries(${MXADATAMODEL_LIB_NAME} ${QT_LIBRARIES})
 
 LibraryProperties( ${MXADATAMODEL_LIB_NAME} ${EXE_DEBUG_EXTENSION})

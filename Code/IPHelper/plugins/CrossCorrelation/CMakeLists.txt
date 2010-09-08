@@ -45,10 +45,25 @@ QT4_WRAP_UI( CrossCorrelationPlugin_Generated_UI_HDRS
 
 QT4_WRAP_CPP( CrossCorrelationPlugin_Generated_MOC_SRCS ${CrossCorrelationPlugin_HDRS} )
 
-set (CrossCorrelationPlugin_PROJECT_SRCS
+IDE_SOURCE_PROPERTIES("Code/" "${CrossCorrelationPlugin_HDRS}" "${CrossCorrelationPlugin_SRCS}")
+IDE_SOURCE_PROPERTIES("Generated" "${CrossCorrelationPlugin_Generated_UI_HDRS}" "${CrossCorrelationPlugin_Generated_MOC_SRCS}")
+
+set (CrossCorrelationPlugin_EXTRA_HDRS
+    ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelation.h
+    ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelationData.h
+    ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelationTable.h
+	)
+set (CrossCorrelationPlugin_EXTRA_SRCS
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelation.cpp
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelationData.cpp
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelationTable.cpp
+	)
+
+IDE_SOURCE_PROPERTIES("Code/" "${CrossCorrelationPlugin_EXTRA_HDRS}" "${CrossCorrelationPlugin_EXTRA_SRCS}")
+
+set (CrossCorrelationPlugin_PROJECT_SRCS
+    ${CrossCorrelationPlugin_EXTRA_SRCS}
+	${CrossCorrelationPlugin_EXTRA_HDRS}
     ${CrossCorrelationPlugin_SRCS}
     ${CrossCorrelationPlugin_HDRS}
     ${CrossCorrelationPlugin_Generated_MOC_SRCS} 

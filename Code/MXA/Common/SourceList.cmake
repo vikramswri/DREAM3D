@@ -26,7 +26,7 @@ SET (MXA_Common_SRCS
 
 )
 
-SET (MXA_Common_HEADERS 
+SET (MXA_Common_HDRS 
     ${MXA_SOURCE_DIR}/MXA/Common/LogTime.h
     ${MXA_SOURCE_DIR}/MXA/Common/DLLExport.h
     ${MXA_SOURCE_DIR}/MXA/Common/MXAEndian.h
@@ -39,19 +39,17 @@ SET (MXA_Common_HEADERS
     ${MXA_SOURCE_DIR}/MXA/Common/Win32Defines.h
 )
 
-
-IDE_SOURCE_PROPERTIES( "MXA/Common" "${MXA_Common_HEADERS}" "${MXA_Common_SRCS}")
-
 SET (MXA_Common_SRCS
     ${MXA_WIN_COMMON_SRCS}
     ${MXA_UNIX_COMMON_SRCS}
 )
 
-SET (MXA_Common_HEADERS 
-    ${MXA_Common_HEADERS}
+SET (MXA_Common_HDRS 
+    ${MXA_Common_HDRS}
     ${MXA_WIN_COMMON_HEADERS}
     ${MXA_UNIX_COMMON_HEADERS}
 )
+IDE_SOURCE_PROPERTIES( "MXA/Common" "${MXA_Common_HDRS}" "${MXA_Common_SRCS}")
 
 if ( ${MXA_INSTALL_FILES} EQUAL 1 )
 
