@@ -935,11 +935,7 @@ void IPHelperApp::loadPlugins()
      QString thePath;
 
  #if defined(Q_OS_WIN)
-     if (aPluginDir.dirName().toLower() == "debug" || aPluginDir.dirName().toLower() == "release")
-     {
-       aPluginDir.cdUp();
-       m_PluginDirs << aPluginDir.absolutePath();
-     }
+
  #elif defined(Q_OS_MAC)
      if (aPluginDir.dirName() == "MacOS") {
          aPluginDir.cdUp();
