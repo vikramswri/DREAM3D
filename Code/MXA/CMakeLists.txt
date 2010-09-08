@@ -17,7 +17,7 @@ MXACompileDir(Common)
 MXACompileDir(BMPIO)
 MXACompileDir(Utilities)
 
-INCLUDE (${PROJECT_CMAKE_DIR}/MXACMakeCommon.cmake )
+#INCLUDE (${PROJECT_CMAKE_DIR}/MXACMakeCommon.cmake )
 
 
 set (Project_SRCS 

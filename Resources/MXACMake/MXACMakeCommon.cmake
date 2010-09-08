@@ -5,7 +5,7 @@
 #  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #
 #///////////////////////////////////////////////////////////////////////////////
-
+message(STATUS "MXACMakeCommon.cmake")
 INCLUDE (${PROJECT_CMAKE_DIR}/CMakeMacros.cmake )
 INCLUDE (${PROJECT_CMAKE_DIR}/CoreTests/ConfigureChecks.cmake)
 MXA_ConfigureHeaderFiles( ${PROJECT_BINARY_DIR} )
