@@ -951,6 +951,8 @@ void IPHelperApp::loadPlugins()
      m_PluginDirs << thePath;
 #else
      aPluginDir.cd("Plugins");
+     thePath = aPluginDir.absolutePath();
+     m_PluginDirs << thePath;
 #endif
 
 

@@ -32,6 +32,7 @@
 #define AIMARRAY_HPP_
 
 //-- C Includes
+#include <stdio.h>
 #include <string.h>
 
 //-- C++ Includes
