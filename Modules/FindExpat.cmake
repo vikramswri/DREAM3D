@@ -9,7 +9,7 @@
 
 # Look for the header file.
 
-# MESSAGE (STATUS "Finding expat library and headers..." )
+#MESSAGE (STATUS "Finding expat library and headers..." )
 SET (EXPAT_DEBUG 0)
 
 SET(EXPAT_INCLUDE_SEARCH_DIRS
