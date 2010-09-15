@@ -5,6 +5,15 @@
 #  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #
 #///////////////////////////////////////////////////////////////////////////////
+function(CMP_CreateQtResourceForText  QT_QRC_TEMPLATE TEXT_FILE BINARY_DIR)
+    get_filename_component(INPUT_FILE ${TEXT_FILE} NAME)
+    get_filename_component(fn ${TEXT_FILE} NAME_WE)
+    # Copy the text file into the Build Directory
+    configure_file("${TEXT_FILE}" ${BINARY_DIR}/${INPUT_FILE}   COPYONLY )
+        
+    # create the Qt Resource File
+    configure_file(${QT_QRC_TEMPLATE} ${BINARY_DIR}/${fn}.qrc)
+endfunction()
 
 
 function(MXA_ConfigureHeaderFiles BIN_DIR )

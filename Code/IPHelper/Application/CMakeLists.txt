@@ -69,7 +69,6 @@ SET( IPHelperApp_UIS
   ${IPHelperApp_SOURCE_DIR}/UI_Files/IPHelperApp.ui
 )
 
-# and finally any resource files
 SET( IPHelperApp_RCS ${PROJECT_RESOURCES_DIR}/icons/images/Icons.qrc)
 
 # --------------------------------------------------------------------
