@@ -65,7 +65,7 @@
 
 #include "IPHelper/plugins/QImageProcessingInterface.h"
 
-
+#include "License/LicenseFiles.h"
 
 #define READ_STRING_SETTING(prefs, var, emptyValue)\
   var->setText( prefs.value(#var).toString() );\
@@ -446,7 +446,7 @@ void IPHelperApp::openFile(QString imageFile)
 // -----------------------------------------------------------------------------
 void IPHelperApp::on_aboutBtn_clicked()
 {
-  ApplicationAboutBoxDialog about(this);
+  ApplicationAboutBoxDialog about(IPHelper::LicenseList, this);
   QString an = QCoreApplication::applicationName();
   QString version("");
   version.append(IPHelper::Version::PackageComplete.c_str());

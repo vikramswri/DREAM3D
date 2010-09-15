@@ -100,18 +100,9 @@ configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 ${PROJECT_BINARY_DIR}/ReadMe.txt )
 IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
 
+include(${PROJECT_SOURCE_DIR}/License/License.cmake)
 
-# and finally any resource files
-FILE(GLOB LICENSE_FILES ${PROJECT_SOURCE_DIR}/License "*.license")
-
-CMP_CreateQtResourceForText(${PROJECT_CMAKE_DIR}/ConfiguredFiles/QtResourceFile.qrc.in
-                            ${IPHelper_SOURCE_DIR}/License.txt.in
-                            ${PROJECT_BINARY_DIR} )
-
-set(LICENSE_FILES ${PROJECT_BINARY_DIR}/License.qrc
-
-
-
+# --------------------------------------------------------------------
 # Compile the support libraries
 add_subdirectory(${IPHelper_CODE_DIR}/AIM ${PROJECT_BINARY_DIR}/AIMLib)
 add_subdirectory(${IPHelper_CODE_DIR}/QtSupport ${PROJECT_BINARY_DIR}/QtSupport)

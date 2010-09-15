@@ -73,7 +73,7 @@ SET( IPHelperApp_RCS ${PROJECT_RESOURCES_DIR}/icons/images/Icons.qrc)
 
 # --------------------------------------------------------------------
 # Run MOC on the files   
-QT4_ADD_RESOURCES( Generated_RC_SRCS ${IPHelperApp_RCS} )
+QT4_ADD_RESOURCES( Generated_RC_SRCS ${IPHelperApp_RCS} ${QRC_LICENSE_FILES})
 
 # --------------------------------------------------------------------
 # this will run uic on .ui files:

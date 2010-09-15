@@ -42,7 +42,7 @@
  * @brief This will display a simple dialog box that acts like an "About Box" for
  * showing some basic information about the application being used.
  * @author Michael A. Jackson for BlueQuartz Software
- * @date Jul 14, 2009
+ * @date Sept 14, 2010
  * @version 1.0
  */
 class ApplicationAboutBoxDialog: public QDialog, private Ui::ApplicationAboutBoxDialog
@@ -51,7 +51,7 @@ class ApplicationAboutBoxDialog: public QDialog, private Ui::ApplicationAboutBox
     ;
 
   public:
-    ApplicationAboutBoxDialog(QWidget *parent = 0);
+    ApplicationAboutBoxDialog(QStringList files, QWidget *parent = 0);
     virtual ~ApplicationAboutBoxDialog();
 
     /**
@@ -61,9 +61,31 @@ class ApplicationAboutBoxDialog: public QDialog, private Ui::ApplicationAboutBox
      */
     void setApplicationInfo( QString appName, QString appVersion);
 
-    void setApplicationHelpText(const QString text);
+    /**
+     * @brief This will set the list of licenses that can be viewed by the
+     * about box. The list should contain values such as ":/SomeLicense.license" which
+     * are defined in a Qt resource file (*.qrc).
+     * @param files The QString list of files to allow the About Box to load.
+     */
+    void setLicenseFiles(QStringList files);
+
+
+  protected slots:
+    void on_licenseCombo_currentIndexChanged(int index);
+
+
+  protected:
+
+    /**
+     * @brief Loads a file that is stored as a resource in the applications Qt resource
+     * system.
+     * @param qresourceFile The source file to load of the form ":/SomeFile.xxx"
+     */
+    void loadResourceFile(const QString qresourceFile);
 
   private:
+    QStringList m_licenseFiles;
+
     ApplicationAboutBoxDialog(const ApplicationAboutBoxDialog&); // Copy Constructor Not Implemented
     void operator=(const ApplicationAboutBoxDialog&); // Operator '=' Not Implemented
 

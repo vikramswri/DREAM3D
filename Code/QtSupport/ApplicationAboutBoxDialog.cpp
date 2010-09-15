@@ -32,13 +32,19 @@
 
 #include <iostream>
 
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+
+
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-ApplicationAboutBoxDialog::ApplicationAboutBoxDialog(QWidget *parent) :
+ApplicationAboutBoxDialog::ApplicationAboutBoxDialog(QStringList files, QWidget *parent) :
   QDialog(parent)
 {
   this->setupUi(this);
+  setLicenseFiles(files);
 }
 
 // -----------------------------------------------------------------------------
@@ -63,7 +69,44 @@ void ApplicationAboutBoxDialog::setApplicationInfo(QString applicationName, QStr
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void ApplicationAboutBoxDialog::setApplicationHelpText(const QString text)
+void ApplicationAboutBoxDialog::setLicenseFiles(QStringList files)
 {
-  this->appHelpText->setText(text);
+  m_licenseFiles = files;
+  licenseCombo->clear();
+  m_licenseFiles = files;
+  for (int i = 0; i < m_licenseFiles.size(); ++i)
+  {
+    QString s = m_licenseFiles[i];
+    s.remove(0, 2);
+    s.remove(".license", Qt::CaseSensitive);
+    licenseCombo->addItem(s);
+  }
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void ApplicationAboutBoxDialog::on_licenseCombo_currentIndexChanged(int index)
+{
+  std::cout << "on_licenseCombo_action" << std::endl;
+  QString resourceFile = m_licenseFiles[licenseCombo->currentIndex()];
+  loadResourceFile(resourceFile);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void ApplicationAboutBoxDialog::loadResourceFile(const QString qresourceFile)
+{
+  QFile inputFile(qresourceFile);
+  inputFile.open(QIODevice::ReadOnly);
+  QTextStream in(&inputFile);
+  QString line = in.readAll();
+  inputFile.close();
+
+//  appHelpText->append(line);
+  appHelpText->setPlainText(line);
+  appHelpText->setUndoRedoEnabled(false);
+  appHelpText->setUndoRedoEnabled(true);
+}
+
