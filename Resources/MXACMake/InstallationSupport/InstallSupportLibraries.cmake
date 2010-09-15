@@ -5,7 +5,7 @@
 #//  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #//
 #///////////////////////////////////////////////////////////////////////////////
-
+message(STATUS "InstallSupportLibraries.cmake")
 # --------------------------------------------------------------------
 # Copy the needed Qt libraries into the Build directory. Also add installation
 # and CPack code to support installer generation.

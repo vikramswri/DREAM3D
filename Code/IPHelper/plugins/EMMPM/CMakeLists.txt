@@ -43,7 +43,7 @@ IDE_SOURCE_PROPERTIES("Generated" "${EMMPMPlugin_Generated_UI_HDRS}" "${EMMPMPlu
 
 # ---------- Setup output Directories -------------------------
 if(NOT MSVC)
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/Plugins  )
+  SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin/Plugins  )
 endif()
 add_library(EMMPMPlugin MODULE ${EMMPMPlugin_PROJECT_SRCS})
 target_link_libraries(EMMPMPlugin 
@@ -54,5 +54,5 @@ target_link_libraries(EMMPMPlugin
                     AIMLib )
 PluginProperties(EMMPMPlugin "_debug")
 if (NOT MSVC)
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
+  SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
 endif()

@@ -257,7 +257,18 @@ macro(PluginProperties targetName DEBUG_EXTENSION)
     else()
         file(APPEND ${IPHelper_BINARY_DIR}/plugins.txt "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}.plugin;")
     endif()
-endmacro(PluginProperties DEBUG_EXTENSION)
+    
+    if (MSVC)
+        set (BUILD_TYPES "Debug;Release")
+        foreach (btype ${BUILD_TYPES} )
+            INSTALL(TARGETS ${targetName}
+                DESTINATION ./plugins
+                CONFIGURATIONS ${btype}
+                COMPONENT Applications)
+        endforeach()
+    endif()
+    
+endmacro(PluginProperties targetName DEBUG_EXTENSION)
 
 #-------------------------------------------------------------------------------
 # This macro will attempt a try_run command in order to compile and then 

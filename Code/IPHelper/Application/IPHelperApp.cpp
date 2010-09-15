@@ -935,7 +935,9 @@ void IPHelperApp::loadPlugins()
      QString thePath;
 
  #if defined(Q_OS_WIN)
-
+     aPluginDir.cd("plugins");
+     thePath = aPluginDir.absolutePath();
+     m_PluginDirs << thePath;
  #elif defined(Q_OS_MAC)
      if (aPluginDir.dirName() == "MacOS") {
          aPluginDir.cdUp();
@@ -955,6 +957,7 @@ void IPHelperApp::loadPlugins()
      m_PluginDirs << thePath;
 #endif
 
+  this->setWindowTitle("IPHelper - No Plugins Loaded");
 
 foreach (QString pluginDirString, m_PluginDirs) {
   std::cout << "Plugin Directory being Searched: " << pluginDirString.toStdString() << std::endl;
