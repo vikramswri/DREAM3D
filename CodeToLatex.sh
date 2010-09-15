@@ -1,9 +1,8 @@
 #!/bin/bash
 
-texFile=IPHelper_PublicAffairs_Release.tex
-cd "/Users/mjackson/Contracts/AFRL-TO79/TO79-FCL Initial Package/IPHelper"
-files=`find ./Code/IPHelper -type f -name "*.h" -or -name "*.cpp" -or -name "*.c"`
-files="License.txt.in $files"
+texFile=/tmp/IPHelper_PublicAffairs_Release.tex
+cd "/Users/mjackson/Workspace/IPHelper"
+
 
 echo "\documentclass[10pt,oneside]{book}" > $texFile
 echo "\usepackage{geometry}" >> $texFile
@@ -45,7 +44,7 @@ echo "\par\nobreak\vspace{2 pt}}}" >> $texFile
 echo "\makeatother" >> $texFile
 echo "\def\thechapter       {\arabic{chapter}}" >> $texFile
 echo "% ------------------- Title and Author -----------------------------" >> $texFile
-echo "\title{Computer Source Codes to Perform Image Processing and Visually Compare Results}" >> $texFile
+echo "\title{Segmentation Tools Package}" >> $texFile
 echo "\author{Michael A. Jackson (BlueQuartz Software)}" >> $texFile
 echo "\begin{document}" >> $texFile
 echo "" >> $texFile
@@ -55,7 +54,20 @@ echo "" >> $texFile
 echo "\tableofcontents" >> $texFile
 
 
+files=`find ./License -type f -name "*.license"`
+for file in $files;
+do
+  echo "$file"
+  echo "\section{$file}" >> $texFile
+  echo "\begin{lstlisting}" >> $texFile
+  cat $texFile $file > /tmp/textemp.tex
+  mv /tmp/textemp.tex $texFile 
+  
+  echo "\end{lstlisting}" >> $texFile
+  echo "% ----------------------------------------------------------------------------------------" >> $texFile
+done
 
+files=`find ./Code -type f ! -name "itk*" -and \( -name "*.c*" -or -name "*.h*" -or -name "*.txx" \)`
 for file in $files;
 do
   echo "$file"
