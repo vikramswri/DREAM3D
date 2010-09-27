@@ -95,6 +95,13 @@ static Pointer New(void) \
   return sharedPtr; \
 }
 
+#define MXA_STATIC_NEW_MACRO_WITH_ARGS(thisClass, args) \
+static Pointer New args \
+{ \
+  Pointer sharedPtr (new thisClass args); \
+  return sharedPtr; \
+}
+
 /** Macro used to add standard methods to all classes, mainly type
  * information. */
 #define MXA_TYPE_MACRO(thisClass) \

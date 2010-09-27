@@ -50,7 +50,25 @@ SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
 
 # --------------------------------------------------------------------
 #  Add an executable based on the ITK Mutual Information Classes
-set (ITK_MI_TEST_SRCS  ${PROJECT_SOURCE_DIR}/itkMITest.cpp)
+set (ITK_MI_TEST_SRCS  
+    ${IPHelper_CODE_DIR}/AngReader/AngDirectoryPatterns.cpp
+    ${IPHelper_CODE_DIR}/AngReader/AngFileHelper.cpp
+    ${IPHelper_CODE_DIR}/AngReader/AngReader.cpp
+    ${IPHelper_CODE_DIR}/AngReader/itkAngImageIO.cpp
+    ${IPHelper_CODE_DIR}/AngReader/itkAngImageIOFactory.cpp
+    ${PROJECT_SOURCE_DIR}/itkMITest.cpp
+)
 
-add_executable(itkMITest ${ITK_MI_TEST_SRCS} )
-target_link_libraries(itkMITest ${ITK_LIBRARIES} )
+set (ITK_MI_TEST_HDRS  
+    ${IPHelper_CODE_DIR}/AngReader/AngConstants.h
+    ${IPHelper_CODE_DIR}/AngReader/AngDirectoryPatterns.h
+    ${IPHelper_CODE_DIR}/AngReader/AngFileHelper.h
+    ${IPHelper_CODE_DIR}/AngReader/AngReader.h
+    ${IPHelper_CODE_DIR}/AngReader/AngUtils.hpp
+    ${IPHelper_CODE_DIR}/AngReader/OIMColoring.hpp
+    ${IPHelper_CODE_DIR}/AngReader/itkAngImageIO.h
+    ${IPHelper_CODE_DIR}/AngReader/itkAngImageIOFactory.h
+)
+
+add_executable(itkMITest ${ITK_MI_TEST_SRCS} ${ITK_MI_TEST_HDRS} )
+target_link_libraries(itkMITest ${ITK_LIBRARIES} ${QT_QTCORE_LIBRARY})

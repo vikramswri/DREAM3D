@@ -51,6 +51,8 @@
 //
 // Software Guide : EndLatex
 
+#include "AngReader/AngUtils.hpp"
+#include "AngReader/itkAngImageIOFactory.h"
 
 // Software Guide : BeginCodeSnippet
 #include "itkImageRegistrationMethod.h"
@@ -106,13 +108,16 @@ public:
     }
 };
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 int main( int argc, char *argv[] )
 {
   if( argc < 4 )
     {
     std::cerr << "Missing Parameters " << std::endl;
     std::cerr << "Usage: " << argv[0];
-    std::cerr << " fixedImageFile  movingImageFile ";
+    std::cerr << " fixedImageFile  oimImage ";
     std::cerr << "outputImagefile [defaultPixelValue]" << std::endl;
     std::cerr << "[checkerBoardAfter] [checkerBoardBefore]" << std::endl;
     std::cerr << "[numberOfBins] [numberOfSamples]";
@@ -120,8 +125,10 @@ int main( int argc, char *argv[] )
     return EXIT_FAILURE;
     }
 
+  itk::AngImageIOFactory::RegisterOneFactory();
   const    unsigned int    Dimension = 2;
-  typedef  unsigned short  PixelType;
+  typedef  unsigned char  PixelType;
+
 
   typedef itk::Image< PixelType, Dimension >  FixedImageType;
   typedef itk::Image< PixelType, Dimension >  MovingImageType;

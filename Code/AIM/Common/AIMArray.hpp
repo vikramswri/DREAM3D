@@ -36,6 +36,7 @@
 #include <string.h>
 
 //-- C++ Includes
+#include <vector>
 #include <iostream>
 #include <limits>
 
@@ -362,7 +363,7 @@ class AIMArray
     // -----------------------------------------------------------------------------
     // Tested
     // -----------------------------------------------------------------------------
-    int32_t initializeImageWithSourceData(size_t numElements, T* source)
+    int32_t initializeArrayWithSourceData(size_t numElements, T* source)
     {
       this->allocateDataArray(numElements, true);
 
@@ -415,6 +416,14 @@ class AIMArray
       m_NumElements = 0;
       m_ManageMemory = false;
       this->m_ImageBuffer = NULL;
+    }
+
+    AIMArray(size_t numElements, bool manageMemory = false)
+    {
+      m_Dimensions.push_back(numElements);
+      m_NumElements = numElements;
+      m_ManageMemory = manageMemory;
+      this->m_ImageBuffer = allocateDataArray(numElements, manageMemory);
     }
 
   private:
