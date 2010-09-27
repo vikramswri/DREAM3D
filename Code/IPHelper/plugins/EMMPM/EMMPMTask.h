@@ -82,7 +82,7 @@ class EMMPMTask : public ProcessQueueTask
   public:
     EMMPMTask(QObject* parent = 0);
     virtual ~EMMPMTask();
-    
+
     void setBeta(float beta);
     void setGamma(float gamma);
     void setEmIterations(int emIterations);
@@ -463,12 +463,6 @@ void EMMPMTask::execute( T* imageData, S* outputData)
       }
     }
 
-
-    for (int kk = 0; kk < NumberClasses; ++kk)
-    {
-
-
-    }
 
   } /* End of EM Loop */
 

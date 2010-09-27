@@ -65,21 +65,34 @@ include_directories(${PROJECT_BINARY_DIR})
 # --------------------------------------------------------------------
 GenerateVersionString( ${PROJECT_NAME} "${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h" "${PROJECT_PREFIX}" )
 
+# --------------------------------------------------------------------
+# Find the ITK Package
+# --------------------------------------------------------------------
+FIND_PACKAGE(ITK)
+IF(ITK_FOUND)
+  INCLUDE(${USE_ITK_FILE})
+  # Add the ITK library directories to the directory search paths for fixing
+  # up OS X bundles.
+  file(APPEND ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${ITK_LIBRARY_DIRS};")
+ELSE(ITK_FOUND)
+  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
+ENDIF(ITK_FOUND)
+
 # ------------------------------------------------------------------------------
 #  Qt 4 Section
 #------------------------------------------------------------------------------
-# by default only QtCore and QtGui modules are enabled
-# other modules must be enabled like this:  
-IF (WIN32)
-  SET (QT_USE_QTMAIN TRUE)
-ENDIF (WIN32)
-
-# this command finds Qt4 libraries and sets all required variables
+# This command finds Qt4 libraries and sets all required variables
 # note that it's Qt4, not QT4 or qt4
 FIND_PACKAGE( Qt4 REQUIRED )
 # add some useful macros and variables
 # (QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that 
 # contains a path to CMake script)
+
+# by default only QtCore and QtGui modules are enabled
+# other modules must be enabled like this:  
+IF (WIN32)
+  SET (QT_USE_QTMAIN TRUE)
+ENDIF (WIN32)
 INCLUDE( ${QT_USE_FILE} )
 
 # --------------------------------------------------------------------

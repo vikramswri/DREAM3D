@@ -49,6 +49,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Beta Term in classical EM/MPM</string>
+       </property>
        <property name="text">
         <string>Capillarity:</string>
        </property>
@@ -111,6 +114,9 @@
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Gamma Term in Classical EM/MPM</string>
        </property>
        <property name="text">
         <string>Constitution:</string>

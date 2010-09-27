@@ -5,18 +5,7 @@
 #///////////////////////////////////////////////////////////////////////////////
 project(CrossCorrelationPlugin)
 
-# --------------------------------------------------------------------
-# Find the ITK Package
-# --------------------------------------------------------------------
-FIND_PACKAGE(ITK)
-IF(ITK_FOUND)
-  INCLUDE(${USE_ITK_FILE})
-  # Add the ITK library directories to the directory search paths for fixing
-  # up OS X bundles.
-  file(APPEND ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${ITK_LIBRARY_DIRS};")
-ELSE(ITK_FOUND)
-  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
-ENDIF(ITK_FOUND)
+
 
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/..)
 include_directories(${IPHelper_CODE_DIR} )

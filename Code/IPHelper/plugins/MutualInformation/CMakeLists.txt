@@ -47,3 +47,10 @@ target_link_libraries(MITest ${QT_LIBRARIES} MXADataModel AIMLib)
 #PluginProperties(MutualInformation "_debug")
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
 
+
+# --------------------------------------------------------------------
+#  Add an executable based on the ITK Mutual Information Classes
+set (ITK_MI_TEST_SRCS  ${PROJECT_SOURCE_DIR}/itkMITest.cpp)
+
+add_executable(itkMITest ${ITK_MI_TEST_SRCS} )
+target_link_libraries(itkMITest ${ITK_LIBRARIES} )
