@@ -66,8 +66,8 @@ macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNee
     # --------------------------------------------------------------------
     # Get the plugin list from the plugin file
     if ( ${appNeedsPlugins})
-      file(READ ${IPHelper_BINARY_DIR}/plugins.txt CMP_COMPLETE_PLUGIN_LIST)
-      file(READ ${IPHelper_BINARY_DIR}/libsearchdirs.txt CMP_PLUGIN_SEARCH_DIRS)
+      file(READ ${CMP_PLUGIN_LIST_FILE} CMP_COMPLETE_PLUGIN_LIST)
+      file(READ ${CMP_PLUGIN_SEARCHDIR_FILE} CMP_PLUGIN_SEARCH_DIRS)
     endif()
     # --- If we are on OS X copy all the embedded libraries to the app bundle
    if (APPLE)
@@ -101,7 +101,7 @@ macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNee
  
     endif(DEFINED GUI_TYPE)
    endif(APPLE)
-endmacro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
+endmacro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNeedsPlugins)
 
 # --------------------------------------------------------------------
 #
@@ -238,7 +238,7 @@ endmacro(PluginProperties DEBUG_EXTENSION)
 # Finds plugins from the Qt installation. The pluginlist argument should be
 # something like "qgif;qjpeg;qtiff"
 #-------------------------------------------------------------------------------
-macro (FindQt4Plugins pluginlist)
+macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile)
   set (qt_plugin_list ${pluginlist})
   set (qt_plugin_types "Debug;Release")
   if (WIN32)
@@ -285,8 +285,8 @@ macro (FindQt4Plugins pluginlist)
         set (QTPLUGINS ${QTPLUGINS_RELEASE})
       endif()
   endif()
-  file(APPEND ${IPHelper_BINARY_DIR}/plugins.txt "${QTPLUGINS}")
-  file(APPEND ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${QT_PLUGINS_DIR}/imageformats;")
+  file(APPEND ${pluginfile} "${QTPLUGINS};")
+  file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/imageformats;")
 endmacro(FindQt4Plugins pluginlist)
 
 
