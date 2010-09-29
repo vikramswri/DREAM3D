@@ -4,28 +4,25 @@
 #  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #///////////////////////////////////////////////////////////////////////////////
 PROJECT( IPHelperApp )
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
-# ---------- Setup output Directories -------------------------
-SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY
-  ${PROJECT_BINARY_DIR}/Bin
-  CACHE PATH
-  "Single Directory for all Libraries"
-  )
+# --------------------------------------------------------------------
+# Find the ITK Package
+# --------------------------------------------------------------------
+IF(ITK_FOUND)
+  INCLUDE(${USE_ITK_FILE})
+ELSE(ITK_FOUND)
+  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
+ENDIF(ITK_FOUND)
 
-# --------- Setup the Executable output Directory -------------
-SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY
-  ${PROJECT_BINARY_DIR}/Bin
-  CACHE PATH
-  "Single Directory for all Executables."
-  )
-
-# --------- Setup the Executable output Directory -------------
-SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-  ${PROJECT_BINARY_DIR}/Bin
-  CACHE PATH
-  "Single Directory for all static libraries."
-  )
+# ------------------------------------------------------------------------------
+#  Qt 4 Section
+# ------------------------------------------------------------------------------
+if(QT4_FOUND)
+    include( ${QT_USE_FILE} )
+else()
+    message(FATAL_ERROR "Qt 4 is Needed for this project.")
+endif(QT4_FOUND)
 
 
 # Set the GUI type for different platforms
@@ -37,8 +34,8 @@ IF(WIN32)
 ENDIF(WIN32)
 
 # Set some include directories
-include_directories( ${IPHelper_CODE_DIR} )
-include_directories( ${IPHelper_CODE_DIR}/QtSupport )
+include_directories( ${PROJECT_CODE_DIR} )
+include_directories( ${PROJECT_CODE_DIR}/QtSupport )
 
 include_directories( ${IPHelperApp_BINARY_DIR} )
 include_directories( ${IPHelper_BINARY_DIR}/MXA)
@@ -53,7 +50,7 @@ SET( IPHelperApp_SRCS
 SET (IPHelperApp_HDRS
     ${IPHelperApp_SOURCE_DIR}/IPHelperApp.h
 )
-IDE_SOURCE_PROPERTIES( "IPHelperApp/GUI" "${IPHelperApp_HDRS}" "${IPHelperApp_SRCS}")
+cmp_IDE_SOURCE_PROPERTIES( "IPHelperApp/GUI" "${IPHelperApp_HDRS}" "${IPHelperApp_SRCS}" "0")
 
 # --------------------------------------------------------------------
 #  Get a list of the header to run 'moc' on 
@@ -85,7 +82,7 @@ QT4_WRAP_CPP( Generated_MOC_SRCS ${IPHelperApp_MOC_HDRS} )
 
 # --------------------------------------------------------------------
 #-- Put the generated files into their own group for IDEs
-IDE_SOURCE_PROPERTIES( "Generated" "${Generated_UI_HDRS}" "${Generated_MOC_SRCS};${Generated_RC_SRCS}")
+cmp_IDE_SOURCE_PROPERTIES( "Generated" "${Generated_UI_HDRS}" "${Generated_MOC_SRCS};${Generated_RC_SRCS}" "0")
 
 # --------------------------------------------------------------------
 # -- Finally set the Project Sources to include all the sources
@@ -97,19 +94,33 @@ SET (IPHelperApp_PROJECT_SRCS
     ${Generated_MOC_SRCS}
 )
 
-# Find all the Qt Plugins after which we should have some more variables to our disposal
-FindQtPlugins("qgif;qjpeg;qtiff")
-# Add to the list of plugins to install and directories to look for libraries - this
-# is mainly for OS X install rules
-file(APPEND ${IPHelper_BINARY_DIR}/plugins.txt "${QTPLUGINS}")
-file(APPEND ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${QT_PLUGINS_DIR}/imageformats;")
 
-file(READ ${IPHelper_BINARY_DIR}/plugins.txt COMPLETE_PLUGIN_LIST)
-file(READ ${IPHelper_BINARY_DIR}/libsearchdirs.txt PLUGIN_SEARCH_DIRS)
+set (PluginListFile ${IPHelperApp_BINARY_DIR}/plugins.txt)
+set (LibDirSearchFile ${IPHelperApp_BINARY_DIR}/libsearchdirs.txt)
+file(WRITE ${PluginListFile} "")
+file(WRITE ${LibDirSearchFile} "${IPHelper_BINARY_DIR}/Bin/plugins;")
+# --------------------------------------------------------------------
+# Get the list of Qt4 Image Format Plugins that we need
+# Find all the Qt Plugins after which we should have some more variables to our disposal
+FindQt4Plugins("qgif;qjpeg;qtiff" "${PluginListFile}" "${LibDirSearchFile}" )
+file(READ ${PluginListFile}  QT4_COMPLETE_PLUGIN_LIST)
+file(READ ${LibDirSearchFile} QT4_PLUGIN_SEARCH_DIRS)
+
+set (COMPLETE_PLUGIN_LIST ${QT4_COMPLETE_PLUGIN_LIST})
+set (PLUGIN_SEARCH_DIRS ${QT4_PLUGIN_SEARCH_DIRS})
+
+# --------------------------------------------------------------------
+# Now read the IPHelper Specific Plugins that we want for this application
+file (READ ${CMP_PLUGIN_LIST_FILE} IP_COMPLETE_PLUGIN_LIST)
+file (READ ${CMP_PLUGIN_SEARCHDIR_FILE} IP_PLUGIN_SEARCH_DIRS)
+
+set (COMPLETE_PLUGIN_LIST ${COMPLETE_PLUGIN_LIST} ${IP_COMPLETE_PLUGIN_LIST})
+set (PLUGIN_SEARCH_DIRS ${PLUGIN_SEARCH_DIRS} ${IP_PLUGIN_SEARCH_DIRS})
+
 
 #-- Set up OS X Application Bundle properties
 #-- This file have tools for OS X Bunlde creation and configuration
-INCLUDE (${PROJECT_RESOURCES_DIR}/OSX_Tools/OSX_BundleTools.cmake)
+INCLUDE (${CMP_OSX_TOOLS_SOURCE_DIR}/OSX_BundleTools.cmake)
 
 
 IF(APPLE)
@@ -138,4 +149,4 @@ TARGET_LINK_LIBRARIES( IPHelperApp
 
 
 
-InstallationSupport(IPHelperApp ${EXE_DEBUG_EXTENSION} ${IPHelperApp_BINARY_DIR})                
+cmp_InstallationSupport(IPHelperApp ${EXE_DEBUG_EXTENSION} ${IPHelperApp_BINARY_DIR} "1")                

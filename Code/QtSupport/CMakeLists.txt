@@ -5,19 +5,15 @@
 #///////////////////////////////////////////////////////////////////////////////
 project(QtSupport)
 
+if(QT4_FOUND)
+    include( ${QT_USE_FILE} )
+else()
+    message(FATAL_ERROR "Qt 4 is Needed for this project.")
+endif(QT4_FOUND)
+
 
 set (Project_SRCS "")
 set (Project_HDRS "")
-
-# --------------------------------------------------------------------
-# Find the ITK Package
-# --------------------------------------------------------------------
-FIND_PACKAGE(ITK)
-IF(ITK_FOUND)
-  INCLUDE(${USE_ITK_FILE})
-ELSE(ITK_FOUND)
-  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
-ENDIF(ITK_FOUND)
 
 set (QtSupport_SRCS
     ${QtSupport_SOURCE_DIR}/ApplicationAboutBoxDialog.cpp
@@ -39,7 +35,7 @@ set (QtSupport_HDRS
     ${QtSupport_SOURCE_DIR}/ProcessQueueController.h
     ${QtSupport_SOURCE_DIR}/ProcessQueueTask.h
 )
-IDE_SOURCE_PROPERTIES("CrossCorrelation/Qt" "${QtSupport_HDRS}" "${QtSupport_SRCS}")
+cmp_IDE_SOURCE_PROPERTIES("CrossCorrelation/Qt" "${QtSupport_HDRS}" "${QtSupport_SRCS}" "0")
 
 
 # --------------------------------------------------------------------
@@ -68,7 +64,7 @@ QT4_WRAP_CPP( QtSupport_Generated_MOC_SRCS ${QtSupport_HDRS} )
 
 # --------------------------------------------------------------------
 #-- Put the generated files into their own group for IDEs
-IDE_SOURCE_PROPERTIES( "Generated" "${QtSupport_Generated_UI_HDRS}" "${QtSupport_Generated_MOC_SRCS};${QtSupport_Generated_RC_SRCS}")
+cmp_IDE_SOURCE_PROPERTIES( "Generated" "${QtSupport_Generated_UI_HDRS}" "${QtSupport_Generated_MOC_SRCS};${QtSupport_Generated_RC_SRCS}" "0")
 
 
 

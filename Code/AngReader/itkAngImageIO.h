@@ -101,24 +101,6 @@ private:
   AngImageIO(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
- // void SwapBytesIfNecessary(void* buffer, unsigned long numberOfPixels);
-
-  /** This methods ensures that the endianess is respected */
-//  void Write32BitsInteger(unsigned int   value);
-//  void Write16BitsInteger(unsigned short value);
-//
-//  std::ifstream             m_Ifstream;
-//  std::ofstream             m_Ofstream;
-//  long                      m_BitMapOffset;
-//  bool                      m_FileLowerLeft;
-//  short                     m_Depth;
-//  bool                      m_Allow8BitANG;
-//  unsigned short            m_NumberOfColors;
-//  unsigned int              m_ColorTableSize;
-//  long                      m_ANGCompression;
-//  unsigned long             m_ANGDataSize;
-//  std::vector<RGBPixelType> m_ColorPalette;
-
 };
 
 } // end namespace itk

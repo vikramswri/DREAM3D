@@ -98,7 +98,7 @@ static Pointer New(void) \
 #define MXA_STATIC_NEW_MACRO_WITH_ARGS(thisClass, args) \
 static Pointer New args \
 { \
-  Pointer sharedPtr (new thisClass args); \
+  Pointer sharedPtr (new thisClass); \
   return sharedPtr; \
 }
 

@@ -33,7 +33,7 @@
 
 
 #include <QtCore/QSettings>
-#include <QtPlugin>
+#include <QtCore/QtPlugin>
 
 /**
  * @class QImageProcessingInterface QImageProcessingInterface.h IPHelper/plugins/QImageProcessingInterface.h

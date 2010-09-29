@@ -5,6 +5,7 @@
 #///////////////////////////////////////////////////////////////////////////////
 project(MXADataModel)
 
+set (MXA_SOURCE_DIR ${PROJECT_CODE_DIR} )
 set (Project_SRCS "")
 set (Project_HDRS "")
 
@@ -14,11 +15,8 @@ Macro(MXACompileDir DirName)
 endMacro()
 
 MXACompileDir(Common)
-MXACompileDir(BMPIO)
 MXACompileDir(Utilities)
-
-#INCLUDE (${PROJECT_CMAKE_DIR}/MXACMakeCommon.cmake )
-
+MXACompileDir(BMPIO)
 
 set (Project_SRCS 
     ${Project_SRCS} 
@@ -27,14 +25,23 @@ set (Project_SRCS
 include_directories(${MXADataModel_SOURCE_DIR}/..)
 include_directories(${MXADataModel_BINARY_DIR})
 include_directories(${MXADataModel_BINARY_DIR}/..)
-add_definitions(-DQT_CORE_LIB)
+
+set (MXA_HDF5_SUPPORT "0")
+set (MXA_TIFF_SUPPORT "0")
+set (MXA_XML_SUPPORT "0")
+set (HDF5_VTK_BRIDGE "0")
+
+configure_file(${PROJECT_RESOURCES_DIR}/MXACMake/MXAConfiguration.h.in
+               ${CMP_HEADER_DIR}/${CMP_EXTRA_CONFIGURATION_FILE})
+               
+#add_definitions(-DQT_CORE_LIB)
 
 # - Check to see if any other project is redefining the library names
 IF ( NOT DEFINED  MXADATAMODEL_LIB_NAME)
   SET (MXADATAMODEL_LIB_NAME MXADataModel)
 ENDIF ( NOT DEFINED MXADATAMODEL_LIB_NAME )
 
-add_library(${MXADATAMODEL_LIB_NAME} STATIC ${Project_SRCS})
+add_library(${MXADATAMODEL_LIB_NAME} ${LIB_TYPE}  ${Project_SRCS})
 target_link_libraries(${MXADATAMODEL_LIB_NAME} ${QT_LIBRARIES})
 
 LibraryProperties( ${MXADATAMODEL_LIB_NAME} ${EXE_DEBUG_EXTENSION})

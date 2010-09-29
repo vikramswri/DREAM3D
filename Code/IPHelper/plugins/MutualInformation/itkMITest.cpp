@@ -57,10 +57,14 @@
 // Software Guide : BeginCodeSnippet
 #include "itkImageRegistrationMethod.h"
 #include "itkTranslationTransform.h"
+#include "itkAffineTransform.h"
 #include "itkMattesMutualInformationImageToImageMetric.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkRegularStepGradientDescentOptimizer.h"
 #include "itkImage.h"
+#include <itkRegionOfInterestImageFilter.h>
+#include "itkSimilarity2DTransform.h"
+
 // Software Guide : EndCodeSnippet
 
 
@@ -126,6 +130,7 @@ int main( int argc, char *argv[] )
     }
 
   itk::AngImageIOFactory::RegisterOneFactory();
+
   const    unsigned int    Dimension = 2;
   typedef  unsigned char  PixelType;
 
@@ -134,6 +139,9 @@ int main( int argc, char *argv[] )
   typedef itk::Image< PixelType, Dimension >  MovingImageType;
 
   typedef itk::TranslationTransform< double, Dimension > TransformType;
+//  typedef itk::AffineTransform< double, Dimension > TransformType;
+//  typedef itk::Similarity2DTransform<double> TransformType;
+
   typedef itk::RegularStepGradientDescentOptimizer       OptimizerType;
   typedef itk::LinearInterpolateImageFunction<
                                     MovingImageType,
@@ -141,6 +149,17 @@ int main( int argc, char *argv[] )
   typedef itk::ImageRegistrationMethod<
                                     FixedImageType,
                                     MovingImageType    > RegistrationType;
+
+  typedef  unsigned char  OutputPixelType;
+
+  typedef itk::Image< OutputPixelType, Dimension > OutputImageType;
+
+  typedef itk::CastImageFilter<
+                        FixedImageType,
+                        OutputImageType > CastFilterType;
+  typedef itk::ImageFileWriter< OutputImageType >  WriterType;
+
+  WriterType::Pointer      writer =  WriterType::New();
 
   //  Software Guide : BeginLatex
   //
@@ -246,18 +265,112 @@ int main( int argc, char *argv[] )
   typedef itk::ImageFileReader< MovingImageType > MovingImageReaderType;
 
   FixedImageReaderType::Pointer  fixedImageReader  = FixedImageReaderType::New();
-  MovingImageReaderType::Pointer movingImageReader = MovingImageReaderType::New();
-
   fixedImageReader->SetFileName(  argv[1] );
-  movingImageReader->SetFileName( argv[2] );
-
-  registration->SetFixedImage(    fixedImageReader->GetOutput()    );
-  registration->SetMovingImage(   movingImageReader->GetOutput()   );
-
   fixedImageReader->Update();
 
-  registration->SetFixedImageRegion(
-       fixedImageReader->GetOutput()->GetBufferedRegion() );
+
+#if 1
+  typedef itk::RGBPixel<unsigned char> AngPixelType;
+  typedef itk::Image< AngPixelType, Dimension > AngImageType;
+  typedef itk::ImageFileReader<AngImageType> AngImageReaderType;
+
+  AngImageReaderType::Pointer angReader = AngImageReaderType::New();
+  angReader->SetFileName(argv[2]);
+
+  typedef itk::ImageFileWriter<AngImageType> IPFImageWriterType;
+  IPFImageWriterType::Pointer angWriter = IPFImageWriterType::New();
+  angWriter->SetFileName("/tmp/ang.tif");
+  angWriter->SetInput(angReader->GetOutput());
+  angWriter->Update();
+#endif
+
+  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  FixedImageType::PointType fixedOrigin = fixedImage->GetOrigin();
+  FixedImageType::SizeType fixedSize = fixedImage->GetLargestPossibleRegion().GetSize();
+
+  typedef itk::RegionOfInterestImageFilter<FixedImageType, FixedImageType > ROIFilterType;
+  ROIFilterType::Pointer filter = ROIFilterType::New();
+  FixedImageType::IndexType start;
+  /* insets The number of pixels to remove from the left, right, top, bottom of the image */
+  FixedImageType::IndexValueType _insets[4] =
+  { 0, 0, 0, 70 };
+  start[0] = _insets[0];
+  start[1] = _insets[2];
+  FixedImageType::SizeType size;
+  size[0] = fixedSize[0] - _insets[0] - _insets[1];
+  size[1] = fixedSize[1] - _insets[2] - _insets[3];
+
+  FixedImageType::RegionType desiredRegion;
+  desiredRegion.SetSize(size);
+  desiredRegion.SetIndex(start);
+
+  filter->SetRegionOfInterest(desiredRegion);
+  filter->SetInput(fixedImageReader->GetOutput());
+  try
+  {
+    filter->Update();
+  }
+  catch (itk::ExceptionObject & excep)
+  {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
+  }
+  writer->SetFileName("/tmp/Cropped.tif");
+  writer->SetInput(filter->GetOutput());
+  writer->Update();
+
+
+  fixedImageReader->SetFileName("/tmp/Cropped.tif");
+  fixedImageReader->Update();
+  registration->SetFixedImage(    fixedImageReader->GetOutput()    );
+
+
+
+  MovingImageReaderType::Pointer movingImageReader = MovingImageReaderType::New();
+  movingImageReader->SetFileName( argv[2] );
+  movingImageReader->Update();
+  registration->SetMovingImage(   movingImageReader->GetOutput()   );
+
+
+  FixedImageType::SpacingType fixedSpacing;
+  fixedSpacing[0] = 0.0545;
+  fixedSpacing[1] = 0.0625;
+  fixedImage->SetSpacing(fixedSpacing);
+
+  fixedSpacing = fixedImage->GetSpacing();
+
+  std::cout << "Fixed Image Size: " << fixedSize[0] << " x " << fixedSize[1] << std::endl;
+  std::cout << "Fixed Image Origin: " << fixedOrigin[0] << ", " << fixedOrigin[1] << std::endl;
+  std::cout << "Fixed Image Spacing: " << fixedSpacing[0] << ", "<< fixedSpacing[1] << std::endl;
+
+  FixedImageType::PointType fCenter;
+  fCenter[0] = fixedOrigin[0] + (fixedSize[0]/2) * fixedSpacing[0];
+  fCenter[1] = fixedOrigin[1] + (fixedSize[1]/2) * fixedSpacing[1];
+  std::cout << "Fixed Image Center: " << fCenter[0] << ", "<< fCenter[1] << std::endl;
+
+
+  MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+
+
+  MovingImageType::SizeType movingSize = movingImage->GetLargestPossibleRegion().GetSize();
+  MovingImageType::SpacingType movingSpacing = movingImage->GetSpacing();
+
+  MovingImageType::PointType mOrg;
+  mOrg[0] = fCenter[0] - ((movingSize[0] * movingSpacing[0] ) / 2.0);
+  mOrg[1] = fCenter[1] - ((movingSize[1] * movingSpacing[1] ) / 2.0);
+
+  movingImage->SetOrigin(mOrg);
+  MovingImageType::PointType movingOrigin = movingImage->GetOrigin();
+  std::cout << "Moving Image Size: " << movingSize[0] << " x " << movingSize[1] << std::endl;
+  std::cout << "Moving Image Origin: " << movingOrigin[0] << ", " << movingOrigin[1] << std::endl;
+  std::cout << "Moving Image Spacing: " << movingSpacing[0] << ", "<< movingSpacing[1] << std::endl;
+
+
+
+ // if (true) return EXIT_FAILURE;
+
+  registration->SetFixedImageRegion(fixedImageReader->GetOutput()->GetBufferedRegion() );
 
 
   typedef RegistrationType::ParametersType ParametersType;
@@ -280,8 +393,8 @@ int main( int argc, char *argv[] )
 
   // Software Guide : BeginCodeSnippet
   optimizer->MinimizeOn();
-  optimizer->SetMaximumStepLength( 2.00 );
-  optimizer->SetMinimumStepLength( 0.001 );
+  optimizer->SetMaximumStepLength( 1.50 );
+  optimizer->SetMinimumStepLength( 0.0005 );
   optimizer->SetNumberOfIterations( 200 );
   // Software Guide : EndCodeSnippet
 
@@ -381,9 +494,9 @@ int main( int argc, char *argv[] )
   resample->SetTransform( finalTransform );
   resample->SetInput( movingImageReader->GetOutput() );
 
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+ fixedImage = fixedImageReader->GetOutput();
 
-  PixelType defaultPixelValue = 100;
+  PixelType defaultPixelValue = 0;
 
   if( argc > 4 )
     {
@@ -397,17 +510,9 @@ int main( int argc, char *argv[] )
   resample->SetDefaultPixelValue( defaultPixelValue );
 
 
-  typedef  unsigned char  OutputPixelType;
 
-  typedef itk::Image< OutputPixelType, Dimension > OutputImageType;
 
-  typedef itk::CastImageFilter<
-                        FixedImageType,
-                        OutputImageType > CastFilterType;
 
-  typedef itk::ImageFileWriter< OutputImageType >  WriterType;
-
-  WriterType::Pointer      writer =  WriterType::New();
   CastFilterType::Pointer  caster =  CastFilterType::New();
 
   writer->SetFileName( argv[3] );

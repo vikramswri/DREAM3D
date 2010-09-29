@@ -138,7 +138,10 @@ class OIMColoring
     template <typename T>
     static void GenerateIPFColor(T phi1, T phi, T phi2,
                                  T refDir0, T refDir1, T refDir2,
-                                 unsigned char* rgb)
+                                 unsigned char* rgb,
+                                 size_t rIdx = 0,
+                                 size_t gIdx = 1,
+                                 size_t bIdx = 2)
     {
      // const T SqrtTwo = static_cast<T>(sqrt(2.0));
       const T SqrtTwoOverTwo = static_cast<T>(sqrt(2.0)/2.0);
@@ -221,9 +224,9 @@ class OIMColoring
       green = green * 255.0f;
       blue = blue * 255.0f;
 
-      rgb[0] = static_cast<unsigned int>(red);
-      rgb[1] = static_cast<unsigned int>(green);
-      rgb[2] = static_cast<unsigned int>(blue);
+      rgb[rIdx] = static_cast<unsigned int>(red);
+      rgb[gIdx] = static_cast<unsigned int>(green);
+      rgb[bIdx] = static_cast<unsigned int>(blue);
     }
 
 

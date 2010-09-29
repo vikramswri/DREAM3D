@@ -6,7 +6,7 @@
 project(MutualInformation)
 
 include_directories(${PROJECT_SOURCE_DIR}  ${PROJECT_BINARY_DIR})
-include_directories(${IPHelper_CODE_DIR} )
+include_directories(${PROJECT_CODE_DIR} )
 include_directories(${IPHelper_BINARY_DIR})
 include_directories(${IPHelper_BINARY_DIR}/MXA)
 
@@ -51,23 +51,23 @@ SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${IPHelper_BINARY_DIR}/Bin  )
 # --------------------------------------------------------------------
 #  Add an executable based on the ITK Mutual Information Classes
 set (ITK_MI_TEST_SRCS  
-    ${IPHelper_CODE_DIR}/AngReader/AngDirectoryPatterns.cpp
-    ${IPHelper_CODE_DIR}/AngReader/AngFileHelper.cpp
-    ${IPHelper_CODE_DIR}/AngReader/AngReader.cpp
-    ${IPHelper_CODE_DIR}/AngReader/itkAngImageIO.cpp
-    ${IPHelper_CODE_DIR}/AngReader/itkAngImageIOFactory.cpp
+    ${PROJECT_CODE_DIR}/AngReader/AngDirectoryPatterns.cpp
+    ${PROJECT_CODE_DIR}/AngReader/AngFileHelper.cpp
+    ${PROJECT_CODE_DIR}/AngReader/AngReader.cpp
+    ${PROJECT_CODE_DIR}/AngReader/itkAngImageIO.cpp
+    ${PROJECT_CODE_DIR}/AngReader/itkAngImageIOFactory.cpp
     ${PROJECT_SOURCE_DIR}/itkMITest.cpp
 )
 
 set (ITK_MI_TEST_HDRS  
-    ${IPHelper_CODE_DIR}/AngReader/AngConstants.h
-    ${IPHelper_CODE_DIR}/AngReader/AngDirectoryPatterns.h
-    ${IPHelper_CODE_DIR}/AngReader/AngFileHelper.h
-    ${IPHelper_CODE_DIR}/AngReader/AngReader.h
-    ${IPHelper_CODE_DIR}/AngReader/AngUtils.hpp
-    ${IPHelper_CODE_DIR}/AngReader/OIMColoring.hpp
-    ${IPHelper_CODE_DIR}/AngReader/itkAngImageIO.h
-    ${IPHelper_CODE_DIR}/AngReader/itkAngImageIOFactory.h
+    ${PROJECT_CODE_DIR}/AngReader/AngConstants.h
+    ${PROJECT_CODE_DIR}/AngReader/AngDirectoryPatterns.h
+    ${PROJECT_CODE_DIR}/AngReader/AngFileHelper.h
+    ${PROJECT_CODE_DIR}/AngReader/AngReader.h
+    ${PROJECT_CODE_DIR}/AngReader/AngUtils.hpp
+    ${PROJECT_CODE_DIR}/AngReader/OIMColoring.hpp
+    ${PROJECT_CODE_DIR}/AngReader/itkAngImageIO.h
+    ${PROJECT_CODE_DIR}/AngReader/itkAngImageIOFactory.h
 )
 
 add_executable(itkMITest ${ITK_MI_TEST_SRCS} ${ITK_MI_TEST_HDRS} )

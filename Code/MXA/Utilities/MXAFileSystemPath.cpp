@@ -37,7 +37,7 @@
 #define MXA_GET_CWD ::getcwd
 #endif
 
-#if defined (MXA_HAVE_SYS_STAT_H)
+#if defined (CMP_HAVE_SYS_STAT_H)
 #include <sys/stat.h>
 
 #if defined (_WIN32)
@@ -81,7 +81,7 @@
 #define MXA_STAT_LNK   S_IFLNK
 #endif
 
-#endif /* defined (MXA_HAVE_SYS_STATS_H) */
+#endif /* defined (CMP_HAVE_SYS_STATS_H) */
 
 // -----------------------------------------------------------------------------
 //

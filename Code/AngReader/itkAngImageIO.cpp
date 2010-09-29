@@ -137,8 +137,8 @@ void AngImageIO::Read(void* buffer)
 {
   unsigned char* rgbImage = static_cast<unsigned char *>(buffer);
 
-  m_Spacing[0] = 1.0;
-  m_Spacing[1] = 1.0;
+  m_Spacing[0] = 0.25;
+  m_Spacing[1] = 0.25;
 
   m_Origin[0] = 0.0;
   m_Origin[1] = 0.0;
@@ -164,11 +164,15 @@ void AngImageIO::Read(void* buffer)
   float* xpos = reader.getXPosPointer();
   float* ypos = reader.getYPosPointer();
 
-  m_Spacing[0] = reader.getXStep();
-  m_Spacing[1] = reader.getYStep();
 
-  m_Origin[0] = xpos[0];
-  m_Origin[1] = ypos[1];
+  this->SetSpacing(0, reader.getXStep());
+  this->SetSpacing(1, reader.getYStep());
+
+  this->SetOrigin(0, xpos[0]);
+  this->SetOrigin(1, ypos[0]);
+
+  std::cout << "Ang Spacing: " << m_Spacing[0] << ", " << m_Spacing[1] << std::endl;
+  std::cout << "Ang Origin : " << m_Origin[0] << ", " << m_Origin[1] << std::endl;
 
   float refDir0 = 0.0f;
   float refDir1 = 0.0f;
@@ -192,9 +196,6 @@ void AngImageIO::Read(void* buffer)
     }
   }
 
-
-
-
 }
 
 /**
@@ -203,28 +204,21 @@ void AngImageIO::Read(void* buffer)
  */
 void AngImageIO::ReadImageInformation()
 {
-  int xsize, ysize;
-//  long tmp;
-//  short stmp;
-//  long infoSize;
-//  int  iinfoSize;  // in case we are on a 64bit machine
-//  int  itmp;       // in case we are on a 64bit machine
-
   AngReader reader;
   reader.setFileName(GetFileName());
   int err = reader.readHeaderOnly();
   if ( err < 0)
   {
-
-  itkExceptionMacro( "itkAngImageIO could not read the Ang File Header " );
-  return;
+    itkExceptionMacro( "itkAngImageIO could not read the Ang File Header " );
+    return;
   }
-  xsize = reader.getNumRows();
-  ysize = reader.getNumEvenCols();
-  reader.setUserOrigin(AngReader::LowerLeftOrigin);
+
   this->SetNumberOfDimensions(2);
-  m_Dimensions[0] = xsize;
-  m_Dimensions[1] = ysize;
+  m_Dimensions[0] = reader.getNumEvenCols();
+  m_Dimensions[1] = reader.getNumRows();
+
+  this->SetSpacing(0, reader.getXStep());
+  this->SetSpacing(1, reader.getYStep());
 }
 
 

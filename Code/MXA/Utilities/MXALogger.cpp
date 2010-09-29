@@ -32,11 +32,10 @@ MXALogger::~MXALogger()
 MXALogger::Pointer MXALogger::instance()
 {
 	static MXALogger::Pointer singleton;
-	if (singleton.RAW_PTR() == NULL)
+	if (singleton.get() == NULL)
 	  {
 	//	std::cout << "MXALogger constructing singleton instance" << std::endl;
-	  MXALogger::Pointer p(new MXALogger());
-	    singleton =  p;
+	    singleton.reset (new MXALogger() );
 	  }
 	  return singleton;
 }

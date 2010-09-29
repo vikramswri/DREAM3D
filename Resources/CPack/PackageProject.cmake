@@ -11,7 +11,7 @@
 # This CMake code sets up for CPack to be used to generate native installers
 # ------------------------------------------------------------------------------
 #INCLUDE (InstallRequiredSystemLibraries)
-INCLUDE (${PROJECT_CMAKE_DIR}/InstallationSupport/InstallMSVCLibraries.cmake)
+INCLUDE (${CMP_INSTALLATION_SUPPORT_SOURCE_DIR}/InstallMSVCLibraries.cmake)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GUI Application that runs various image processing algorithms through a plugin interface.")
 SET(CPACK_PACKAGE_VENDOR "BlueQuartz Software, Michael A. Jackson")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_BINARY_DIR}/ReadMe.txt")
@@ -45,8 +45,8 @@ IF(WIN32 AND NOT UNIX)
   SET(CPACK_NSIS_CONTACT "mike.jackson@bluequartz.net")
   SET(CPACK_NSIS_MODIFY_PATH ON)
   SET(CPACK_GENERATOR "ZIP")
-  SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "IPHelper Software Tools")
   SET(CPACK_BINARY_ZIP "ON")
+  SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "IPHelper Software Tools")
 ELSE(WIN32 AND NOT UNIX)
     SET(CPACK_BINARY_BUNDLE "OFF")
     SET(CPACK_BINARY_CYGWIN "OFF")

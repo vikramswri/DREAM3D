@@ -126,6 +126,7 @@ class IPHelperApp : public QMainWindow, private Ui::IPHelperApp
                                QActionGroup *actionGroup);
 
     QStringList generateInputFileList();
+
     /**
     *
     * @param event

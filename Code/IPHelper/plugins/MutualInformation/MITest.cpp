@@ -161,17 +161,17 @@ int main(int argc, char **argv)
 
 
   std::vector<AIMArray<uint8_t>::Pointer> images;
-  AIMArray<uint8_t>::Pointer i0 = loadImage(QString("/Users/mjackson/Contracts/AFRL-TO79/Mutual_Info_CMU/4044.tif"));
-  AIMArray<uint8_t>::Pointer i1 = loadImage(QString("/Users/mjackson/Contracts/AFRL-TO79/Mutual_Info_CMU/5044.tif"));
-  AIMArray<uint8_t>::Pointer i2 = loadImage(QString("/Users/mjackson/Contracts/AFRL-TO79/Mutual_Info_CMU/6044.tif"));
-  AIMArray<uint8_t>::Pointer i3 = loadImage(QString("/Users/mjackson/Contracts/AFRL-TO79/Mutual_Info_CMU/7044.tif"));
+  AIMArray<uint8_t>::Pointer i0 = loadImage(QString("/private/tmp/Cropped.tif"));
+  AIMArray<uint8_t>::Pointer i1 = loadImage(QString("/private/tmp/out.tif"));
+//  AIMArray<uint8_t>::Pointer i2 = loadImage(QString("/Users/mjackson/Contracts/AFRL-TO79/Mutual_Info_CMU/6044.tif"));
+//  AIMArray<uint8_t>::Pointer i3 = loadImage(QString("/Users/mjackson/Contracts/AFRL-TO79/Mutual_Info_CMU/7044.tif"));
 
 
   // Make sure all images are the same size. for this test we know the first image
   // is shorter vertically than the other images so we will just simply chop off
   // the bottom portion of the other images
 
-#if 1
+#if 0
   CropInputImage(i0, i1);
   CropInputImage(i0, i2);
   CropInputImage(i0, i3);
@@ -187,8 +187,8 @@ int main(int argc, char **argv)
 
   images.push_back(i0);
   images.push_back(i1);
-  images.push_back(i2);
-  images.push_back(i3);
+//  images.push_back(i2);
+//  images.push_back(i3);
 
   int binSize = 4;
 

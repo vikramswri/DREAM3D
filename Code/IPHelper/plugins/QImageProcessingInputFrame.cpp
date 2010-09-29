@@ -155,7 +155,7 @@ AIMImage::Pointer QImageProcessingInputFrame::loadImage(QString filePath)
     }
     image.setColorTable(colorTable);
     aimImage = convertQImageToGrayScaleAIMImage(image);
-    if (NULL == aimImage.data())
+    if (NULL == aimImage.RAW_PTR())
     {
       return aimImage;
     }

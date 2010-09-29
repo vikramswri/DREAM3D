@@ -5,6 +5,15 @@
 #///////////////////////////////////////////////////////////////////////////////
 project(AIMLib)
 
+
+IF(ITK_FOUND)
+  INCLUDE(${USE_ITK_FILE})
+ELSE(ITK_FOUND)
+  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
+ENDIF(ITK_FOUND)
+
+
+
 set (Project_SRCS "")
 
 Macro(MXACompileDir DirName)
@@ -19,18 +28,6 @@ include_directories(${AIMLib_SOURCE_DIR}/..)
 include_directories(${AIMLib_BINARY_DIR})
 include_directories(${AIMLib_BINARY_DIR}/..)
 add_definitions(-DQT_CORE_LIB)
-
-
-# --------------------------------------------------------------------
-# Find the ITK Package
-# --------------------------------------------------------------------
-FIND_PACKAGE(ITK)
-IF(ITK_FOUND)
-  INCLUDE(${USE_ITK_FILE})
-ELSE(ITK_FOUND)
-  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
-ENDIF(ITK_FOUND)
-
 
 
 add_library(AIMLib STATIC ${Project_SRCS})

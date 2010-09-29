@@ -69,7 +69,7 @@ void EMMPMTask::run()
   // Load the image from the input file
   QImage image(getInputFilePath());
   m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
-  if (NULL == m_OriginalImage.data())
+  if (NULL == m_OriginalImage.RAW_PTR())
   {
     std::cout << "Error loading image '" << getInputFilePath().toStdString() << "'" << std::endl;
     emit finished();

@@ -11,7 +11,6 @@
 #ifndef _MXA_DLL_EXPORT_H_
 #define _MXA_DLL_EXPORT_H_
 
-#include <MXA/MXAConfiguration.h>
 
 #if defined (_MSC_VER)
   #pragma warning(disable: 4251)

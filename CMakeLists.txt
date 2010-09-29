@@ -15,7 +15,7 @@
 # ------------------------------------------------------------------------------
 
 project (IPHelper)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 # ---------- Setup output Directories -------------------------
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY
@@ -38,96 +38,116 @@ SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
   "Single Directory for all static libraries."
   )
 
-SET (IPHelper_PROJECT_DIR ${IPHelper_SOURCE_DIR})
-SET (IPHelper_CODE_DIR ${IPHelper_SOURCE_DIR}/Code)
+SET (PROJECT_CODE_DIR ${PROJECT_SOURCE_DIR}/Code)
 SET (PROJECT_RESOURCES_DIR ${IPHelper_SOURCE_DIR}/Resources)
-SET (PROJECT_CMAKE_DIR  ${PROJECT_RESOURCES_DIR}/MXACMake)
-SET (OSX_TOOLS_DIR ${PROJECT_RESOURCES_DIR}/OSX_Tools)
-SET (PROJECT_PREFIX "IPHelper" CACHE STRING "The 3 Letter Prefix to be used for Preprocessor definitions")
+SET (PROJECT_PREFIX "MXA" CACHE STRING "The Prefix to be used for Preprocessor definitions")
 SET (EXE_DEBUG_EXTENSION "_debug")
-SET (MXA_INSTALL_FILES "0")
-SET (MXA_SOURCE_DIR ${IPHelper_CODE_DIR})
 
-file(WRITE ${IPHelper_BINARY_DIR}/plugins.txt "")
-file(WRITE ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${IPHelper_BINARY_DIR}/Bin/plugins;")
-file(APPEND ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${IPHelper_BINARY_DIR}/Bin;")
-# --------------------------------------------------------------------
-# including this file will kick off all the type, header and other configuration
-# checks that need to be performed in order to include all the MXA Files
-INCLUDE (${PROJECT_CMAKE_DIR}/MXACMakeCommon.cmake )
-
-
-# Include some directories for the compiler
-include_directories(${PROJECT_BINARY_DIR})
+#-------------------------------------------------------------------------------
+# Include the cmp project to perform all the basic configuration tests for the 
+# project.
+#------------------------------------------------------------------------------- 
+set (CMP_HEADER_DIR ${IPHelper_BINARY_DIR}/MXA)
+set (CMP_CONFIGURATION_FILE_NAME "CMPConfiguration.h")
+set (CMP_TYPES_FILE_NAME "MXATypes.h")
+set (CMP_VERSION_HEADER_FILE_NAME "MXAVersion.h")
+set (CMP_EXTRA_CONFIGURATION_FILE "MXAConfiguration.h")
+set (CMP_PROJECT_NAMESPACE "MXA")
+set (CMP_PROJECT_NAME "MXA")
+SET (CMP_INSTALL_FILES "1")
+set (CMP_ENABLE_PLUGINS "1")
+INCLUDE (${PROJECT_RESOURCES_DIR}/cmp/cmpProject.cmake)
 
 # --------------------------------------------------------------------
 # Generate a Header file with Compile Version variables
 # --------------------------------------------------------------------
-GenerateVersionString( ${PROJECT_NAME} "${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h" "${PROJECT_PREFIX}" )
-
-# --------------------------------------------------------------------
-# Find the ITK Package
-# --------------------------------------------------------------------
-FIND_PACKAGE(ITK)
-IF(ITK_FOUND)
-  INCLUDE(${USE_ITK_FILE})
-  # Add the ITK library directories to the directory search paths for fixing
-  # up OS X bundles.
-  file(APPEND ${IPHelper_BINARY_DIR}/libsearchdirs.txt "${ITK_LIBRARY_DIRS};")
-ELSE(ITK_FOUND)
-  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
-ENDIF(ITK_FOUND)
-
-# ------------------------------------------------------------------------------
-#  Qt 4 Section
-#------------------------------------------------------------------------------
-# This command finds Qt4 libraries and sets all required variables
-# note that it's Qt4, not QT4 or qt4
-FIND_PACKAGE( Qt4 REQUIRED )
-# add some useful macros and variables
-# (QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that 
-# contains a path to CMake script)
-
-# by default only QtCore and QtGui modules are enabled
-# other modules must be enabled like this:  
-IF (WIN32)
-  SET (QT_USE_QTMAIN TRUE)
-ENDIF (WIN32)
-INCLUDE( ${QT_USE_FILE} )
-
-# --------------------------------------------------------------------
-# Find the ITK Package
-# --------------------------------------------------------------------
-FIND_PACKAGE(ITK)
-IF(ITK_FOUND)
-  INCLUDE(${USE_ITK_FILE})
-ELSE(ITK_FOUND)
-  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
-ENDIF(ITK_FOUND)
-
+cmpGenerateVersionString( "${IPHelper_BINARY_DIR}/${PROJECT_NAME}/Common/${PROJECT_NAME}Version.h" 
+                          "IPHelper" 
+                          "IPHelper")
+                          
 # --------------------------------------------------------------------
 # Generate our ReadMe and License Files
 configure_file(${PROJECT_SOURCE_DIR}/License.txt.in
                 ${PROJECT_BINARY_DIR}/License.txt )
 configure_file(${PROJECT_SOURCE_DIR}/ReadMe.txt.in
                 ${PROJECT_BINARY_DIR}/ReadMe.txt )
-IDE_SOURCE_PROPERTIES( "EMMPM/Configured" "${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h;${PROJECT_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "")                
 
+# --------------------------------------------------------------------
+# Generate the License File Headers
 include(${PROJECT_SOURCE_DIR}/License/License.cmake)
+
+SET (MXA_INSTALL_FILES "0")
+SET (MXA_SOURCE_DIR ${PROJECT_CODE_DIR})
+
+# Include some directories for the compiler
+include_directories(${PROJECT_BINARY_DIR})
+
+
+# Build shared libraries
+OPTION (BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
+SET (LIB_TYPE STATIC)
+SET (MXA_BUILT_AS_DYNAMIC_LIB)
+IF (BUILD_SHARED_LIBS)
+  SET (LIB_TYPE SHARED)
+ENDIF (BUILD_SHARED_LIBS)
+
+# ---------- Find Boost Headers/Libraries -----------------------
+SET (Boost_FIND_REQUIRED TRUE)
+SET (Boost_DEBUG FALSE)
+set (Boost_USE_MULTITHREADED TRUE)
+set (Boost_USE_STATIC_LIBS TRUE)
+SET (Boost_ADDITIONAL_VERSIONS "1.44.0" "1.44" "1.36" "1.36.0" "1.41" "1.41.0" "1.39" "1.39.0")
+SET (MXA_BOOST_COMPONENTS "")
+FIND_PACKAGE(Boost COMPONENTS  ${MXA_BOOST_COMPONENTS} )
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+
+# --------------------------------------------------------------------
+# Find the ITK Package
+# --------------------------------------------------------------------
+FIND_PACKAGE(ITK)
+# --------------------------------------------------------------------
+# Find the ITK Package
+# --------------------------------------------------------------------
+IF(ITK_FOUND)
+  file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${ITK_LIBRARY_DIRS};")
+ELSE(ITK_FOUND)
+  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
+ENDIF(ITK_FOUND)
+# ------------------------------------------------------------------------------
+#  Qt 4 Section
+# ------------------------------------------------------------------------------
+# by default only QtCore and QtGui modules are enabled
+# other modules must be enabled like this:  
+IF (WIN32)
+    SET (QT_USE_QTMAIN TRUE)
+ENDIF (WIN32)
+# this command finds Qt4 libraries and sets all required variables
+# note that it's Qt4, not QT4 or qt4. add some useful macros and variables
+# (QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that 
+# contains a path to CMake script)
+FIND_PACKAGE( Qt4 REQUIRED )
 
 # --------------------------------------------------------------------
 # Compile the support libraries
-add_subdirectory(${IPHelper_CODE_DIR}/AIM ${PROJECT_BINARY_DIR}/AIMLib)
-add_subdirectory(${IPHelper_CODE_DIR}/QtSupport ${PROJECT_BINARY_DIR}/QtSupport)
-add_subdirectory(${IPHelper_CODE_DIR}/MXA ${PROJECT_BINARY_DIR}/MXA)
+add_subdirectory(${PROJECT_CODE_DIR}/AIM ${PROJECT_BINARY_DIR}/AIMLib)
+add_subdirectory(${PROJECT_CODE_DIR}/QtSupport ${PROJECT_BINARY_DIR}/QtSupport)
+add_subdirectory(${PROJECT_CODE_DIR}/MXA ${PROJECT_BINARY_DIR}/MXA)
+add_subdirectory(${PROJECT_CODE_DIR}/AngReader ${PROJECT_BINARY_DIR}/AngReader)
+set (MXADATAMODEL_INCLUDE_DIRS ${PROJECT_CODE_DIR})
+
+add_subdirectory(${PROJECT_CODE_DIR}/MIApp ${PROJECT_BINARY_DIR}/Applications/MIApp)
+
 
 # Compile the image processing plugins
-add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/EMMPM ${PROJECT_BINARY_DIR}/plugins/EMMPM)
-add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/CrossCorrelation ${PROJECT_BINARY_DIR}/plugins/CrossCorrelation)
-add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/plugins/MutualInformation ${PROJECT_BINARY_DIR}/plugins/MutualInformation)
+add_subdirectory(${PROJECT_CODE_DIR}/IPHelper/plugins/EMMPM ${PROJECT_BINARY_DIR}/plugins/EMMPM)
+add_subdirectory(${PROJECT_CODE_DIR}/IPHelper/plugins/CrossCorrelation ${PROJECT_BINARY_DIR}/plugins/CrossCorrelation)
+#add_subdirectory(${PROJECT_CODE_DIR}/IPHelper/plugins/MutualInformation ${PROJECT_BINARY_DIR}/plugins/MutualInformation)
 
 # Compile the main Application - this MUST be last due to how some variables are built up.
-add_subdirectory(${IPHelper_CODE_DIR}/IPHelper/Application ${PROJECT_BINARY_DIR}/Application)
+add_subdirectory(${PROJECT_CODE_DIR}/IPHelper/Application ${PROJECT_BINARY_DIR}/Applications/IPHelper)
+
+
 
 # Should we build the HTML documentation
 option(IPHelper_BUILD_API_DOCS "Use Doxygen to create the HTML based API documentation" OFF)
@@ -141,5 +161,4 @@ if(IPHelper_BUILD_API_DOCS)
   add_custom_target(docs COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile)
 endif()
 
-include(${PROJECT_CMAKE_DIR}/InstallationSupport/InstallSupportLibraries.cmake)
 include(${PROJECT_RESOURCES_DIR}/CPack/PackageProject.cmake)
