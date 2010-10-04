@@ -232,13 +232,23 @@ macro(PluginProperties targetName DEBUG_EXTENSION projectVersion binaryDir)
     else()
         file(APPEND ${binaryDir}/plugins.txt "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}.plugin;")
     endif()
+    
+    if (MSVC)
+        set (BUILD_TYPES "Debug;Release")
+        foreach(btype ${BUILD_TYPES})
+            INSTALL(TARGETS ${targetName}
+                    DESTINATION ./plugins
+                    CONFIGURATIONS ${btype}
+                    COMPONENT Applications)
+        endforeach()
+    endif()
 endmacro(PluginProperties DEBUG_EXTENSION)
 
 #-------------------------------------------------------------------------------
 # Finds plugins from the Qt installation. The pluginlist argument should be
 # something like "qgif;qjpeg;qtiff"
 #-------------------------------------------------------------------------------
-macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile)
+macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
   set (qt_plugin_list ${pluginlist})
   set (qt_plugin_types "Debug;Release")
   if (WIN32)
@@ -261,15 +271,42 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile)
     string(TOUPPER ${build_type} BTYPE)
       foreach(plugin ${qt_plugin_list})
       STRING(TOUPPER ${plugin} PLUGIN)
-  #      message(STATUS "|-- Looking for q${plugin}${qt_plugin_${build_type}_suffix}")
-         FIND_LIBRARY( QT_${PLUGIN}_PLUGIN_${BTYPE} 
+       # message(STATUS "|-- Looking for ${plugin}${qt_plugin_${BTYPE}_suffix}")
+         FIND_LIBRARY( QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE} 
                       NAMES ${plugin}${qt_plugin_${BTYPE}_suffix} 
-                      PATHS ${QT_PLUGINS_DIR}/imageformats 
+                      PATHS ${QT_PLUGINS_DIR}/${plugintype} 
                       DOC "Library Path for ${plugin}"
                       NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-         mark_as_advanced(QT_${PLUGIN}_PLUGIN_${BTYPE})
-  #      message(STATUS "|--  Q${plugin}_PLUGIN_${build_type}_LIB: ${Q${plugin}_PLUGIN_${build_type}_LIB}")
-        LIST(APPEND QTPLUGINS_${BTYPE} ${QT_${PLUGIN}_PLUGIN_${BTYPE}})
+                      
+         if (MSVC)
+            #  message(STATUS "QT_PLUGINS_DIR: ${QT_PLUGINS_DIR}")
+            #  message(STATUS " QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+            get_filename_component(lib_path ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} PATH)
+            get_filename_component(lib_name ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} NAME_WE)
+            #  message(STATUS "lib_path: ${lib_path}")
+            #  message(STATUS "lib_name: ${lib_name}")
+            set (QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE} ${lib_path}/${lib_name}.dll CACHE PATH "" FORCE)
+            if ( ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} STREQUAL  "QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}-NOTFOUND")
+              message(STATUS "A Companion DLL for ${upperlib}_LIBRARY_${TYPE} was NOT found which usually means"
+                                " that the library was NOT built as a DLL. I looked in the "
+                                " following locations:  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin")
+            else()
+              #  set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
+              #  message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
+              #  message(STATUS "Generating Install Rule for DLL File for QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}\n  ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+              INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
+                DESTINATION ./plugins/${plugintype} 
+                CONFIGURATIONS ${BTYPE} 
+                COMPONENT Runtime)
+            endif()
+
+         endif()             
+                      
+                      
+                      
+        mark_as_advanced(QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE})
+       # message(STATUS "|--  QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+        LIST(APPEND QTPLUGINS_${BTYPE} QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE})
       endforeach()
   endforeach()
 
