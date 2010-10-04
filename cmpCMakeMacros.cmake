@@ -349,7 +349,6 @@ macro (CMP_COPY_QT4_RUNTIME_LIBRARIES QTLIBLIST)
         if (DEFINED QT_QMAKE_EXECUTABLE)
             set(TYPE "d")
             FOREACH(qtlib ${QTLIBLIST})
-                message(STATUS "qtlib: ${qtlib}")
                 GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
                 INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}${type}d4.dll 
                     DESTINATION ./
