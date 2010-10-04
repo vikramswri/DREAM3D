@@ -339,8 +339,40 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
       ENDIF(${upperlib}_IS_SHARED)
     ENDFOREACH(lib ${mxa_lib_list})
   ENDIF(MSVC)  
-    
 endmacro()
+
+# --------------------------------------------------------------------
+#-- Copy all the Qt4 dependent DLLs into the current build directory so that
+#-- one can debug an application or library that depends on Qt4 libraries.
+macro (CMP_COPY_QT4_RUNTIME_LIBRARIES QTLIBLIST)
+    if (MSVC)
+        if (DEFINED QT_QMAKE_EXECUTABLE)
+            set(TYPE "d")
+            FOREACH(qtlib ${QTLIBLIST})
+                message(STATUS "qtlib: ${qtlib}")
+                GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
+                INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}${type}d4.dll 
+                    DESTINATION ./
+                    CONFIGURATIONS Debug
+                    COMPONENT Applications)
+                INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll 
+                    DESTINATION ./
+                    CONFIGURATIONS Release
+                    COMPONENT Applications)
+                add_custom_target(ZZ_${qtlib}-Debug-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}4.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/ 
+                            COMMENT "Copying ${qtlib}${TYPE}4.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/")
+                add_custom_target(ZZ_${qtlib}-Release-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}4.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ 
+                            COMMENT "Copying ${qtlib}4.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/")
+          
+            ENDFOREACH(qtlib)
+        endif(DEFINED QT_QMAKE_EXECUTABLE)
+    endif()
+endmacro()
+
 #
 # --------------------------------------------------------------------
 # This macro generates install rules for Visual Studio builds so that
