@@ -306,7 +306,7 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
                       
         mark_as_advanced(QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE})
        # message(STATUS "|--  QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
-        LIST(APPEND QTPLUGINS_${BTYPE} QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE})
+        LIST(APPEND QTPLUGINS_${BTYPE} ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}})
       endforeach()
   endforeach()
 
