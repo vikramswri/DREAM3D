@@ -675,7 +675,7 @@ AIMImage::Pointer IPHelperApp::loadImage(QString filePath)
     }
     image.setColorTable(colorTable);
     aimImage = convertQImageToGrayScaleAIMImage(image);
-    if (NULL == aimImage.data())
+    if (NULL == aimImage.RAW_PTR())
     {
       return aimImage;
     }
@@ -748,7 +748,7 @@ qint32 IPHelperApp::initImageViews()
 
     // Create the m_OriginalImage and m_Processed Image Objects
     m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
-    if (NULL == m_OriginalImage.data())
+    if (NULL == m_OriginalImage.RAW_PTR())
     {
       return -1;
     }
@@ -759,11 +759,11 @@ qint32 IPHelperApp::initImageViews()
   // If we have NOT loaded a processed file AND we have a valid Original Image, then
   // create the Processed image based on the input image.
   QImage processedImage;
-  if (m_CurrentProcessedFile.isEmpty() == true && NULL != m_OriginalImage.data() )
+  if (m_CurrentProcessedFile.isEmpty() == true && NULL != m_OriginalImage.RAW_PTR() )
   {
     processedImage = image;
     m_ProcessedImage = convertQImageToGrayScaleAIMImage(processedImage);
-    if (NULL == m_ProcessedImage.data())
+    if (NULL == m_ProcessedImage.RAW_PTR())
     {
       return -1;
     }
@@ -778,14 +778,14 @@ qint32 IPHelperApp::initImageViews()
     }
     // Convert it to an AIMImage in GrayScale
     m_ProcessedImage = convertQImageToGrayScaleAIMImage(processedImage);
-    if (NULL == m_ProcessedImage.data() )
+    if (NULL == m_ProcessedImage.RAW_PTR() )
     {
       std::cout << "Error loading Processed image from file" << std::endl;
       return -1;
     }
   }
 
-  if (NULL != m_ProcessedImage.data() )
+  if (NULL != m_ProcessedImage.RAW_PTR() )
   {
     // Create the QGraphicsScene Objects
     if (NULL == m_ProcessedImageGScene) {
@@ -935,9 +935,10 @@ void IPHelperApp::loadPlugins()
      QString thePath;
 
  #if defined(Q_OS_WIN)
-     aPluginDir.cd("plugins");
-     thePath = aPluginDir.absolutePath();
-     m_PluginDirs << thePath;
+     if (aPluginDir.cd("plugins") ) {
+      thePath = aPluginDir.absolutePath();
+      m_PluginDirs << thePath;
+     }
  #elif defined(Q_OS_MAC)
      if (aPluginDir.dirName() == "MacOS") {
          aPluginDir.cdUp();

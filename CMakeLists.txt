@@ -86,7 +86,6 @@ include_directories(${PROJECT_BINARY_DIR})
 # Build shared libraries
 OPTION (BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
 SET (LIB_TYPE STATIC)
-SET (MXA_BUILT_AS_DYNAMIC_LIB)
 IF (BUILD_SHARED_LIBS)
   SET (LIB_TYPE SHARED)
 ENDIF (BUILD_SHARED_LIBS)
@@ -127,6 +126,13 @@ ENDIF (WIN32)
 # (QT_USE_FILE is a variable defined by FIND_PACKAGE( Qt4 ) that 
 # contains a path to CMake script)
 FIND_PACKAGE( Qt4 REQUIRED )
+IF (QT4_FOUND)
+    CMP_COPY_QT4_RUNTIME_LIBRARIES( "QtCore;QtGui" )
+    # Get the list of Qt4 Image Format Plugins that we need
+    # Find all the Qt Plugins after which we should have some more variables to our disposal
+    FindQt4Plugins("qgif;qjpeg;qtiff" "${PluginListFile}" "${LibDirSearchFile}" "imageformats" )
+endif()
+
 
 # --------------------------------------------------------------------
 # Compile the support libraries

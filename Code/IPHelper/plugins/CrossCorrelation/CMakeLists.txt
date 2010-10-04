@@ -82,13 +82,13 @@ if(NOT MSVC)
 endif()
 
 add_library(CrossCorrelationPlugin MODULE ${CrossCorrelationPlugin_PROJECT_SRCS})
-target_link_libraries(CrossCorrelationPlugin 
+target_link_libraries(CrossCorrelationPlugin
+                    MXADataModel 
                     ${QT_QTCORE_LIBRARY}   
                     ${QT_QTGUI_LIBRARY}
                     ${ITK_LIBRARIES} 
-                    QtSupport
-                    MXADataModel 
-                    AIMLib)
+                    QtSupport 
+                    AIMLib )
 PluginProperties(CrossCorrelationPlugin "_debug" "${IPHelper_VERSION}" "${IPHelper_BINARY_DIR}")
 
 if (NOT MSVC)

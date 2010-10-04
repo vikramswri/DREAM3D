@@ -75,7 +75,7 @@ void CrossCorrelationTask::run()
   mvImage = getMovingImagePath().toStdString();
   // Load the fixed image into an AIMIMage object
   AIMImage::Pointer fixedImage = loadImage(getInputFilePath());
-  if (NULL == fixedImage.data() )
+  if (NULL == fixedImage.RAW_PTR() )
   {
     emit finished();
     emit finished(this);
@@ -85,7 +85,7 @@ void CrossCorrelationTask::run()
 
   // Load the moving image into an AIMImage Object
   AIMImage::Pointer movingImage = loadImage(getMovingImagePath());
-  if (NULL == movingImage.data() )
+  if (NULL == movingImage.RAW_PTR() )
   {
     emit finished();
     emit finished(this);
@@ -143,7 +143,7 @@ AIMImage::Pointer CrossCorrelationTask::loadImage(QString filePath)
     }
     image.setColorTable(colorTable);
     aimImage = convertQImageToGrayScaleAIMImage(image);
-    if (NULL == aimImage.data())
+    if (NULL == aimImage.RAW_PTR())
     {
       return aimImage;
     }

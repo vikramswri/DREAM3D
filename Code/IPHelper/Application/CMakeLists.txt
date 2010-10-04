@@ -101,7 +101,7 @@ file(WRITE ${LibDirSearchFile} "${IPHelper_BINARY_DIR}/Bin/plugins;")
 # --------------------------------------------------------------------
 # Get the list of Qt4 Image Format Plugins that we need
 # Find all the Qt Plugins after which we should have some more variables to our disposal
-FindQt4Plugins("qgif;qjpeg;qtiff" "${PluginListFile}" "${LibDirSearchFile}" )
+FindQt4Plugins("qgif;qjpeg;qtiff" "${PluginListFile}" "${LibDirSearchFile}" "imageformats")
 file(READ ${PluginListFile}  QT4_COMPLETE_PLUGIN_LIST)
 file(READ ${LibDirSearchFile} QT4_PLUGIN_SEARCH_DIRS)
 
@@ -133,8 +133,8 @@ IF(Q_WS_WIN)
     include_directories(${PROJECT_RESOURCES_DIR}/icons/ico)
     configure_file(${PROJECT_RESOURCES_DIR}/icons/ico/IconResource.rc.in ${IPHelperApp_BINARY_DIR}/IPHelperApp.rc)
     SET (IPHelperApp_PROJECT_SRCS ${IPHelperApp_PROJECT_SRCS} ${IPHelperApp_BINARY_DIR}/IPHelperApp.rc) 
-    IDE_SOURCE_PROPERTIES ("IPHelperApp/ConfiguredFiles" "${IPHelperApp_BINARY_DIR}/IPHelperApp.rc" "")
-    IDE_SOURCE_PROPERTIES( "IPHelperApp/Configured" "${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h" "${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h")                
+    cmp_IDE_SOURCE_PROPERTIES ("IPHelperApp/ConfiguredFiles" "${IPHelperApp_BINARY_DIR}/IPHelperApp.rc" "" "0")
+    cmp_IDE_SOURCE_PROPERTIES( "IPHelperApp/Configured" "${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h" "${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "0") 
 ENDIF(Q_WS_WIN)
 
 # ---------- Build the Viewer Application  ----------------------

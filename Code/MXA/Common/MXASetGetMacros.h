@@ -14,6 +14,11 @@
 #include <sstream>
 #include <stdexcept>
 
+#ifdef QT_CORE_LIB
+#undef QT_CORE_LIB
+#define redef_QT_CORE_LIB
+#endif
+
 
 #if defined(QT_CORE_LIB)
 //-- Qt includes
@@ -279,7 +284,8 @@ namespace MXA
 
 #endif
 
-
-
+#ifdef redef_QT_CORE_LIB
+#define QT_CORE_LIB
+#endif
 
 #endif /* _MXASetGetMacros_h_  */

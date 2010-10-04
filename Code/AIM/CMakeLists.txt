@@ -5,14 +5,17 @@
 #///////////////////////////////////////////////////////////////////////////////
 project(AIMLib)
 
-
 IF(ITK_FOUND)
   INCLUDE(${USE_ITK_FILE})
 ELSE(ITK_FOUND)
   MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
-
+if(QT4_FOUND)
+    include( ${QT_USE_FILE} )
+else()
+    message(FATAL_ERROR "Qt 4 is Needed for this project.")
+endif(QT4_FOUND)
 
 set (Project_SRCS "")
 

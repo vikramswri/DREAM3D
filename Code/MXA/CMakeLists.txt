@@ -9,6 +9,14 @@ set (MXA_SOURCE_DIR ${PROJECT_CODE_DIR} )
 set (Project_SRCS "")
 set (Project_HDRS "")
 
+SET (MXA_BUILT_AS_DYNAMIC_LIB)
+IF (BUILD_SHARED_LIBS)
+    SET (MXA_BUILT_AS_DYNAMIC_LIB 1)
+    IF (WIN32)
+        ADD_DEFINITIONS("-DMXA_BUILT_AS_DYNAMIC_LIB")
+    ENDIF (WIN32)
+ENDIF (BUILD_SHARED_LIBS)
+
 Macro(MXACompileDir DirName)
     include(${MXADataModel_SOURCE_DIR}/${DirName}/SourceList.cmake)
     set (Project_SRCS ${Project_SRCS} ${MXA_${DirName}_SRCS} ${MXA_${DirName}_HDRS})
@@ -34,7 +42,7 @@ set (HDF5_VTK_BRIDGE "0")
 configure_file(${PROJECT_RESOURCES_DIR}/MXACMake/MXAConfiguration.h.in
                ${CMP_HEADER_DIR}/${CMP_EXTRA_CONFIGURATION_FILE})
                
-#add_definitions(-DQT_CORE_LIB)
+# add_definitions(-DQT_CORE_LIB)
 
 # - Check to see if any other project is redefining the library names
 IF ( NOT DEFINED  MXADATAMODEL_LIB_NAME)
@@ -42,7 +50,7 @@ IF ( NOT DEFINED  MXADATAMODEL_LIB_NAME)
 ENDIF ( NOT DEFINED MXADATAMODEL_LIB_NAME )
 
 add_library(${MXADATAMODEL_LIB_NAME} ${LIB_TYPE}  ${Project_SRCS})
-target_link_libraries(${MXADATAMODEL_LIB_NAME} ${QT_LIBRARIES})
+target_link_libraries(${MXADATAMODEL_LIB_NAME} )
 
 LibraryProperties( ${MXADATAMODEL_LIB_NAME} ${EXE_DEBUG_EXTENSION})
 

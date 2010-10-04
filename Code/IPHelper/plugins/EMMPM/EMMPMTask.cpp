@@ -30,11 +30,11 @@
 
 #include "EMMPMTask.h"
 
+#include <iostream>
 
 #include <QtCore/QDir>
 #include <QtCore/QLocale>
 
-#include <iostream>
 
 // -----------------------------------------------------------------------------
 //
@@ -63,6 +63,7 @@ EMMPMTask::~EMMPMTask()
 // -----------------------------------------------------------------------------
 void EMMPMTask::run()
 {
+  
 //  std::cout << "  EMMPMTask::run()" << std::endl;
   UPDATE_PROGRESS(QString("Starting Segmentation"), 0);
 
