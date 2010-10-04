@@ -3,8 +3,7 @@
 #  All rights reserved.
 #  BSD License: http://www.opensource.org/licenses/bsd-license.html
 #///////////////////////////////////////////////////////////////////////////////
-PROJECT( IPHelperApp )
-cmake_minimum_required(VERSION 2.8)
+project(IPHelperApp)
 
 # --------------------------------------------------------------------
 # Find the ITK Package

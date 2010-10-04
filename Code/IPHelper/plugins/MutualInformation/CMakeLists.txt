@@ -5,27 +5,46 @@
 #///////////////////////////////////////////////////////////////////////////////
 project(MutualInformation)
 
-include_directories(${PROJECT_SOURCE_DIR}  ${PROJECT_BINARY_DIR})
+# --------------------------------------------------------------------
+# Find the ITK Package
+# --------------------------------------------------------------------
+IF(ITK_FOUND)
+  INCLUDE(${USE_ITK_FILE})
+ELSE(ITK_FOUND)
+  MESSAGE(FATAL_ERROR "Cannot build without ITK.  Please set ITK_DIR.")
+ENDIF(ITK_FOUND)
+
+# ------------------------------------------------------------------------------
+#  Qt 4 Section
+# ------------------------------------------------------------------------------
+if(QT4_FOUND)
+    include( ${QT_USE_FILE} )
+else()
+    message(FATAL_ERROR "Qt 4 is Needed for this project.")
+endif(QT4_FOUND)
+
+
+include_directories(${MutualInformation_SOURCE_DIR}  ${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_CODE_DIR} )
 include_directories(${IPHelper_BINARY_DIR})
 include_directories(${IPHelper_BINARY_DIR}/MXA)
 
 
 set (MutualInformation_HDRS
-    ${PROJECT_SOURCE_DIR}/MutualInformation.h
-    ${PROJECT_SOURCE_DIR}/EMMPMInputUI.h
-    ${PROJECT_SOURCE_DIR}/EMMPMTask.h
-    ${PROJECT_SOURCE_DIR}/../QImageProcessingInputFrame.h
+    ${MutualInformation_SOURCE_DIR}/MutualInformation.h
+    ${MutualInformation_SOURCE_DIR}/EMMPMInputUI.h
+    ${MutualInformation_SOURCE_DIR}/EMMPMTask.h
+    ${MutualInformation_SOURCE_DIR}/../QImageProcessingInputFrame.h
     )
     
 set (MutualInformation_SRCS 
-    ${PROJECT_SOURCE_DIR}/MutualInformation.cpp
-    ${PROJECT_SOURCE_DIR}/EMMPMInputUI.cpp
-    ${PROJECT_SOURCE_DIR}/EMMPMTask.cpp
-    ${PROJECT_SOURCE_DIR}/../QImageProcessingInputFrame.cpp
+    ${MutualInformation_SOURCE_DIR}/MutualInformation.cpp
+    ${MutualInformation_SOURCE_DIR}/EMMPMInputUI.cpp
+    ${MutualInformation_SOURCE_DIR}/EMMPMTask.cpp
+    ${MutualInformation_SOURCE_DIR}/../QImageProcessingInputFrame.cpp
     )
 QT4_WRAP_UI( MutualInformation_Generated_UI_HDRS 
-            ${PROJECT_SOURCE_DIR}/EMMPMInputUI.ui )
+            ${MutualInformation_SOURCE_DIR}/EMMPMInputUI.ui )
 
 QT4_WRAP_CPP( MutualInformation_Generated_MOC_SRCS ${MutualInformation_HDRS} )
 
@@ -34,9 +53,9 @@ set (MutualInformation_PROJECT_SRCS
 #    ${MutualInformation_HDRS}
 #    ${MutualInformation_Generated_MOC_SRCS} 
 #    ${MutualInformation_Generated_UI_HDRS}
-    ${PROJECT_SOURCE_DIR}/MITest.cpp
-    ${PROJECT_SOURCE_DIR}/CMUMutualInformation.cpp
-    ${PROJECT_SOURCE_DIR}/CMUMutualInformation.h
+    ${MutualInformation_SOURCE_DIR}/MITest.cpp
+    ${MutualInformation_SOURCE_DIR}/CMUMutualInformation.cpp
+    ${MutualInformation_SOURCE_DIR}/CMUMutualInformation.h
 )
 
 # ---------- Setup output Directories -------------------------
@@ -56,7 +75,7 @@ set (ITK_MI_TEST_SRCS
     ${PROJECT_CODE_DIR}/AngReader/AngReader.cpp
     ${PROJECT_CODE_DIR}/AngReader/itkAngImageIO.cpp
     ${PROJECT_CODE_DIR}/AngReader/itkAngImageIOFactory.cpp
-    ${PROJECT_SOURCE_DIR}/itkMITest.cpp
+    ${MutualInformation_SOURCE_DIR}/itkMITest.cpp
 )
 
 set (ITK_MI_TEST_HDRS  
@@ -72,3 +91,20 @@ set (ITK_MI_TEST_HDRS
 
 add_executable(itkMITest ${ITK_MI_TEST_SRCS} ${ITK_MI_TEST_HDRS} )
 target_link_libraries(itkMITest ${ITK_LIBRARIES} ${QT_QTCORE_LIBRARY})
+
+
+set (ir9_SRCS 
+    ${PROJECT_CODE_DIR}/AngReader/itkAngImageIO.cpp
+    ${PROJECT_CODE_DIR}/AngReader/itkAngImageIOFactory.cpp
+    ${MutualInformation_SOURCE_DIR}/ImageRegistration9.cxx
+    )
+set (ir9_HDRS
+    ${PROJECT_CODE_DIR}/AngReader/itkAngImageIO.h
+    ${PROJECT_CODE_DIR}/AngReader/itkAngImageIOFactory.h
+)
+
+
+add_executable(ir9  ${ir9_SRCS} ${ir9_HDRS})
+target_link_libraries(ir9  ${ITK_LIBRARIES} AngReader)
+
+
