@@ -130,7 +130,7 @@ IF (QT4_FOUND)
     CMP_COPY_QT4_RUNTIME_LIBRARIES( "QtCore;QtGui" )
     # Get the list of Qt4 Image Format Plugins that we need
     # Find all the Qt Plugins after which we should have some more variables to our disposal
-    FindQt4Plugins("qgif;qjpeg;qtiff" "${PluginListFile}" "${LibDirSearchFile}" "imageformats" )
+    FindQt4Plugins("qgif;qjpeg;qtiff" "${CMP_PLUGIN_LIST_FILE}" "${CMP_PLUGIN_SEARCHDIR_FILE}" "imageformats" )
 endif()
 
 
