@@ -537,13 +537,24 @@ void CrossCorrelationInputUI::on_sourceDirectoryBtn_clicked() {
 // -----------------------------------------------------------------------------
 void CrossCorrelationInputUI::on_outputDirectoryBtn_clicked()
 {
+  bool canWrite = false;
   QString aDir = QFileDialog::getExistingDirectory(this, tr("Select Output Directory"), getOpenDialogLastDirectory(),
                                             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
   setOpenDialogLastDirectory(aDir);
   if (!getOpenDialogLastDirectory().isNull())
   {
-    this->outputDirectoryLE->setText(getOpenDialogLastDirectory());
+    QFileInfo fi(aDir);
+    canWrite = fi.isWritable();
+    if (canWrite) {
+      this->outputDirectoryLE->setText(getOpenDialogLastDirectory());
+    }
+    else
+    {
+      QMessageBox::critical(this, tr("Output Directory Selection Error"),
+                            tr("The Output directory is not writable by your user. Please make it writeable by changing the permissions or select another directory"),
+                            QMessageBox::Ok);
+    }
   }
 }
 
@@ -593,7 +604,18 @@ void CrossCorrelationInputUI::on_outputImageButton_clicked()
   {
     return;
   }
-  outputImageFile->setText(outputFile);
+
+  QFileInfo fi(outputFile);
+  QFileInfo fi2(fi.absolutePath());
+  if (fi2.isWritable() == true) {
+    outputImageFile->setText(outputFile);
+  }
+  else
+  {
+    QMessageBox::critical(this, tr("Output Image File Error"),
+                          tr("The parent directory of the output image is not writable by your user. Please make it writeable by changing the permissions or select another directory"),
+                          QMessageBox::Ok);
+  }
 }
 
 // -----------------------------------------------------------------------------

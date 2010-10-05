@@ -471,7 +471,7 @@ void IPHelperApp::on_processBtn_clicked()
 // -----------------------------------------------------------------------------
 void IPHelperApp::processingStarted()
 {
-  std::cout << "TO79MainWindow::processingStarted()" << std::endl;
+  std::cout << "IPHelper::processingStarted()" << std::endl;
   processBtn->setText("Cancel");
   processBtn->setEnabled(false);
   this->statusBar()->showMessage("Processing Images...");
@@ -483,7 +483,7 @@ void IPHelperApp::processingStarted()
 // -----------------------------------------------------------------------------
 void IPHelperApp::processingFinished()
 {
-  std::cout << "TO79MainWindow::processingFinished()" << std::endl;
+  std::cout << "IPHelper::processingFinished()" << std::endl;
   /* Code that cleans up anything from the processing */
   processBtn->setText("Process");
   processBtn->setEnabled(true);
@@ -963,13 +963,23 @@ void IPHelperApp::loadPlugins()
 foreach (QString pluginDirString, m_PluginDirs) {
   std::cout << "Plugin Directory being Searched: " << pluginDirString.toStdString() << std::endl;
     aPluginDir = QDir(pluginDirString);
-     foreach (QString fileName, aPluginDir.entryList(QDir::Files)) {
+     foreach (QString fileName, aPluginDir.entryList(QDir::Files))
+    {
+#ifdef QT_DEBUG
+       if (fileName.endsWith( "_debug.plugin", Qt::CaseSensitive) )
+#else
+       if (fileName.endsWith( ".plugin", Qt::CaseSensitive) )
+#endif
+       {
          QPluginLoader loader(aPluginDir.absoluteFilePath(fileName));
          QObject *plugin = loader.instance();
-         if (plugin) {
+         if (plugin && pluginFileNames.contains(fileName, Qt::CaseSensitive) == false)
+         {
              populateMenus(plugin);
              pluginFileNames += fileName;
+
          }
+       }
      }
 
      menuPlugins->setEnabled(!pluginActionGroup->actions().isEmpty());
