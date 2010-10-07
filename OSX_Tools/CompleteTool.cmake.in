@@ -1,3 +1,15 @@
+# -----------------------------------------------------------------------------------
+# This file was auto generated from the template file "CompleteBundle.cmake.in", if you 
+# need to make changes edit the template file NOT this one. Your changes will be 
+# lost the next time CMake is run. You have been warned.
+#   This file is called from CMake's installation generated scripts. It is added
+# via a CMake call 
+#   install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}")
+# which can be sometime found in the macro 'MakeOSXBundleApp' which is sometimes located
+# in the file OSX_BundleTools.cmake
+# -----------------------------------------------------------------------------------
+
+message (STATUS "#------------ Starting OS X Tool Fixup --------------------------")
 cmake_minimum_required(VERSION 2.6)
 
 #-- Need this for link line stuff?
@@ -63,13 +75,13 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
 endfunction(gp_item_default_embedded_path_override)
 
 #-- Be sure all the internal directories are created first before calling the 'fixup_bundle'
-file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/bin/tool_lib")
-#file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/Plugins")
-#file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/Frameworks")
-#file(MAKE_DIRECTORY "@CMAKE_INSTALL_PREFIX@/Support")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin/tool_lib")
+#file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/Plugins")
+#file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/Frameworks")
+#file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/Support")
 
 
 # -- Run the BundleUtilities cmake code
 include(@CMP_OSX_TOOLS_SOURCE_DIR@/ToolUtilities.cmake)
-deploy_tool("@CMAKE_INSTALL_PREFIX@/bin/@target@" "${PluginList}" "")
+deploy_tool("${CMAKE_INSTALL_PREFIX}/bin/@target@" "${PluginList}" "")
 
