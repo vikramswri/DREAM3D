@@ -57,7 +57,7 @@ ImageGraphicsDelegate::ImageGraphicsDelegate(QObject* parent) :
   m_CompositeImages(false),
   m_CurrentGraphicsItem(NULL),
   _zoomFactor(1.0),
-      _shouldFitToWindow(false)
+  _shouldFitToWindow(false)
 {
 
   _zoomFactors[0] = 0.05;
@@ -75,6 +75,7 @@ ImageGraphicsDelegate::ImageGraphicsDelegate(QObject* parent) :
   m_composition_mode = QPainter::CompositionMode_Exclusion;
   this->m_CachedImage = QImage();
   this->m_OverlayImage = QImage();
+  this->m_CompositedImage = QImage();
   m_DelegateName = "Default ImageGraphicsDelegate";
 }
 
@@ -310,9 +311,11 @@ void ImageGraphicsDelegate::updateGraphicsView(bool updateGraphicsScene)
     painter.drawImage(point, dataImage);
     painter.end();
     imagePixmap = QPixmap::fromImage(paintImage);
+    m_CompositedImage = paintImage;
   }
   else
   {
+    m_CompositedImage = QImage();
     imagePixmap = QPixmap::fromImage(dataImage);
   }
 

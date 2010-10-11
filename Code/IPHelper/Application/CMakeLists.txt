@@ -133,8 +133,8 @@ IF(Q_WS_WIN)
     include_directories(${PROJECT_RESOURCES_DIR}/icons/ico)
     configure_file(${PROJECT_RESOURCES_DIR}/icons/ico/IconResource.rc.in ${IPHelperApp_BINARY_DIR}/IPHelperApp.rc)
     SET (IPHelperApp_PROJECT_SRCS ${IPHelperApp_PROJECT_SRCS} ${IPHelperApp_BINARY_DIR}/IPHelperApp.rc) 
-    cmp_IDE_SOURCE_PROPERTIES ("IPHelperApp/ConfiguredFiles" "${IPHelperApp_BINARY_DIR}/IPHelperApp.rc" "" "0")
-    cmp_IDE_SOURCE_PROPERTIES( "IPHelperApp/Configured" "${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h" "${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "0") 
+    cmp_IDE_SOURCE_PROPERTIES ("ConfiguredFiles" "${IPHelperApp_BINARY_DIR}/IPHelperApp.rc" "${QRC_LICENSE_FILES};${IPHelperApp_BINARY_DIR}/IPHelperApp.rc" "0")
+    cmp_IDE_SOURCE_PROPERTIES( "ConfiguredFiles" "${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Version.h;${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Configuration.h" "${IPHelper_BINARY_DIR}/${PROJECT_PREFIX}/Common/${PROJECT_PREFIX}Types.h" "0") 
 ENDIF(Q_WS_WIN)
 
 # ---------- Build the Viewer Application  ----------------------

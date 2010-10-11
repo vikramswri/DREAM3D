@@ -622,6 +622,9 @@ void IPHelperApp::openProcessedImage(QString processedImage)
 qint32 IPHelperApp::saveProcessedImage()
 {
   QImage image = m_ProcessedGDelegate->getCachedImage();
+  if (m_ProcessedGDelegate->getCompositeImages() == true) {
+    image = m_ProcessedGDelegate->getCompositedImage();
+  }
   int err = 0;
   if (m_CurrentProcessedFile.isEmpty())
   {

@@ -35,7 +35,7 @@ set (QtSupport_HDRS
     ${QtSupport_SOURCE_DIR}/ProcessQueueController.h
     ${QtSupport_SOURCE_DIR}/ProcessQueueTask.h
 )
-cmp_IDE_SOURCE_PROPERTIES("CrossCorrelation/Qt" "${QtSupport_HDRS}" "${QtSupport_SRCS}" "0")
+cmp_IDE_SOURCE_PROPERTIES("QtSupport" "${QtSupport_HDRS}" "${QtSupport_SRCS}" "0")
 
 
 # --------------------------------------------------------------------
