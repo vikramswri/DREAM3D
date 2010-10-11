@@ -339,7 +339,8 @@ int EMMPMInputUI::processInputs(QObject* parentGUI)
 
   connect(queueController, SIGNAL(started()), parentGUI, SLOT(processingStarted()));
   connect(queueController, SIGNAL(finished()), parentGUI, SLOT(processingFinished()));
-
+  
+//  getQueueDialog()->setParent(this);
   getQueueDialog()->setVisible(true);
 
   queueController->start();

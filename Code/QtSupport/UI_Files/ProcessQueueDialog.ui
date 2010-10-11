@@ -3,7 +3,7 @@
  <class>ProcessQueueDialog</class>
  <widget class="QDialog" name="ProcessQueueDialog">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::WindowModal</enum>
   </property>
   <property name="geometry">
    <rect>
