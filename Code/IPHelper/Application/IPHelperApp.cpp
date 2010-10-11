@@ -262,6 +262,10 @@ void IPHelperApp::setupGui()
   modeComboBox->setCurrentIndex(0);
   modeComboBox->blockSignals(false);
 
+  compositeWithOriginal->setEnabled(false);
+  processedZoomCombo->setEnabled(false);
+  fixedZoomCombo->setEnabled(false);
+  compositeWithOriginal->setChecked(false);
   modeComboBox->setEnabled(compositeWithOriginal->isChecked());
 
   connect (originalImageGView, SIGNAL(loadImageFileRequested(const QString &)),
@@ -272,6 +276,16 @@ void IPHelperApp::setupGui()
 
   pluginActionGroup = new QActionGroup(this);
 
+  m_ZoomFactors[0] = 0.1;
+  m_ZoomFactors[1] = 0.25;
+  m_ZoomFactors[2] = 0.5;
+  m_ZoomFactors[3] = 1.0;
+  m_ZoomFactors[4] = 1.250;
+  m_ZoomFactors[5] = 1.500;
+  m_ZoomFactors[6] = 2.000;
+  m_ZoomFactors[7] = 4.000;
+  m_ZoomFactors[8] = 6.000;
+  m_ZoomFactors[9] = -1.0;
 }
 
 
@@ -333,13 +347,16 @@ void IPHelperApp::setWidgetListEnabled(bool b)
 // -----------------------------------------------------------------------------
 void IPHelperApp::on_compositeWithOriginal_stateChanged(int state)
 {
-  modeComboBox->setEnabled(compositeWithOriginal->isChecked());
-  if (NULL != m_OriginalGDelegate) {
-    QImage cachedImage ( m_OriginalGDelegate->getCachedImage() );
-    if (cachedImage.isNull() != true) {
-      m_ProcessedGDelegate->setOverlayImage(cachedImage);
-      m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
-      m_ProcessedGDelegate->updateGraphicsView();
+  if (NULL != m_OriginalGDelegate && NULL != m_ProcessedGDelegate) {
+    modeComboBox->setEnabled(compositeWithOriginal->isChecked());
+    if (NULL != m_OriginalGDelegate)
+    {
+      QImage cachedImage ( m_OriginalGDelegate->getCachedImage() );
+      if (cachedImage.isNull() != true) {
+        m_ProcessedGDelegate->setOverlayImage(cachedImage);
+        m_ProcessedGDelegate->setCompositeImages( compositeWithOriginal->isChecked() );
+        m_ProcessedGDelegate->updateGraphicsView();
+      }
     }
   }
 }
@@ -438,6 +455,7 @@ void IPHelperApp::openFile(QString imageFile)
   // Tell the RecentFileList to update itself then broadcast those changes.
   QRecentFileList::instance()->addFile(imageFile);
   setWidgetListEnabled(true);
+  updateRecentFileList(imageFile);
 }
 
 
@@ -613,6 +631,7 @@ void IPHelperApp::openProcessedImage(QString processedImage)
   if (compositeWithOriginal->isChecked()) {
     on_modeComboBox_currentIndexChanged();
   }
+  updateRecentFileList(processedImage);
 }
 
 
@@ -732,19 +751,19 @@ qint32 IPHelperApp::initImageViews()
     connect(this, SIGNAL(parentResized () ),
             m_OriginalGDelegate, SLOT(on_parentResized () ));
 
-    connect(fixedZoomInBtn, SIGNAL(clicked()),
-            m_OriginalGDelegate, SLOT(increaseZoom() ));
-
-    connect(fixedZoomOutBtn, SIGNAL(clicked()),
-            m_OriginalGDelegate, SLOT(decreaseZoom() ));
-
-    connect(fixedFitToWindowBtn, SIGNAL(stateChanged(int)),
-            m_OriginalGDelegate, SLOT(fitToWindow(int) ));
-
-    connect(fixedZoomInBtn, SIGNAL(clicked()),
-            this, SLOT(disableFixedFitToWindow()) );
-    connect(fixedZoomOutBtn, SIGNAL(clicked()),
-            this, SLOT(disableFixedFitToWindow()) );
+//    connect(fixedZoomInBtn, SIGNAL(clicked()),
+//            m_OriginalGDelegate, SLOT(increaseZoom() ));
+//
+//    connect(fixedZoomOutBtn, SIGNAL(clicked()),
+//            m_OriginalGDelegate, SLOT(decreaseZoom() ));
+//
+//    connect(fixedFitToWindowBtn, SIGNAL(stateChanged(int)),
+//            m_OriginalGDelegate, SLOT(fitToWindow(int) ));
+//
+//    connect(fixedZoomInBtn, SIGNAL(clicked()),
+//            this, SLOT(disableFixedFitToWindow()) );
+//    connect(fixedZoomOutBtn, SIGNAL(clicked()),
+//            this, SLOT(disableFixedFitToWindow()) );
 
     // Create the m_OriginalImage and m_Processed Image Objects
     m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
@@ -759,7 +778,7 @@ qint32 IPHelperApp::initImageViews()
   // If we have NOT loaded a processed file AND we have a valid Original Image, then
   // create the Processed image based on the input image.
   QImage processedImage;
-  if (m_CurrentProcessedFile.isEmpty() == true && NULL != m_OriginalImage.RAW_PTR() )
+  if (false && m_CurrentProcessedFile.isEmpty() == true && NULL != m_OriginalImage.RAW_PTR() )
   {
     processedImage = image;
     m_ProcessedImage = convertQImageToGrayScaleAIMImage(processedImage);
@@ -812,19 +831,19 @@ qint32 IPHelperApp::initImageViews()
     connect(this, SIGNAL(parentResized () ),
             m_ProcessedGDelegate, SLOT(on_parentResized () ) );
 
-    connect(processedZoomInBtn, SIGNAL(clicked()),
-            m_ProcessedGDelegate, SLOT(increaseZoom() ));
-
-    connect(processedZoomOutBtn, SIGNAL(clicked()),
-            m_ProcessedGDelegate, SLOT(decreaseZoom() ));
-
-    connect(processedFitToWindowBtn, SIGNAL(stateChanged(int)),
-            m_ProcessedGDelegate, SLOT(fitToWindow(int) ));
-
-    connect(processedZoomInBtn, SIGNAL(clicked()),
-            this, SLOT(disableProcessedFitToWindow()) );
-    connect(processedZoomOutBtn, SIGNAL(clicked()),
-            this, SLOT(disableProcessedFitToWindow()) );
+//    connect(processedZoomInBtn, SIGNAL(clicked()),
+//            m_ProcessedGDelegate, SLOT(increaseZoom() ));
+//
+//    connect(processedZoomOutBtn, SIGNAL(clicked()),
+//            m_ProcessedGDelegate, SLOT(decreaseZoom() ));
+//
+//    connect(processedFitToWindowBtn, SIGNAL(stateChanged(int)),
+//            m_ProcessedGDelegate, SLOT(fitToWindow(int) ));
+//
+//    connect(processedZoomInBtn, SIGNAL(clicked()),
+//            this, SLOT(disableProcessedFitToWindow()) );
+//    connect(processedZoomOutBtn, SIGNAL(clicked()),
+//            this, SLOT(disableProcessedFitToWindow()) );
   }
 
   if (compositeWithOriginal->isChecked())
@@ -847,10 +866,11 @@ void IPHelperApp::initWithFile(const QString imageFile, QString processedImage)
   if (m_CurrentImageFile.isEmpty())
   {
     this->compositeWithOriginal->setEnabled(false);
+    fixedZoomCombo->setEnabled(false);
   }
   else
   {
-    this->compositeWithOriginal->setEnabled(true);
+    fixedZoomCombo->setEnabled(true);
   }
   qint32 err = initImageViews();
 
@@ -866,11 +886,15 @@ void IPHelperApp::initWithFile(const QString imageFile, QString processedImage)
   {
     this->processedImageTitle->setText("Unsaved Processed Image");
     this->setWindowModified(true);
+    compositeWithOriginal->setEnabled(false);
+    processedZoomCombo->setEnabled(false);
   }
   else {
     QFileInfo segInfo(m_CurrentProcessedFile);
     this->processedImageTitle->setText(segInfo.fileName());
     this->processedImageTitle->setToolTip(m_CurrentProcessedFile);
+    if (m_CurrentImageFile.isEmpty() == false) { compositeWithOriginal->setEnabled(true); }
+    processedZoomCombo->setEnabled(true);
   }
   this->statusBar()->showMessage("Input Image Loaded");
 }
@@ -902,22 +926,6 @@ AIMImage::Pointer IPHelperApp::convertQImageToGrayScaleAIMImage(QImage image)
     }
   }
   return aimImage;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void IPHelperApp::disableFixedFitToWindow()
-{
-  this->fixedFitToWindowBtn->setChecked(false);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void IPHelperApp::disableProcessedFitToWindow()
-{
-  this->processedFitToWindowBtn->setChecked(false);
 }
 
 // -----------------------------------------------------------------------------
@@ -1045,4 +1053,42 @@ void IPHelperApp::setInputUI()
   // Get a pointer to the plugins Input Widget
   QWidget* inputWidget = m_ActivePlugin->getInputWidget(this);
   inputsTab->layout()->addWidget(inputWidget);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void IPHelperApp::on_fixedZoomCombo_currentIndexChanged(int index)
+{
+  std::cout << "on_fixedZoomCombo_currentIndexChanged" << std::endl;
+  if (index == fixedZoomCombo->count()-1)
+  {
+    m_OriginalGDelegate->fitToWindow(Qt::Checked);
+  }
+  else
+  {
+    m_OriginalGDelegate->fitToWindow(Qt::Unchecked);
+    m_OriginalGDelegate->setZoomFactor(m_ZoomFactors[index]);
+  }
+
+  m_OriginalGDelegate->updateGraphicsView();
+}
+
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void IPHelperApp::on_processedZoomCombo_currentIndexChanged(int index)
+{
+  if (index == fixedZoomCombo->count()-1)
+  {
+    m_ProcessedGDelegate->fitToWindow(Qt::Checked);
+  }
+  else
+  {
+    m_ProcessedGDelegate->fitToWindow(Qt::Unchecked);
+    m_ProcessedGDelegate->setZoomFactor(m_ZoomFactors[index]);
+  }
+
+  m_ProcessedGDelegate->updateGraphicsView();
 }
