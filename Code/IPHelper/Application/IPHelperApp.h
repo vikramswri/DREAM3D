@@ -93,8 +93,13 @@ class IPHelperApp : public QMainWindow, private Ui::IPHelperApp
     void on_compositeWithOriginal_stateChanged(int state);
     void on_modeComboBox_currentIndexChanged();
 
-    void disableFixedFitToWindow();
-    void disableProcessedFitToWindow();
+//    void disableFixedFitToWindow();
+//    void disableProcessedFitToWindow();
+
+    void on_fixedZoomCombo_currentIndexChanged(int index);
+    void on_processedZoomCombo_currentIndexChanged(int index);
+
+
 
     /**
      * @brief Qt Slot that fires in response to a click on a "Recent File' Menu entry.
@@ -216,6 +221,7 @@ class IPHelperApp : public QMainWindow, private Ui::IPHelperApp
 
  //   bool            m_OutputExistsCheck;
 
+    float m_ZoomFactors[10];
 
     IPHelperApp(const IPHelperApp&); // Copy Constructor Not Implemented
     void operator=(const IPHelperApp&); // Operator '=' Not Implemented

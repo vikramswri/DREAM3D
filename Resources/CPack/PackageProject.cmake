@@ -10,7 +10,6 @@
 # ------------------------------------------------------------------------------ 
 # This CMake code sets up for CPack to be used to generate native installers
 # ------------------------------------------------------------------------------
-#INCLUDE (InstallRequiredSystemLibraries)
 INCLUDE (${CMP_INSTALLATION_SUPPORT_SOURCE_DIR}/InstallMSVCLibraries.cmake)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GUI Application that runs various image processing algorithms through a plugin interface.")
 SET(CPACK_PACKAGE_VENDOR "BlueQuartz Software, Michael A. Jackson")
