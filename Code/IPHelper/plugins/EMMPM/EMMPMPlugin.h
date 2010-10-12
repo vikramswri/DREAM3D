@@ -45,7 +45,10 @@ class EMMPMPlugin : public QObject, public QImageProcessingInterface
   public:
     EMMPMPlugin();
     virtual ~EMMPMPlugin();
-
+    
+    typedef QPair<QString, QString>        InputOutputFilePair;
+    typedef QList<InputOutputFilePair>     InputOutputFilePairList;
+    
     QString getPluginName();
 
     virtual QWidget* getInputWidget(QWidget* parent);
@@ -57,6 +60,8 @@ class EMMPMPlugin : public QObject, public QImageProcessingInterface
 
     virtual void writeSettings(QSettings* prefs);
     virtual void readSettings(QSettings* prefs);
+
+    virtual InputOutputFilePairList getInputOutputFilePairs();
 
   protected:
     EMMPMInputUI* m_InputWidget;

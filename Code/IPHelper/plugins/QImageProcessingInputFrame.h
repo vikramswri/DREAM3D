@@ -65,6 +65,9 @@ class QImageProcessingInputFrame : public QFrame
       * @brief Writes the preferences to the users pref file
       */
     virtual void writeSettings(QSettings* prefs) = 0;
+    
+    typedef QPair<QString, QString>        InputOutputFilePair;
+    typedef QList<InputOutputFilePair>     InputOutputFilePairList;
 
     MXA_INSTANCE_PROPERTY(QString, CurrentImageFile)
     MXA_INSTANCE_PROPERTY(QString, CurrentProcessedFile)
@@ -74,6 +77,7 @@ class QImageProcessingInputFrame : public QFrame
     MXA_INSTANCE_PROPERTY(ProcessQueueController*, QueueController)
     MXA_INSTANCE_PROPERTY(ProcessQueueDialog*, QueueDialog)
     MXA_INSTANCE_PROPERTY(QString, OpenDialogLastDirectory)
+    MXA_INSTANCE_PROPERTY(InputOutputFilePairList, InputOutputFilePairList)
 
 
   protected slots:

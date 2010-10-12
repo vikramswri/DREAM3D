@@ -29,7 +29,7 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 #include "ProcessQueueController.h"
-
+#include <QtCore/QMutexLocker>
 #include <iostream>
 
 // -----------------------------------------------------------------------------
@@ -88,7 +88,10 @@ void ProcessQueueController::addTask(QThread* t)
 // -----------------------------------------------------------------------------
 void ProcessQueueController::processTask()
 {
+  QMutexLocker lock(&m_Mutex);
+
   --m_ThreadCount; //decrement the value as this is called when another thread gets finished
+//  std::cout << "ProcessQueueController::processTask() Start m_ThreadCount: " << m_ThreadCount << std::endl;
   while (m_ThreadCount < m_MaxThreads)
   {
     if (m_Tasks.count() > 0)

@@ -73,7 +73,8 @@ void EMMPMTask::run()
   if (NULL == m_OriginalImage.RAW_PTR())
   {
     std::cout << "Error loading image '" << getInputFilePath().toStdString() << "'" << std::endl;
-    emit finished();
+ //   emit finished();
+    emit taskFinished(this);
     return;
   }
 
@@ -83,7 +84,8 @@ void EMMPMTask::run()
   if (NULL == m_SegmentedImage)
   {
     std::cout << "Error Allocating Memory for segmented Image." << std::endl;
-    emit finished();
+ //   emit finished();
+    emit taskFinished(this);
     return;
   }
 
@@ -122,8 +124,8 @@ void EMMPMTask::run()
     m_OriginalImage = AIMImage::NullPointer();
   }
   // Notify observers that we are finished
-  emit finished();
-  emit finished(this);
+//  emit finished();
+  emit taskFinished(this);
  // std::cout << "  EmMpm Task Finished." << std::endl;
 }
 

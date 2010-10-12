@@ -95,13 +95,13 @@ class ProcessQueueTask : public QThread
       /**
        * @brief Signal sent when the encoding task is complete
        */
-      void finished();
+    //  void finished();
 
       /**
        * @brief Signal sent when the encoding task is complete
        * @param o A QObject to send with the signal
        */
-      void finished(QObject *o);
+      void taskFinished(QObject *o);
 
     public slots:
 

@@ -51,12 +51,14 @@ class EMMPMTask;
 class EMMPMInputUI : public QImageProcessingInputFrame, private Ui::EMMPMInputUI
 {
   Q_OBJECT;
+  
+  typedef QPair<QString, QString>        InputOutputFilePair;
+  typedef QList<InputOutputFilePair>     InputOutputFilePairList;
+
 
   public:
     EMMPMInputUI(QWidget *parent = 0);
     virtual ~EMMPMInputUI();
-
-
 
     int processInputs(QObject* parentGUI);
 
@@ -69,7 +71,6 @@ class EMMPMInputUI : public QImageProcessingInputFrame, private Ui::EMMPMInputUI
      * @brief Writes the preferences to the users pref file
      */
     void writeSettings(QSettings* prefs);
-
 
   protected slots:
     void on_fixedImageButton_clicked();
@@ -85,6 +86,10 @@ class EMMPMInputUI : public QImageProcessingInputFrame, private Ui::EMMPMInputUI
     void on_outputDirectoryLE_textChanged(const QString & text);
 
     void on_filterPatternLineEdit_textChanged();
+
+    void on_outputPrefix_textChanged();
+    void on_outputSuffix_textChanged();
+    void on_outputImageType_currentIndexChanged(int index);
 
     // Over rides from Parent Class
     /* Slots to receive events from the ProcessQueueController */

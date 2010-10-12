@@ -276,16 +276,16 @@ void IPHelperApp::setupGui()
 
   pluginActionGroup = new QActionGroup(this);
 
-  m_ZoomFactors[0] = 0.1;
-  m_ZoomFactors[1] = 0.25;
-  m_ZoomFactors[2] = 0.5;
-  m_ZoomFactors[3] = 1.0;
-  m_ZoomFactors[4] = 1.250;
-  m_ZoomFactors[5] = 1.500;
-  m_ZoomFactors[6] = 2.000;
-  m_ZoomFactors[7] = 4.000;
-  m_ZoomFactors[8] = 6.000;
-  m_ZoomFactors[9] = -1.0;
+  m_ZoomFactors[0] = 0.1f;
+  m_ZoomFactors[1] = 0.25f;
+  m_ZoomFactors[2] = 0.5f;
+  m_ZoomFactors[3] = 1.0f;
+  m_ZoomFactors[4] = 1.250f;
+  m_ZoomFactors[5] = 1.500f;
+  m_ZoomFactors[6] = 2.000f;
+  m_ZoomFactors[7] = 4.000f;
+  m_ZoomFactors[8] = 6.000f;
+  m_ZoomFactors[9] = -1.0f;
 }
 
 
@@ -501,7 +501,7 @@ void IPHelperApp::processingStarted()
 // -----------------------------------------------------------------------------
 void IPHelperApp::processingFinished()
 {
-  std::cout << "IPHelper::processingFinished()" << std::endl;
+//  std::cout << "IPHelper::processingFinished()" << std::endl;
   /* Code that cleans up anything from the processing */
   processBtn->setText("Process");
   processBtn->setEnabled(true);
@@ -511,6 +511,13 @@ void IPHelperApp::processingFinished()
   m_CurrentImageFile = m_ActivePlugin->getInputImage();
   m_CurrentProcessedFile = m_ActivePlugin->getProcessedImage();
   initWithFile(m_CurrentImageFile, m_CurrentProcessedFile);
+
+  m_InputOutputFilePairList = m_ActivePlugin->getInputOutputFilePairs();
+  for (int i = 0; i < m_InputOutputFilePairList.size(); ++i) 
+  {
+    QPair<QString, QString> pair = m_InputOutputFilePairList.at(i);
+ //   std::cout << pair.first.toStdString() << " <--> " << pair.second.toStdString() << std::endl;
+  }
 }
 
 
@@ -598,7 +605,6 @@ void IPHelperApp::on_actionSave_As_triggered()
 //
 // -----------------------------------------------------------------------------
 void IPHelperApp::on_actionClose_triggered() {
-  // std::cout << "AIMMountMaker::on_actionClose_triggered" << std::endl;
   qint32 err = -1;
   err = checkDirtyDocument();
   if (err >= 0)
@@ -753,21 +759,6 @@ qint32 IPHelperApp::initImageViews()
 
     connect(this, SIGNAL(parentResized () ),
             m_OriginalGDelegate, SLOT(on_parentResized () ));
-
-//    connect(fixedZoomInBtn, SIGNAL(clicked()),
-//            m_OriginalGDelegate, SLOT(increaseZoom() ));
-//
-//    connect(fixedZoomOutBtn, SIGNAL(clicked()),
-//            m_OriginalGDelegate, SLOT(decreaseZoom() ));
-//
-//    connect(fixedFitToWindowBtn, SIGNAL(stateChanged(int)),
-//            m_OriginalGDelegate, SLOT(fitToWindow(int) ));
-//
-//    connect(fixedZoomInBtn, SIGNAL(clicked()),
-//            this, SLOT(disableFixedFitToWindow()) );
-//    connect(fixedZoomOutBtn, SIGNAL(clicked()),
-//            this, SLOT(disableFixedFitToWindow()) );
-
     // Create the m_OriginalImage and m_Processed Image Objects
     m_OriginalImage = convertQImageToGrayScaleAIMImage(image);
     if (NULL == m_OriginalImage.RAW_PTR())
@@ -833,20 +824,6 @@ qint32 IPHelperApp::initImageViews()
 
     connect(this, SIGNAL(parentResized () ),
             m_ProcessedGDelegate, SLOT(on_parentResized () ) );
-
-//    connect(processedZoomInBtn, SIGNAL(clicked()),
-//            m_ProcessedGDelegate, SLOT(increaseZoom() ));
-//
-//    connect(processedZoomOutBtn, SIGNAL(clicked()),
-//            m_ProcessedGDelegate, SLOT(decreaseZoom() ));
-//
-//    connect(processedFitToWindowBtn, SIGNAL(stateChanged(int)),
-//            m_ProcessedGDelegate, SLOT(fitToWindow(int) ));
-//
-//    connect(processedZoomInBtn, SIGNAL(clicked()),
-//            this, SLOT(disableProcessedFitToWindow()) );
-//    connect(processedZoomOutBtn, SIGNAL(clicked()),
-//            this, SLOT(disableProcessedFitToWindow()) );
   }
 
   if (compositeWithOriginal->isChecked())
@@ -1011,10 +988,8 @@ foreach (QString pluginDirString, m_PluginDirs) {
   if (ipPlugin)
   {
     m_LoadedPlugins.push_back(ipPlugin);
-  //  QWidget* activeInputWidget = ipPlugin->getInputWidget(NULL);
     qWarning(ipPlugin->getPluginName().toAscii(), "%s");
     addToPluginMenu(plugin, ipPlugin->getPluginName(), menuPlugins, SLOT(setInputUI()), pluginActionGroup);
-    //m_ActivePlugin = ipPlugin;
   }
 }
 

@@ -105,3 +105,11 @@ void CrossCorrelationPlugin::readSettings(QSettings* prefs)
 {
   m_InputWidget->readSettings(prefs);
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+CrossCorrelationPlugin::InputOutputFilePairList CrossCorrelationPlugin::getInputOutputFilePairs()
+{
+  return m_InputWidget->getInputOutputFilePairList();
+}

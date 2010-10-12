@@ -110,6 +110,10 @@ class CrossCorrelationInputUI : public QImageProcessingInputFrame, private Ui::C
 
     void on_filterPatternLineEdit_textChanged();
 
+    void on_outputPrefix_textChanged();
+    void on_outputSuffix_textChanged();
+    void on_outputImageType_currentIndexChanged(int index);
+
     /* Slots to receive events from the ProcessQueueController */
     void queueControllerFinished();
 

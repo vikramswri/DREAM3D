@@ -55,6 +55,9 @@ class CrossCorrelationPlugin : public QObject, public QImageProcessingInterface
     CrossCorrelationPlugin();
     virtual ~CrossCorrelationPlugin();
 
+    typedef QPair<QString, QString>        InputOutputFilePair;
+    typedef QList<InputOutputFilePair>     InputOutputFilePairList;
+
     /* ---- Implementation of pure virtual functions from QImageProcessingInterface class -- */
     QString getPluginName();
 
@@ -69,7 +72,8 @@ class CrossCorrelationPlugin : public QObject, public QImageProcessingInterface
     virtual void readSettings(QSettings* prefs);
     /* ---- Other class specific methods --- */
 
-
+    virtual InputOutputFilePairList getInputOutputFilePairs();
+  
   protected:
     CrossCorrelationInputUI* m_InputWidget;
 

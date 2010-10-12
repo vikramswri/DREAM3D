@@ -301,7 +301,9 @@ int CrossCorrelationInputUI::processInputs(QObject* parentGUI)
   }
   ProcessQueueController* queueController = new ProcessQueueController(this);
   setQueueController(queueController);
-//  bool ok;
+  
+  InputOutputFilePairList filepairs;
+
   if (this->processFolder->isChecked() == false)
   {
     if (fixedImageFile->text().isEmpty() )
@@ -331,7 +333,7 @@ int CrossCorrelationInputUI::processInputs(QObject* parentGUI)
     crossCorrelationData->setMovingSlice(1);
     task->setCrossCorrelationData(crossCorrelationData);
     m_CrossCorrelationTable->addCrossCorrelationData(0, crossCorrelationData);
-
+    filepairs.append(InputOutputFilePair(task->getInputFilePath(), task->getOutputFilePath()));
     queueController->addTask(static_cast<QThread*>(task) );
     this->addProcess(task);
   }
@@ -364,12 +366,13 @@ int CrossCorrelationInputUI::processInputs(QObject* parentGUI)
       crossCorrelationData->setMovingSlice(i+1);
       task->setCrossCorrelationData(crossCorrelationData);
       m_CrossCorrelationTable->addCrossCorrelationData(i+1, crossCorrelationData);
-
+      filepairs.append(InputOutputFilePair(task->getInputFilePath(), task->getOutputFilePath()));
       queueController->addTask(static_cast<QThread*>(task) );
       this->addProcess(task);
     }
 
   }
+  setInputOutputFilePairList(filepairs);
 
   // When the event loop of the controller starts it will signal the ProcessQueue to run
   connect(queueController, SIGNAL(started()), queueController, SLOT(processTask()));
@@ -482,6 +485,30 @@ void CrossCorrelationInputUI::on_filterPatternLineEdit_textChanged()
  // std::cout << "filterPattern: " << std::endl;
   getProxyModel()->setFilterFixedString(filterPatternLineEdit->text());
   getProxyModel()->setFilterCaseSensitivity(Qt::CaseInsensitive);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void CrossCorrelationInputUI::on_outputPrefix_textChanged()
+{
+  outputFilenamePattern->setText(outputPrefix->text() + "[ORIGINAL FILE NAME]" + outputSuffix->text() + "." + outputImageType->currentText() );
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void CrossCorrelationInputUI::on_outputSuffix_textChanged()
+{
+  outputFilenamePattern->setText(outputPrefix->text() + "[ORIGINAL FILE NAME]" + outputSuffix->text() + "." + outputImageType->currentText() );
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void CrossCorrelationInputUI::on_outputImageType_currentIndexChanged(int index)
+{
+  outputFilenamePattern->setText(outputPrefix->text() + "[ORIGINAL FILE NAME]" + outputSuffix->text() + "." + outputImageType->currentText() );
 }
 
 

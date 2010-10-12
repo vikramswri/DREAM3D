@@ -82,7 +82,7 @@ void ProcessQueueDialog::addProcess(ProcessQueueTask* task)
   this->processTableWidget->setCellWidget(rowCount, 1, progBar);
 
   connect(task, SIGNAL(progressValueChanged(int)), progBar, SLOT(setValue(int)));
-  connect(task, SIGNAL(finished(QObject*)), this, SLOT(removeRow(QObject*)));
+  connect(task, SIGNAL(taskFinished(QObject*)), this, SLOT(removeRow(QObject*)));
   connect(cancelBtn, SIGNAL(clicked()), task, SLOT(cancel()));
   m_TasksMap[task] = progBar;
 

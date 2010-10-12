@@ -52,6 +52,7 @@ QT4_WRAP_CPP( EMMPMPlugin_Generated_MOC_SRCS ${EMMPMPlugin_HDRS} )
 set (EMMPMPlugin_PROJECT_SRCS
     ${EMMPMPlugin_SRCS}
     ${EMMPMPlugin_HDRS}
+    ${PROJECT_SOURCE_DIR}/../QImageProcessingInterface.h
     ${EMMPMPlugin_Generated_MOC_SRCS} 
     ${EMMPMPlugin_Generated_UI_HDRS}
 )

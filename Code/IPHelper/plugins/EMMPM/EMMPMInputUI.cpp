@@ -277,6 +277,9 @@ int EMMPMInputUI::processInputs(QObject* parentGUI)
   ProcessQueueController* queueController = new ProcessQueueController(this);
   setQueueController(queueController);
   bool ok;
+  
+  InputOutputFilePairList filepairs;
+
   if (this->processFolder->isChecked() == false)
   {
 
@@ -292,7 +295,7 @@ int EMMPMInputUI::processInputs(QObject* parentGUI)
     }
     task->setInputFilePath(fixedImageFile->text());
     task->setOutputFilePath(outputImageFile->text());
-
+    filepairs.append(InputOutputFilePair(task->getInputFilePath(), task->getOutputFilePath()));
     queueController->addTask(static_cast<QThread* > (task));
     this->addProcess(task);
   }
@@ -325,12 +328,13 @@ int EMMPMInputUI::processInputs(QObject* parentGUI)
       filepath.append(".");
       filepath.append(outputImageType->currentText());
       task->setOutputFilePath(filepath);
-
+      filepairs.append(InputOutputFilePair(task->getInputFilePath(), task->getOutputFilePath()));
       queueController->addTask(static_cast<QThread* > (task));
       this->addProcess(task);
     }
 
   }
+  setInputOutputFilePairList(filepairs);
 
   // When the event loop of the controller starts it will signal the ProcessQueue to run
   connect(queueController, SIGNAL(started()), queueController, SLOT(processTask()));
@@ -434,6 +438,29 @@ void EMMPMInputUI::on_filterPatternLineEdit_textChanged()
   getProxyModel()->setFilterCaseSensitivity(Qt::CaseInsensitive);
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void EMMPMInputUI::on_outputPrefix_textChanged()
+{
+  outputFilenamePattern->setText(outputPrefix->text() + "[ORIGINAL FILE NAME]" + outputSuffix->text() + "." + outputImageType->currentText() );
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void EMMPMInputUI::on_outputSuffix_textChanged()
+{
+  outputFilenamePattern->setText(outputPrefix->text() + "[ORIGINAL FILE NAME]" + outputSuffix->text() + "." + outputImageType->currentText() );
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void EMMPMInputUI::on_outputImageType_currentIndexChanged(int index)
+{
+  outputFilenamePattern->setText(outputPrefix->text() + "[ORIGINAL FILE NAME]" + outputSuffix->text() + "." + outputImageType->currentText() );
+}
 
 // -----------------------------------------------------------------------------
 //

@@ -32,6 +32,7 @@
 #define PROCESSQUEUECONTROLLER_H_
 
 #include <QtCore/QThread>
+#include <QtCore/QMutex>
 #include <QtCore/QVector>
 
 class ProcessQueue;
@@ -100,6 +101,7 @@ class ProcessQueueController : public QThread
     QVector<QThread*>  m_CompletedTasks;
     int m_MaxThreads;
     int m_ThreadCount;
+    QMutex              m_Mutex;
 
     bool            m_AutoDelete;
     ProcessQueueController(const ProcessQueueController&);    // Copy Constructor Not Implemented

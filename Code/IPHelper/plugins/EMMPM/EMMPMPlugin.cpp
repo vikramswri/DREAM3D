@@ -107,3 +107,11 @@ void EMMPMPlugin::readSettings(QSettings* prefs)
 {
   m_InputWidget->readSettings(prefs);
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+EMMPMPlugin::InputOutputFilePairList EMMPMPlugin::getInputOutputFilePairs()
+{
+  return m_InputWidget->getInputOutputFilePairList();
+}

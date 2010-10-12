@@ -58,6 +58,7 @@ set (CrossCorrelationPlugin_EXTRA_HDRS
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelation.h
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelationData.h
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelationTable.h
+    ${PROJECT_SOURCE_DIR}/../QImageProcessingInterface.h
 	)
 set (CrossCorrelationPlugin_EXTRA_SRCS
     ${CrossCorrelationPlugin_SOURCE_DIR}/CrossCorrelation.cpp

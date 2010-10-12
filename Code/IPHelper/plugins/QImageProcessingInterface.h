@@ -34,6 +34,8 @@
 
 #include <QtCore/QSettings>
 #include <QtCore/QtPlugin>
+#include <QPair>
+#include <QVector>
 
 /**
  * @class QImageProcessingInterface QImageProcessingInterface.h IPHelper/plugins/QImageProcessingInterface.h
@@ -45,7 +47,7 @@
  *
  * @section intro Introduction
  *  In order to develop a plugin for the IPHelper there are several classes that need to be
- *  implemeneted by the developer.
+ *  implemented by the developer.
  *  @li [Plugin Name]Plugin
  *  @li [Plugin Name]InputUI
  *  @li [Plugin Name]Task
@@ -61,12 +63,18 @@
  *    class MyPlugin : public QObject, public QImageProcessingInterface {
  *    @endcode
  *
- *    The developer will also need to add some macro declarations to their class
+ *    The developer will also need to add some macro declarations to their class declaration (usually
+ *     in the header file.
  *
  *    @code
  *      Q_OBJECT;
  *      Q_INTERFACES(QImageProcessingInterface )
  *    @endcode
+ *    The programmer will also need to add the following macros to their implementation file.
+ *    @code
+ *    Q_EXPORT_PLUGIN2(MyPlugin, MyPlugin);
+ *    @endcode
+ *
  *    At this point the developer is ready to implement each of the virtual functions in the
  *    QImageProcessingInterface in order to make their plugin valid
  *
@@ -84,7 +92,7 @@
  * @subsection plugin_task PluginTask
  *  If the developer would like to take advantage of the ProcessQueueController and the
  *  ProcessQueueDialog facilities
- *  that are availble then they can create a MyPluginTask class that inherits from
+ *  that are available then they can create a MyPluginTask class that inherits from
  *  the ProcessQueueTask class. They simply need to implement the <tt>run()</tt> method.
  *
  * @section details Details
@@ -93,6 +101,9 @@ class QImageProcessingInterface
 {
   public:
     virtual ~QImageProcessingInterface(){};
+
+    typedef QPair<QString, QString>        InputOutputFilePair;
+    typedef QList<InputOutputFilePair>     InputOutputFilePairList;
 
     /**
      * @brief Returns the name of the plugin
@@ -129,6 +140,8 @@ class QImageProcessingInterface
      * @return Returns the processed image as it was saved on disk by the processing code.
      */
     virtual QString getProcessedImage() = 0;
+
+    virtual InputOutputFilePairList getInputOutputFilePairs() = 0;
 
     /**
      * @brief Writes the settings in the input gui to the Application's preference file

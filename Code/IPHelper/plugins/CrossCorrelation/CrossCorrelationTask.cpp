@@ -66,8 +66,8 @@ void CrossCorrelationTask::run()
 //  std::cout << "    MovingImage: " << getMovingImagePath().toStdString() << std::endl;
   if (isCanceled() )
   {
-    emit finished();
-    emit finished(this);
+  //  emit finished();
+    emit taskFinished(this);
     return;
   }
   UPDATE_PROGRESS(QString("Starting Registration"), 0);
@@ -77,8 +77,8 @@ void CrossCorrelationTask::run()
   AIMImage::Pointer fixedImage = loadImage(getInputFilePath());
   if (NULL == fixedImage.RAW_PTR() )
   {
-    emit finished();
-    emit finished(this);
+  //  emit finished();
+    emit taskFinished(this);
     return;
   }
   UPDATE_PROGRESS(QString("Reading Fixed Image"), 10);
@@ -87,8 +87,8 @@ void CrossCorrelationTask::run()
   AIMImage::Pointer movingImage = loadImage(getMovingImagePath());
   if (NULL == movingImage.RAW_PTR() )
   {
-    emit finished();
-    emit finished(this);
+ //   emit finished();
+    emit taskFinished(this);
     return;
   }
   UPDATE_PROGRESS(QString("Reading Moving Image"), 20);
@@ -117,8 +117,8 @@ void CrossCorrelationTask::run()
 
   UPDATE_PROGRESS(QString("Complete"), 100);
   // Notify observers that we are finished
-  emit finished();
-  emit finished(this);
+ // emit finished();
+  emit taskFinished(this);
 //  std::cout << "  CrossCorrelation Task Finished." << std::endl;
 }
 

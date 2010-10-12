@@ -216,10 +216,9 @@ class IPHelperApp : public QMainWindow, private Ui::IPHelperApp
 
     QVector<QImageProcessingInterface*> m_LoadedPlugins;
 
-    QString m_OpenDialogLastDirectory;
-    QList<QWidget*> m_WidgetList;
-
- //   bool            m_OutputExistsCheck;
+    QString                             m_OpenDialogLastDirectory;
+    QList<QWidget*>                     m_WidgetList;
+    QList<QPair<QString, QString> >     m_InputOutputFilePairList;
 
     float m_ZoomFactors[10];
 
