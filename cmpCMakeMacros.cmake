@@ -233,7 +233,7 @@ macro(PluginProperties targetName DEBUG_EXTENSION projectVersion binaryDir)
         file(APPEND ${binaryDir}/plugins.txt "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}.plugin;")
     endif()
     
-    if (MSVC)
+    if (NOT APPLE)
         set (BUILD_TYPES "Debug;Release")
         foreach(btype ${BUILD_TYPES})
             INSTALL(TARGETS ${targetName}
@@ -299,6 +299,11 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
                 CONFIGURATIONS ${BTYPE} 
                 COMPONENT Runtime)
             endif()
+	 elseif (UNIX AND NOT APPLE)
+	   INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
+                DESTINATION ./plugins/${plugintype} 
+                CONFIGURATIONS ${BTYPE} 
+                COMPONENT Runtime)
 
          endif()             
                       
