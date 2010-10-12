@@ -127,7 +127,7 @@ macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
         LIBRARY DESTINATION ${TOOL_INSTALL_LOCATION} 
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION ${TOOL_INSTALL_LOCATION}
-        BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}/.
+        BUNDLE DESTINATION ./
     )   
     
     #   message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
