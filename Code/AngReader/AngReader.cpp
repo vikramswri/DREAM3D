@@ -9,6 +9,10 @@
 
 
 #include "AngReader.h"
+//-- C Includes
+#include <string.h>
+
+//-- C++ Includes
 #include <iostream>
 #include <fstream>
 #include <sstream>
