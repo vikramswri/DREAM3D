@@ -93,8 +93,8 @@ class IPHelperApp : public QMainWindow, private Ui::IPHelperApp
     void on_compositeWithOriginal_stateChanged(int state);
     void on_modeComboBox_currentIndexChanged();
 
-//    void disableFixedFitToWindow();
-//    void disableProcessedFitToWindow();
+    void on_originalImageFileList_currentIndexChanged(int index);
+    void on_processedImageFileList_currentIndexChanged(int index);
 
     void on_fixedZoomCombo_currentIndexChanged(int index);
     void on_processedZoomCombo_currentIndexChanged(int index);

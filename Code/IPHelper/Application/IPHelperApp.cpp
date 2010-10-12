@@ -513,13 +513,41 @@ void IPHelperApp::processingFinished()
   initWithFile(m_CurrentImageFile, m_CurrentProcessedFile);
 
   m_InputOutputFilePairList = m_ActivePlugin->getInputOutputFilePairs();
+  originalImageFileList->clear();
+  processedImageFileList->clear();
   for (int i = 0; i < m_InputOutputFilePairList.size(); ++i) 
   {
     QPair<QString, QString> pair = m_InputOutputFilePairList.at(i);
- //   std::cout << pair.first.toStdString() << " <--> " << pair.second.toStdString() << std::endl;
+    QFileInfo fi(pair.first);
+    originalImageFileList->addItem(fi.fileName());
+    fi = QFileInfo(pair.second);
+    processedImageFileList->addItem(fi.fileName());
   }
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void IPHelperApp::on_originalImageFileList_currentIndexChanged(int index)
+{
+  openFile(m_InputOutputFilePairList.at(index).first);
+  if (openProcessedImageCB->isChecked())
+  {
+    openProcessedImage(m_InputOutputFilePairList.at(index).second);
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void IPHelperApp::on_processedImageFileList_currentIndexChanged(int index)
+{
+  openProcessedImage(m_InputOutputFilePairList.at(index).second);
+  if (openOriginalImageCB->isChecked())
+  {
+    openFile(m_InputOutputFilePairList.at(index).first);
+  }
+}
 
 // -----------------------------------------------------------------------------
 //
