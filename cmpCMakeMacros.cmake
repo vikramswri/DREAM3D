@@ -270,15 +270,15 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
   foreach(build_type ${qt_plugin_types})
     string(TOUPPER ${build_type} BTYPE)
       foreach(plugin ${qt_plugin_list})
-      STRING(TOUPPER ${plugin} PLUGIN)
-       # message(STATUS "|-- Looking for ${plugin}${qt_plugin_${BTYPE}_suffix}")
-         FIND_LIBRARY( QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE} 
+		STRING(TOUPPER ${plugin} PLUGIN)
+		# message(STATUS "|-- Looking for ${plugin}${qt_plugin_${BTYPE}_suffix}")
+        FIND_LIBRARY( QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE} 
                       NAMES ${plugin}${qt_plugin_${BTYPE}_suffix} 
                       PATHS ${QT_PLUGINS_DIR}/${plugintype} 
                       DOC "Library Path for ${plugin}"
                       NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
                       
-         if (MSVC)
+        if (MSVC)
             #  message(STATUS "QT_PLUGINS_DIR: ${QT_PLUGINS_DIR}")
             #  message(STATUS " QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
             get_filename_component(lib_path ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} PATH)
@@ -291,44 +291,51 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
                                 " that the library was NOT built as a DLL. I looked in the "
                                 " following locations:  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin")
             else()
-              #  set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
-              #  message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
-              #  message(STATUS "Generating Install Rule for DLL File for QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}\n  ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
-              INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
-                DESTINATION ./plugins/${plugintype} 
-                CONFIGURATIONS ${BTYPE} 
-                COMPONENT Runtime)
+				#  set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
+				#  message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
+				#  message(STATUS "Generating Install Rule for DLL File for QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}\n  ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+				INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
+					DESTINATION ./plugins/${plugintype} 
+					CONFIGURATIONS ${BTYPE} 
+					COMPONENT Runtime)
             endif()
-	 elseif (UNIX AND NOT APPLE)
-	   INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
+		elseif (UNIX AND NOT APPLE)
+			INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
                 DESTINATION ./plugins/${plugintype} 
                 CONFIGURATIONS ${BTYPE} 
                 COMPONENT Runtime)
 
-         endif()             
+        endif()             
                       
                       
                       
         mark_as_advanced(QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE})
-       # message(STATUS "|--  QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+		# message(STATUS "|--  QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
         LIST(APPEND QTPLUGINS_${BTYPE} ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}})
       endforeach()
-  endforeach()
+	endforeach()
 
-  # Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
-  if (NOT MSVC)
-      if ( NOT DEFINED CMAKE_BUILD_TYPE )
-        if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-            set (QTPLUGINS ${QTPLUGINS_DEBUG})
-        else()
-            set (QTPLUGINS ${QTPLUGINS_RELEASE})
-        endif()
-      else()
-        set (QTPLUGINS ${QTPLUGINS_RELEASE})
-      endif()
-  endif()
-  file(APPEND ${pluginfile} "${QTPLUGINS};")
-  file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/imageformats;")
+	# Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
+	if (NOT MSVC)
+	  if ( NOT DEFINED CMAKE_BUILD_TYPE )
+		if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+			set (QTPLUGINS ${QTPLUGINS_DEBUG})
+		else()
+			set (QTPLUGINS ${QTPLUGINS_RELEASE})
+		endif()
+	  else()
+		set (QTPLUGINS ${QTPLUGINS_RELEASE})
+	  endif()
+	else()
+		# Create the qt.conf file so that the image plugins will be loaded correctly
+		FILE(WRITE ${PROJECT_BINARY_DIR}/qt.conf "[Paths]\nPlugins = plugins")
+		INSTALL(FILES ${PROJECT_BINARY_DIR}/qt.conf
+				DESTINATION .
+				COMPONENT Runtime)
+	endif()
+	file(APPEND ${pluginfile} "${QTPLUGINS};")
+	file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/imageformats;")
+	
 endmacro(FindQt4Plugins pluginlist)
 
 
