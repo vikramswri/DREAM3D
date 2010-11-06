@@ -345,6 +345,7 @@ endmacro(FindQt4Plugins pluginlist)
 #-- Copy all the dependent DLLs into the current build directory so that the test
 #-- can run.
 MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
+    #message(STATUS "CMP_COPY_DEPENDENT_LIBRARIES: ${mxa_lib_list}")
   set (mxa_lib_list ${mxa_lib_list})
   SET (TYPES Debug Release)
   if (MSVC)
@@ -354,15 +355,18 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MinSizeRel)
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RelWithDebInfo)
     FOREACH(lib ${mxa_lib_list})
+    
       STRING(TOUPPER ${lib} upperlib)
+     # message(STATUS "upperlib: ${upperlib}")
+     # message(STATUS "${upperlib}_IS_SHARED: ${${upperlib}_IS_SHARED}")
       if (${upperlib}_IS_SHARED)
         FOREACH(BTYPE ${TYPES} )
         #  message(STATUS "Looking for ${BTYPE} DLL Version of ${lib_name}")
           STRING(TOUPPER ${BTYPE} TYPE)        
           get_filename_component(lib_path ${${upperlib}_LIBRARY_${TYPE}} PATH)
           get_filename_component(lib_name ${${upperlib}_LIBRARY_${TYPE}} NAME_WE)
-        #  message(STATUS "lib_path: ${lib_path}")
-        #  message(STATUS "lib_name: ${lib_name}")
+         # message(STATUS "lib_path: ${lib_path}")
+         # message(STATUS "lib_name: ${lib_name}")
           
           find_file(${upperlib}_LIBRARY_DLL_${TYPE}
                         NAMES ${lib_name}.dll
@@ -378,7 +382,7 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
 
          # SET(${upperlib}_LIBRARY_DLL_${TYPE} "${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll" CACHE FILEPATH "The path to the DLL Portion of the library" FORCE)
          # message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
-          message(STATUS "Generating Copy Rule for DLL File for ${upperlib}_LIBRARY_${TYPE}")
+         # message(STATUS "Generating Copy Rule for DLL File for ${upperlib}_LIBRARY_${TYPE}")
           ADD_CUSTOM_TARGET(ZZ_${upperlib}_DLL_${TYPE}-Copy ALL 
                       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${${upperlib}_LIBRARY_DLL_${TYPE}}
                       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/ 
