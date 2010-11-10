@@ -164,7 +164,7 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
       OPTION (CMP_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
       IF(CMP_BUILD_WITH_INSTALL_NAME)
       
-          SET_TARGET_PROPERTIES(${MXADATAMODEL_LIB_NAME}
+          SET_TARGET_PROPERTIES(${targetName}
              PROPERTIES
              LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VERSION} -compatibility_version ${${CMP_PROJECT_NAME}_VERSION}"
              INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
@@ -473,8 +473,7 @@ ENDMACRO()
 # This macro will attempt a try_run command in order to compile and then 
 # generate a version string based on today's date. The output string should be
 # of the form YYYY.MM.DD. 
-#  Required CMake variables to be set are:
-#   EmInit_CMAKE_DIR - The path to the MXA CMake directory
+#
 #  The following variables are set, all of which should have been already
 #  initialized to a default value
 #   ${CMP_PROJECT_NAME}_VERSION
@@ -485,17 +484,6 @@ ENDMACRO()
 #-------------------------------------------------------------------------------
 macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE cmpProjectName)
     INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
-   #  message(STATUS "Generating Version Strings for ${cmpProjectName}")
- #   SET(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
- #   SET(CMAKE_REQUIRED_FLAGS_SAVE    ${CMAKE_REQUIRED_FLAGS})
-    # Add MXADATAMODEL_INCLUDE_DIR to CMAKE_REQUIRED_INCLUDES
- #   SET(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${CMP_HEADER_DIR}")
-
-   # CHECK_SYMBOL_EXISTS( CMP_HAVE_TIME_GETTIMEOFDAY "${CMP_CONFIGURATION_FILE}" HAVE_TIME_GETTIMEOFDAY)
-   # CHECK_SYMBOL_EXISTS( CMP_HAVE_SYS_TIME_GETTIMEOFDAY "${CMP_CONFIGURATION_FILE}" HAVE_SYS_TIME_GETTIMEOFDAY)
-    # Restore CMAKE_REQUIRED_INCLUDES and CMAKE_REQUIRED_FLAGS variables
- #   SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
-  #  SET(CMAKE_REQUIRED_FLAGS    ${CMAKE_REQUIRED_FLAGS_SAVE})
     
     if ( CMP_HAVE_TIME_GETTIMEOFDAY )
       set ( VERSION_COMPILE_FLAGS "-DHAVE_TIME_GETTIMEOFDAY")
