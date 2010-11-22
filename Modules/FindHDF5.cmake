@@ -88,7 +88,8 @@ MARK_AS_ADVANCED(HDF5_DUMP_PROG)
 
 
 # include the macro to adjust libraries
-INCLUDE (${CMP_MODULES_SOURCE_DIR}/cmpAdjustLibVars.cmake)
+get_filename_component(CURRENT_PARENT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+INCLUDE ( ${CURRENT_PARENT_DIR}/cmpAdjustLibVars.cmake)
 cmp_ADJUST_LIB_VARS(HDF5)
 
 #IF(NOT HDF5_FIND_QUIETLY)

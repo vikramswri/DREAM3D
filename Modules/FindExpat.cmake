@@ -80,7 +80,8 @@ MESSAGE(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 endif(EXPAT_DEBUG)
 
 # include the macro to adjust libraries
-INCLUDE (${CMP_MODULES_SOURCE_DIR}/cmpAdjustLibVars.cmake)
+get_filename_component(CURRENT_PARENT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+INCLUDE ( ${CURRENT_PARENT_DIR}/cmpAdjustLibVars.cmake)
 cmp_ADJUST_LIB_VARS(EXPAT)
 
 # MESSAGE( STATUS "EXPAT_LIBRARY: ${EXPAT_LIBRARY}")
