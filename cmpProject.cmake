@@ -6,7 +6,12 @@ set(CMP_CONFIGURED_FILES_SOURCE_DIR ${CMP_SOURCE_DIR}/ConfiguredFiles CACHE INTE
 set(CMP_CORE_TESTS_SOURCE_DIR ${CMP_SOURCE_DIR}/CoreTests CACHE INTERNAL "")
 set(CMP_INSTALLATION_SUPPORT_SOURCE_DIR ${CMP_SOURCE_DIR}/InstallationSupport CACHE INTERNAL "")
 set(CMP_MODULES_SOURCE_DIR ${CMP_SOURCE_DIR}/Modules CACHE INTERNAL "")
-set(CMP_OSX_TOOLS_SOURCE_DIR ${CMP_SOURCE_DIR}/OSX_TOOLS CACHE INTERNAL "")
+set(CMP_OSX_TOOLS_SOURCE_DIR ${CMP_SOURCE_DIR}/OSX_Tools CACHE INTERNAL "")
+
+# --------------------------------------------------------------------
+# Over ride CMake's built in module directory by prepending cmp's module
+# directory first
+SET (CMAKE_MODULE_PATH ${CMP_MODULES_SOURCE_DIR} ${CMAKE_MODULE_PATH})
 
 INCLUDE (${PROJECT_RESOURCES_DIR}/cmp/cmpCMakeMacros.cmake )
 
