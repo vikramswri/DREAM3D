@@ -127,7 +127,7 @@ macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
         LIBRARY DESTINATION ${TOOL_INSTALL_LOCATION} 
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION ${TOOL_INSTALL_LOCATION}
-        BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}/.
+        BUNDLE DESTINATION ./
     )   
     
     #   message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
@@ -164,7 +164,7 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
       OPTION (CMP_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
       IF(CMP_BUILD_WITH_INSTALL_NAME)
       
-          SET_TARGET_PROPERTIES(${MXADATAMODEL_LIB_NAME}
+          SET_TARGET_PROPERTIES(${targetName}
              PROPERTIES
              LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VERSION} -compatibility_version ${${CMP_PROJECT_NAME}_VERSION}"
              INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
@@ -232,13 +232,23 @@ macro(PluginProperties targetName DEBUG_EXTENSION projectVersion binaryDir)
     else()
         file(APPEND ${binaryDir}/plugins.txt "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}.plugin;")
     endif()
+    
+    if (NOT APPLE)
+        set (BUILD_TYPES "Debug;Release")
+        foreach(btype ${BUILD_TYPES})
+            INSTALL(TARGETS ${targetName}
+                    DESTINATION ./plugins
+                    CONFIGURATIONS ${btype}
+                    COMPONENT Applications)
+        endforeach()
+    endif()
 endmacro(PluginProperties DEBUG_EXTENSION)
 
 #-------------------------------------------------------------------------------
 # Finds plugins from the Qt installation. The pluginlist argument should be
 # something like "qgif;qjpeg;qtiff"
 #-------------------------------------------------------------------------------
-macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile)
+macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
   set (qt_plugin_list ${pluginlist})
   set (qt_plugin_types "Debug;Release")
   if (WIN32)
@@ -260,33 +270,72 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile)
   foreach(build_type ${qt_plugin_types})
     string(TOUPPER ${build_type} BTYPE)
       foreach(plugin ${qt_plugin_list})
-      STRING(TOUPPER ${plugin} PLUGIN)
-  #      message(STATUS "|-- Looking for q${plugin}${qt_plugin_${build_type}_suffix}")
-         FIND_LIBRARY( QT_${PLUGIN}_PLUGIN_${BTYPE} 
+		STRING(TOUPPER ${plugin} PLUGIN)
+		# message(STATUS "|-- Looking for ${plugin}${qt_plugin_${BTYPE}_suffix}")
+        FIND_LIBRARY( QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE} 
                       NAMES ${plugin}${qt_plugin_${BTYPE}_suffix} 
-                      PATHS ${QT_PLUGINS_DIR}/imageformats 
+                      PATHS ${QT_PLUGINS_DIR}/${plugintype} 
                       DOC "Library Path for ${plugin}"
                       NO_DEFAULT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-         mark_as_advanced(QT_${PLUGIN}_PLUGIN_${BTYPE})
-  #      message(STATUS "|--  Q${plugin}_PLUGIN_${build_type}_LIB: ${Q${plugin}_PLUGIN_${build_type}_LIB}")
-        LIST(APPEND QTPLUGINS_${BTYPE} ${QT_${PLUGIN}_PLUGIN_${BTYPE}})
-      endforeach()
-  endforeach()
+                      
+        if (MSVC)
+            #  message(STATUS "QT_PLUGINS_DIR: ${QT_PLUGINS_DIR}")
+            #  message(STATUS " QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+            get_filename_component(lib_path ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} PATH)
+            get_filename_component(lib_name ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} NAME_WE)
+            #  message(STATUS "lib_path: ${lib_path}")
+            #  message(STATUS "lib_name: ${lib_name}")
+            set (QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE} ${lib_path}/${lib_name}.dll CACHE PATH "" FORCE)
+            if ( ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}} STREQUAL  "QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}-NOTFOUND")
+              message(STATUS "A Companion DLL for ${upperlib}_LIBRARY_${TYPE} was NOT found which usually means"
+                                " that the library was NOT built as a DLL. I looked in the "
+                                " following locations:  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin")
+            else()
+				#  set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
+				#  message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
+				#  message(STATUS "Generating Install Rule for DLL File for QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}\n  ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+				INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
+					DESTINATION ./plugins/${plugintype} 
+					CONFIGURATIONS ${BTYPE} 
+					COMPONENT Runtime)
+            endif()
+		elseif (UNIX AND NOT APPLE)
+			INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
+                DESTINATION ./plugins/${plugintype} 
+                CONFIGURATIONS ${BTYPE} 
+                COMPONENT Runtime)
 
-  # Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
-  if (NOT MSVC)
-      if ( NOT DEFINED CMAKE_BUILD_TYPE )
-        if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-            set (QTPLUGINS ${QTPLUGINS_DEBUG})
-        else()
-            set (QTPLUGINS ${QTPLUGINS_RELEASE})
-        endif()
-      else()
-        set (QTPLUGINS ${QTPLUGINS_RELEASE})
-      endif()
-  endif()
-  file(APPEND ${pluginfile} "${QTPLUGINS};")
-  file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/imageformats;")
+        endif()             
+                      
+                      
+                      
+        mark_as_advanced(QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE})
+		# message(STATUS "|--  QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+        LIST(APPEND QTPLUGINS_${BTYPE} ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}})
+      endforeach()
+	endforeach()
+
+	# Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
+	if (NOT MSVC)
+	  if ( NOT DEFINED CMAKE_BUILD_TYPE )
+		if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+			set (QTPLUGINS ${QTPLUGINS_DEBUG})
+		else()
+			set (QTPLUGINS ${QTPLUGINS_RELEASE})
+		endif()
+	  else()
+		set (QTPLUGINS ${QTPLUGINS_RELEASE})
+	  endif()
+	else()
+		# Create the qt.conf file so that the image plugins will be loaded correctly
+		FILE(WRITE ${PROJECT_BINARY_DIR}/qt.conf "[Paths]\nPlugins = plugins")
+		INSTALL(FILES ${PROJECT_BINARY_DIR}/qt.conf
+				DESTINATION .
+				COMPONENT Runtime)
+	endif()
+	file(APPEND ${pluginfile} "${QTPLUGINS};")
+	file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/imageformats;")
+	
 endmacro(FindQt4Plugins pluginlist)
 
 
@@ -296,6 +345,7 @@ endmacro(FindQt4Plugins pluginlist)
 #-- Copy all the dependent DLLs into the current build directory so that the test
 #-- can run.
 MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
+    #message(STATUS "CMP_COPY_DEPENDENT_LIBRARIES: ${mxa_lib_list}")
   set (mxa_lib_list ${mxa_lib_list})
   SET (TYPES Debug Release)
   if (MSVC)
@@ -305,15 +355,18 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MinSizeRel)
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RelWithDebInfo)
     FOREACH(lib ${mxa_lib_list})
+    
       STRING(TOUPPER ${lib} upperlib)
+     # message(STATUS "upperlib: ${upperlib}")
+     # message(STATUS "${upperlib}_IS_SHARED: ${${upperlib}_IS_SHARED}")
       if (${upperlib}_IS_SHARED)
         FOREACH(BTYPE ${TYPES} )
         #  message(STATUS "Looking for ${BTYPE} DLL Version of ${lib_name}")
           STRING(TOUPPER ${BTYPE} TYPE)        
           get_filename_component(lib_path ${${upperlib}_LIBRARY_${TYPE}} PATH)
           get_filename_component(lib_name ${${upperlib}_LIBRARY_${TYPE}} NAME_WE)
-        #  message(STATUS "lib_path: ${lib_path}")
-        #  message(STATUS "lib_name: ${lib_name}")
+         # message(STATUS "lib_path: ${lib_path}")
+         # message(STATUS "lib_name: ${lib_name}")
           
           find_file(${upperlib}_LIBRARY_DLL_${TYPE}
                         NAMES ${lib_name}.dll
@@ -329,7 +382,7 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
 
          # SET(${upperlib}_LIBRARY_DLL_${TYPE} "${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll" CACHE FILEPATH "The path to the DLL Portion of the library" FORCE)
          # message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
-          message(STATUS "Generating Copy Rule for DLL File for ${upperlib}_LIBRARY_${TYPE}")
+         # message(STATUS "Generating Copy Rule for DLL File for ${upperlib}_LIBRARY_${TYPE}")
           ADD_CUSTOM_TARGET(ZZ_${upperlib}_DLL_${TYPE}-Copy ALL 
                       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${${upperlib}_LIBRARY_DLL_${TYPE}}
                       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/ 
@@ -339,8 +392,39 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
       ENDIF(${upperlib}_IS_SHARED)
     ENDFOREACH(lib ${mxa_lib_list})
   ENDIF(MSVC)  
-    
 endmacro()
+
+# --------------------------------------------------------------------
+#-- Copy all the Qt4 dependent DLLs into the current build directory so that
+#-- one can debug an application or library that depends on Qt4 libraries.
+macro (CMP_COPY_QT4_RUNTIME_LIBRARIES QTLIBLIST)
+    if (MSVC)
+        if (DEFINED QT_QMAKE_EXECUTABLE)
+            set(TYPE "d")
+            FOREACH(qtlib ${QTLIBLIST})
+                GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
+                INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}${type}d4.dll 
+                    DESTINATION ./
+                    CONFIGURATIONS Debug
+                    COMPONENT Applications)
+                INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll 
+                    DESTINATION ./
+                    CONFIGURATIONS Release
+                    COMPONENT Applications)
+                add_custom_target(ZZ_${qtlib}-Debug-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}${TYPE}4.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/ 
+                            COMMENT "Copying ${qtlib}${TYPE}4.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/")
+                add_custom_target(ZZ_${qtlib}-Release-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${qtlib}4.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ 
+                            COMMENT "Copying ${qtlib}4.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/")
+          
+            ENDFOREACH(qtlib)
+        endif(DEFINED QT_QMAKE_EXECUTABLE)
+    endif()
+endmacro()
+
 #
 # --------------------------------------------------------------------
 # This macro generates install rules for Visual Studio builds so that
@@ -389,8 +473,7 @@ ENDMACRO()
 # This macro will attempt a try_run command in order to compile and then 
 # generate a version string based on today's date. The output string should be
 # of the form YYYY.MM.DD. 
-#  Required CMake variables to be set are:
-#   EmInit_CMAKE_DIR - The path to the MXA CMake directory
+#
 #  The following variables are set, all of which should have been already
 #  initialized to a default value
 #   ${CMP_PROJECT_NAME}_VERSION
@@ -401,17 +484,6 @@ ENDMACRO()
 #-------------------------------------------------------------------------------
 macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE cmpProjectName)
     INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
-   #  message(STATUS "Generating Version Strings for ${cmpProjectName}")
- #   SET(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
- #   SET(CMAKE_REQUIRED_FLAGS_SAVE    ${CMAKE_REQUIRED_FLAGS})
-    # Add MXADATAMODEL_INCLUDE_DIR to CMAKE_REQUIRED_INCLUDES
- #   SET(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${CMP_HEADER_DIR}")
-
-   # CHECK_SYMBOL_EXISTS( CMP_HAVE_TIME_GETTIMEOFDAY "${CMP_CONFIGURATION_FILE}" HAVE_TIME_GETTIMEOFDAY)
-   # CHECK_SYMBOL_EXISTS( CMP_HAVE_SYS_TIME_GETTIMEOFDAY "${CMP_CONFIGURATION_FILE}" HAVE_SYS_TIME_GETTIMEOFDAY)
-    # Restore CMAKE_REQUIRED_INCLUDES and CMAKE_REQUIRED_FLAGS variables
- #   SET(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
-  #  SET(CMAKE_REQUIRED_FLAGS    ${CMAKE_REQUIRED_FLAGS_SAVE})
     
     if ( CMP_HAVE_TIME_GETTIMEOFDAY )
       set ( VERSION_COMPILE_FLAGS "-DHAVE_TIME_GETTIMEOFDAY")
