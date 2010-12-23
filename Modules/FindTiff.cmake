@@ -13,17 +13,22 @@
 
 # MESSAGE (STATUS "Finding Tiff library and headers..." )
 
+# Only set TIFF_INSTALL to the environment variable if it is blank
+if ("${TIFF_INSTALL}" STREQUAL "")
+    SET (TIFF_INSTALL  $ENV{TIFF_INSTALL})
+endif()
+
 # Look for the header file.
 SET(TIFF_INCLUDE_SEARCH_DIRS
-  $ENV{TIFF_INSTALL}/include
+  ${TIFF_INSTALL}/include
 )
 
 SET (TIFF_LIB_SEARCH_DIRS
-  $ENV{TIFF_INSTALL}/lib
+  ${TIFF_INSTALL}/lib
   )
 
 SET (TIFF_BIN_SEARCH_DIRS
-  $ENV{TIFF_INSTALL}/bin
+  ${TIFF_INSTALL}/bin
 )
 
 FIND_PATH(TIFF_INCLUDE_DIR 
@@ -71,8 +76,7 @@ MARK_AS_ADVANCED(TIFF_DUMP_PROG)
  #MESSAGE(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 # include the macro to adjust libraries
-get_filename_component(CURRENT_PARENT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-INCLUDE ( ${CURRENT_PARENT_DIR}/cmpAdjustLibVars.cmake)
+INCLUDE (${CMP_MODULES_SOURCE_DIR}/cmpAdjustLibVars.cmake)
 cmp_ADJUST_LIB_VARS(TIFF)
 
 IF(TIFF_INCLUDE_DIR AND TIFF_LIBRARY)
