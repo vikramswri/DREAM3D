@@ -106,7 +106,7 @@ endmacro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR app
 # --------------------------------------------------------------------
 #
 # --------------------------------------------------------------------
-macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
+macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR comp dest)
 
     SET_TARGET_PROPERTIES( ${EXE_NAME} 
         PROPERTIES
@@ -114,19 +114,11 @@ macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
         RELEASE_OUTPUT_NAME ${EXE_NAME}
     )
     
-    if (APPLE)
-        set(TOOL_INSTALL_LOCATION "bin")
-    else()
-        set(TOOL_INSTALL_LOCATION "bin")
-    endif()
-    
     INSTALL(TARGETS ${EXE_NAME} 
-        RUNTIME
-        DESTINATION ${TOOL_INSTALL_LOCATION}
-        COMPONENT Tools
-        LIBRARY DESTINATION ${TOOL_INSTALL_LOCATION} 
+        COMPONENT ${comp}
+        LIBRARY DESTINATION ${dest} 
         ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION ${TOOL_INSTALL_LOCATION}
+        RUNTIME DESTINATION ${dest}
         BUNDLE DESTINATION ./
     )   
     
@@ -143,7 +135,7 @@ macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
         endif()
     endif(APPLE)
 
-endmacro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR)
+endmacro()
 
 # --------------------------------------------------------------------
 
@@ -160,18 +152,27 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
         PROPERTIES
         DEBUG_POSTFIX ${DEBUG_EXTENSION} )
     
-    IF (APPLE AND BUILD_SHARED_LIBS)
-      OPTION (CMP_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
-      IF(CMP_BUILD_WITH_INSTALL_NAME)
-      
-          SET_TARGET_PROPERTIES(${targetName}
-             PROPERTIES
-             LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VERSION} -compatibility_version ${${CMP_PROJECT_NAME}_VERSION}"
-             INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-             BUILD_WITH_INSTALL_RPATH ${CMP_BUILD_WITH_INSTALL_NAME}
-          )
-     ENDIF(CMP_BUILD_WITH_INSTALL_NAME)
-   ENDIF (APPLE AND BUILD_SHARED_LIBS)
+    IF (BUILD_SHARED_LIBS)
+      if (APPLE)
+          OPTION (CMP_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
+          IF(CMP_BUILD_WITH_INSTALL_NAME)
+          
+              SET_TARGET_PROPERTIES(${MXADATAMODEL_LIB_NAME}
+                 PROPERTIES
+                 LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VERSION} -compatibility_version ${${CMP_PROJECT_NAME}_VERSION}"
+                 INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+                 BUILD_WITH_INSTALL_RPATH ${CMP_BUILD_WITH_INSTALL_NAME}
+              )
+         ENDIF(CMP_BUILD_WITH_INSTALL_NAME)
+     endif(APPLE)
+#     INSTALL(TARGETS ${targetName} 
+#        COMPONENT Applications
+#        RUNTIME DESTINATION ./
+#        LIBRARY DESTINATION ./ 
+#        ARCHIVE DESTINATION ./        
+#        BUNDLE DESTINATION ./
+#      )   
+   ENDIF( BUILD_SHARED_LIBS)
 
 endmacro(LibraryProperties DEBUG_EXTENSION)
 
@@ -388,14 +389,13 @@ macro (CMP_QT_LIBRARIES_INSTALL_RULES QTLIBLIST destination)
     endif()
 endmacro()
 
-
-
 # --------------------------------------------------------------------
 #-- Copy all the dependent DLLs into the current build directory so that the test
 #-- can run.
-MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
-    #message(STATUS "CMP_COPY_DEPENDENT_LIBRARIES: ${mxa_lib_list}")
-  set (mxa_lib_list ${mxa_lib_list})
+MACRO (CMP_COPY_DEPENDENT_LIBRARIES _libraryList)
+ # message(STATUS "#--------------------------------------------")
+ # message(STATUS "CMP_COPY_DEPENDENT_LIBRARIES: ${_libraryList}")
+  set (_libraryList ${_libraryList})
   SET (TYPES Debug Release)
   if (MSVC)
     # Make all the necessary intermediate directories for Visual Studio
@@ -403,25 +403,25 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release)
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MinSizeRel)
     file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RelWithDebInfo)
-    FOREACH(lib ${mxa_lib_list})
+    FOREACH(lib ${_libraryList})
     
       STRING(TOUPPER ${lib} upperlib)
-     # message(STATUS "upperlib: ${upperlib}")
-     # message(STATUS "${upperlib}_IS_SHARED: ${${upperlib}_IS_SHARED}")
+    #  message(STATUS "upperlib: ${upperlib}")
+    #  message(STATUS "${upperlib}_IS_SHARED: ${${upperlib}_IS_SHARED}")
       if (${upperlib}_IS_SHARED)
         FOREACH(BTYPE ${TYPES} )
-        #  message(STATUS "Looking for ${BTYPE} DLL Version of ${lib_name}")
+      #    message(STATUS "Looking for ${BTYPE} DLL Version of ${lib}")
           STRING(TOUPPER ${BTYPE} TYPE)        
           get_filename_component(lib_path ${${upperlib}_LIBRARY_${TYPE}} PATH)
           get_filename_component(lib_name ${${upperlib}_LIBRARY_${TYPE}} NAME_WE)
-         # message(STATUS "lib_path: ${lib_path}")
-         # message(STATUS "lib_name: ${lib_name}")
+       #   message(STATUS "lib_path: ${lib_path}")
+       #   message(STATUS "lib_name: ${lib_name}")
           
           find_file(${upperlib}_LIBRARY_DLL_${TYPE}
                         NAMES ${lib_name}.dll
                         PATHS  ${lib_path}/../bin ${lib_path}/.. ${lib_path}/
                         NO_DEFAULT_PATH )
-         # message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
+      #    message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
           mark_as_advanced(${upperlib}_LIBRARY_DLL_${TYPE})
           if ( ${${upperlib}_LIBRARY_DLL_${TYPE}} STREQUAL  "${upperlib}_LIBRARY_DLL_${TYPE}-NOTFOUND")
             message(FATAL_ERROR "According to how ${upperlib}_LIBRARY_${TYPE} was found the library should"
@@ -431,7 +431,7 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
 
          # SET(${upperlib}_LIBRARY_DLL_${TYPE} "${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll" CACHE FILEPATH "The path to the DLL Portion of the library" FORCE)
          # message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
-         # message(STATUS "Generating Copy Rule for DLL File for ${upperlib}_LIBRARY_${TYPE}")
+          message(STATUS "Generating Copy Rule for DLL Library ${${upperlib}_LIBRARY_DLL_${TYPE}}")
           ADD_CUSTOM_TARGET(ZZ_${upperlib}_DLL_${TYPE}-Copy ALL 
                       COMMAND ${CMAKE_COMMAND} -E copy_if_different ${${upperlib}_LIBRARY_DLL_${TYPE}}
                       ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/ 
@@ -439,22 +439,22 @@ MACRO (CMP_COPY_DEPENDENT_LIBRARIES mxa_lib_list)
 
         ENDFOREACH(BTYPE ${TYPES})
       ENDIF(${upperlib}_IS_SHARED)
-    ENDFOREACH(lib ${mxa_lib_list})
+    ENDFOREACH(lib ${_libraryList})
   ENDIF(MSVC)  
 endmacro()
 
-#
 # --------------------------------------------------------------------
 # This macro generates install rules for Visual Studio builds so that
 # dependent DLL libraries (HDF5, Tiff, Expat, MXADataModel) will be
 # properly installed with your project.
 # --------------------------------------------------------------------
-MACRO (CMP_LIBRARIES_INSTALL_RULES mxa_lib_list destination)
-  set (mxa_lib_list ${mxa_lib_list})
+MACRO (CMP_LIBRARIES_INSTALL_RULES _libraryList destination)
+  #  message(STATUS "CMP_LIBRARIES_INSTALL_RULES")
+  set (_libraryList ${_libraryList})
   SET (TYPES Debug Release)
   if (MSVC)
    
-    FOREACH(lib ${mxa_lib_list})
+    FOREACH(lib ${_libraryList})
         STRING(TOUPPER ${lib} upperlib)
       
         FOREACH(BTYPE ${TYPES} )
@@ -469,9 +469,9 @@ MACRO (CMP_LIBRARIES_INSTALL_RULES mxa_lib_list destination)
          # message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
           mark_as_advanced(${upperlib}_LIBRARY_DLL_${TYPE})
           if ( ${${upperlib}_LIBRARY_DLL_${TYPE}} STREQUAL  "${upperlib}_LIBRARY_DLL_${TYPE}-NOTFOUND")
-            # message(STATUS "A Companion DLL for ${upperlib}_LIBRARY_${TYPE} was NOT found which usually means"
-            #                    " that the library was NOT built as a DLL. I looked in the "
-            #                    " following locations:  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin")
+             message(STATUS "A Companion DLL for ${upperlib}_LIBRARY_${TYPE} was NOT found which usually means"
+                                " that the library was NOT built as a DLL. I looked in the "
+                                " following locations:  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin")
           else()
              # set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
              # message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
@@ -483,7 +483,7 @@ MACRO (CMP_LIBRARIES_INSTALL_RULES mxa_lib_list destination)
           endif()
         
         ENDFOREACH(BTYPE ${TYPES})
-    ENDFOREACH(lib ${mxa_lib_list})
+    ENDFOREACH(lib ${_libraryList})
   ENDIF(MSVC) 
 ENDMACRO()
 
@@ -491,7 +491,8 @@ ENDMACRO()
 # This macro will attempt a try_run command in order to compile and then 
 # generate a version string based on today's date. The output string should be
 # of the form YYYY.MM.DD. 
-#
+#  Required CMake variables to be set are:
+#   EmInit_CMAKE_DIR - The path to the MXA CMake directory
 #  The following variables are set, all of which should have been already
 #  initialized to a default value
 #   ${CMP_PROJECT_NAME}_VERSION
