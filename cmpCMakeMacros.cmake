@@ -44,97 +44,109 @@ ENDMACRO (cmp_IDE_SOURCE_PROPERTIES NAME HEADERS SOURCES INSTALL_FILES)
 # ------------------------------------------------------------------------------ 
 # This CMake code installs the needed support libraries
 # ------------------------------------------------------------------------------ 
-macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNeedsPlugins)
+macro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR 
+                                appNeedsPlugins installFiles comp dest searchDirs)
 
     SET_TARGET_PROPERTIES( ${EXE_NAME} 
-        PROPERTIES
-        DEBUG_OUTPUT_NAME ${EXE_NAME}${EXE_DEBUG_EXTENSION}
-        RELEASE_OUTPUT_NAME ${EXE_NAME}
+                PROPERTIES
+                DEBUG_OUTPUT_NAME ${EXE_NAME}${EXE_DEBUG_EXTENSION}
+                RELEASE_OUTPUT_NAME ${EXE_NAME}
     )
-    if ( DEFINED CMP_INSTALL_FILES)
-        if ( ${CMP_INSTALL_FILES} EQUAL 1 )
-            INSTALL(TARGETS ${EXE_NAME} 
-                COMPONENT Applications
-                RUNTIME DESTINATION ./
-                LIBRARY DESTINATION ./ 
-                ARCHIVE DESTINATION ./        
-                BUNDLE DESTINATION ./
-            )   
+    if ( ${installFiles} EQUAL 1 )
+        INSTALL(TARGETS ${EXE_NAME} 
+            COMPONENT ${comp}
+            RUNTIME DESTINATION ${dest}
+            LIBRARY DESTINATION ${dest} 
+            ARCHIVE DESTINATION ${dest}        
+            BUNDLE DESTINATION ${dest}
+        )   
+        
+        
+        # --------------------------------------------------------------------
+        # Get the plugin list from the plugin file
+        if ( ${appNeedsPlugins})
+          file(READ ${CMP_PLUGIN_LIST_FILE} CMP_COMPLETE_PLUGIN_LIST)
+          file(READ ${CMP_PLUGIN_SEARCHDIR_FILE} CMP_PLUGIN_SEARCH_DIRS)
         endif()
-    endif()
-    
-    # --------------------------------------------------------------------
-    # Get the plugin list from the plugin file
-    if ( ${appNeedsPlugins})
-      file(READ ${CMP_PLUGIN_LIST_FILE} CMP_COMPLETE_PLUGIN_LIST)
-      file(READ ${CMP_PLUGIN_SEARCHDIR_FILE} CMP_PLUGIN_SEARCH_DIRS)
-    endif()
-    # --- If we are on OS X copy all the embedded libraries to the app bundle
-   if (APPLE)
-    if(DEFINED GUI_TYPE)
-       # message(STATUS "Creating Install CMake file for GUI application ${EXE_NAME}")
-        if(${GUI_TYPE} STREQUAL "MACOSX_BUNDLE")
-            include (${CMP_OSX_TOOLS_SOURCE_DIR}/OSX_BundleTools.cmake)
-            if(CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXBundleApp( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
-                                    ${EXE_BINARY_DIR}
-                                    ${CMP_OSX_TOOLS_SOURCE_DIR} )
-            else (CMAKE_BUILD_TYPE MATCHES "Debug")
-                MakeOSXBundleApp(${EXE_NAME} 
-                                 ${EXE_BINARY_DIR}
-                                 ${CMP_OSX_TOOLS_SOURCE_DIR} )
-            endif()
-        endif()
-    else(DEFINED GUI_TYPE)
-      #  message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
-
-        include (${CMP_OSX_TOOLS_SOURCE_DIR}/OSX_BundleTools.cmake)
-        if(CMAKE_BUILD_TYPE MATCHES "Debug")
-            MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
+        
+        if (APPLE)
+            # --- If we are on OS X copy all the embedded libraries to the app bundle
+            # message(STATUS "Creating Install CMake file for GUI application ${EXE_NAME}")
+            set (PLUGIN_SEARCH_DIRS "searchDirs")
+            if(${GUI_TYPE} STREQUAL "MACOSX_BUNDLE")
+                include (${CMP_OSX_TOOLS_SOURCE_DIR}/OSX_BundleTools.cmake)
+                if(CMAKE_BUILD_TYPE MATCHES "Debug")
+                    MakeOSXBundleApp( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
                                 ${EXE_BINARY_DIR}
                                 ${CMP_OSX_TOOLS_SOURCE_DIR} )
-        else (CMAKE_BUILD_TYPE MATCHES "Debug")
-            MakeOSXTool(${EXE_NAME} 
+                else (CMAKE_BUILD_TYPE MATCHES "Debug")
+                    MakeOSXBundleApp(${EXE_NAME} 
                              ${EXE_BINARY_DIR}
                              ${CMP_OSX_TOOLS_SOURCE_DIR} )
-        endif()
- 
-    endif(DEFINED GUI_TYPE)
-   endif(APPLE)
-endmacro(cmp_InstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR appNeedsPlugins)
+                endif()
+            endif()
+        else()    
+            #------------------------------------------------------------------------------
+            # Add install rules for required system runtimes such as MSVCRxx.dll
+            SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON)
+            SET (CMAKE_INSTALL_DEBUG_LIBRARIES ON)
+            INCLUDE(InstallRequiredSystemLibraries)
+            IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+              INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+                DESTINATION ./
+                PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+                COMPONENT Runtime)
+            ENDIF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)                
+            
+            set(_extension)
+            set(_dir "")
+            
+            IF(WIN32)
+              set(_extension ".exe")
+              set(_dir "")
+            ENDIF(WIN32)
+            set(APPS "\${CMAKE_INSTALL_PREFIX}/${dest}/${EXE_NAME}${EXE_DEBUG_EXTENSION}${_extension}")  # paths to executables
+            INSTALL(CODE "
+               include(\"${CMAKE_ROOT}/Modules/BundleUtilities.cmake\")
+               fixup_bundle(\"${APPS}\"   \"\"   \"${searchDirs}\")
+               " COMPONENT ${comp})
+            
+        endif(APPLE)
+    endif()
+endmacro()
 
 # --------------------------------------------------------------------
 #
 # --------------------------------------------------------------------
-macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR comp dest)
+macro(cmp_ToolInstallationSupport EXE_NAME EXE_DEBUG_EXTENSION EXE_BINARY_DIR installFiles comp dest)
 
     SET_TARGET_PROPERTIES( ${EXE_NAME} 
         PROPERTIES
         DEBUG_OUTPUT_NAME ${EXE_NAME}${EXE_DEBUG_EXTENSION}
         RELEASE_OUTPUT_NAME ${EXE_NAME}
     )
+    IF (${installFiles} EQUAL 1)
+        INSTALL(TARGETS ${EXE_NAME} 
+            COMPONENT ${comp}
+            LIBRARY DESTINATION ${dest} 
+            ARCHIVE DESTINATION lib
+            RUNTIME DESTINATION ${dest}
+            BUNDLE DESTINATION ./
+        )   
     
-    INSTALL(TARGETS ${EXE_NAME} 
-        COMPONENT ${comp}
-        LIBRARY DESTINATION ${dest} 
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION ${dest}
-        BUNDLE DESTINATION ./
-    )   
-    
-    #   message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
-    if (APPLE)
-        if(CMAKE_BUILD_TYPE MATCHES "Debug")
-            MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
-                                ${EXE_BINARY_DIR}
-                                ${CMP_OSX_TOOLS_SOURCE_DIR} )
-        else (CMAKE_BUILD_TYPE MATCHES "Debug")
-            MakeOSXTool(${EXE_NAME} 
-                             ${EXE_BINARY_DIR}
-                             ${CMP_OSX_TOOLS_SOURCE_DIR} )
-        endif()
-    endif(APPLE)
-
+        #   message(STATUS "Creating Install CMake file for tool application ${EXE_NAME}")
+        if (APPLE)
+            if(CMAKE_BUILD_TYPE MATCHES "Debug")
+                MakeOSXTool( "${EXE_NAME}${EXE_DEBUG_EXTENSION}" 
+                                    ${EXE_BINARY_DIR}
+                                    ${CMP_OSX_TOOLS_SOURCE_DIR} )
+            else (CMAKE_BUILD_TYPE MATCHES "Debug")
+                MakeOSXTool(${EXE_NAME} 
+                                 ${EXE_BINARY_DIR}
+                                 ${CMP_OSX_TOOLS_SOURCE_DIR} )
+            endif()
+        endif(APPLE)
+    endif()
 endmacro()
 
 # --------------------------------------------------------------------
@@ -271,8 +283,8 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
   foreach(build_type ${qt_plugin_types})
     string(TOUPPER ${build_type} BTYPE)
       foreach(plugin ${qt_plugin_list})
-		STRING(TOUPPER ${plugin} PLUGIN)
-		# message(STATUS "|-- Looking for ${plugin}${qt_plugin_${BTYPE}_suffix}")
+        STRING(TOUPPER ${plugin} PLUGIN)
+        # message(STATUS "|-- Looking for ${plugin}${qt_plugin_${BTYPE}_suffix}")
         FIND_LIBRARY( QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE} 
                       NAMES ${plugin}${qt_plugin_${BTYPE}_suffix} 
                       PATHS ${QT_PLUGINS_DIR}/${plugintype} 
@@ -292,16 +304,16 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
                                 " that the library was NOT built as a DLL. I looked in the "
                                 " following locations:  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin")
             else()
-				#  set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
-				#  message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
-				#  message(STATUS "Generating Install Rule for DLL File for QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}\n  ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
-				INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
-					DESTINATION ./plugins/${plugintype} 
-					CONFIGURATIONS ${BTYPE} 
-					COMPONENT Runtime)
+                #  set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
+                #  message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
+                #  message(STATUS "Generating Install Rule for DLL File for QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}\n  ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+                INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
+                    DESTINATION ./plugins/${plugintype} 
+                    CONFIGURATIONS ${BTYPE} 
+                    COMPONENT Runtime)
             endif()
-		elseif (UNIX AND NOT APPLE)
-			INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
+        elseif (UNIX AND NOT APPLE)
+            INSTALL(FILES ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}
                 DESTINATION ./plugins/${plugintype} 
                 CONFIGURATIONS ${BTYPE} 
                 COMPONENT Runtime)
@@ -311,32 +323,32 @@ macro (FindQt4Plugins pluginlist pluginfile libdirsearchfile plugintype)
                       
                       
         mark_as_advanced(QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE})
-		# message(STATUS "|--  QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
+        # message(STATUS "|--  QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}: ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}}")
         LIST(APPEND QTPLUGINS_${BTYPE} ${QT_IMAGEFORMAT_PLUGIN_${PLUGIN}_${BTYPE}})
       endforeach()
-	endforeach()
+    endforeach()
 
-	# Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
-	if (NOT MSVC)
-	  if ( NOT DEFINED CMAKE_BUILD_TYPE )
-		if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-			set (QTPLUGINS ${QTPLUGINS_DEBUG})
-		else()
-			set (QTPLUGINS ${QTPLUGINS_RELEASE})
-		endif()
-	  else()
-		set (QTPLUGINS ${QTPLUGINS_RELEASE})
-	  endif()
-	else()
-		# Create the qt.conf file so that the image plugins will be loaded correctly
-		FILE(WRITE ${PROJECT_BINARY_DIR}/qt.conf "[Paths]\nPlugins = plugins")
-		INSTALL(FILES ${PROJECT_BINARY_DIR}/qt.conf
-				DESTINATION .
-				COMPONENT Runtime)
-	endif()
-	file(APPEND ${pluginfile} "${QTPLUGINS};")
-	file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/imageformats;")
-	
+    # Assign either the debug or release plugin list to the QTPLUGINS variable on NON msvc platforms.
+    if (NOT MSVC)
+      if ( NOT DEFINED CMAKE_BUILD_TYPE )
+        if ( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+            set (QTPLUGINS ${QTPLUGINS_DEBUG})
+        else()
+            set (QTPLUGINS ${QTPLUGINS_RELEASE})
+        endif()
+      else()
+        set (QTPLUGINS ${QTPLUGINS_RELEASE})
+      endif()
+    else()
+        # Create the qt.conf file so that the image plugins will be loaded correctly
+        FILE(WRITE ${PROJECT_BINARY_DIR}/qt.conf "[Paths]\nPlugins = plugins")
+        INSTALL(FILES ${PROJECT_BINARY_DIR}/qt.conf
+                DESTINATION .
+                COMPONENT Runtime)
+    endif()
+    file(APPEND ${pluginfile} "${QTPLUGINS};")
+    file(APPEND ${libdirsearchfile} "${QT_PLUGINS_DIR}/imageformats;")
+    
 endmacro(FindQt4Plugins pluginlist)
 
 # --------------------------------------------------------------------
