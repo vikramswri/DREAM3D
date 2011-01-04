@@ -474,8 +474,8 @@ MACRO (CMP_LIBRARIES_INSTALL_RULES _libraryList destination)
                                 " following locations:  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin")
           else()
              # set(${upperlib}_LIBRARY_DLL_${TYPE}  ${${upperlib}_LIBRARY_DLL_${TYPE}}/${lib_name}.dll)
-             # message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
-              message(STATUS "Generating Install Rule for DLL File for ${${upperlib}_LIBRARY_${TYPE}}")
+           #   message(STATUS "${upperlib}_LIBRARY_DLL_${TYPE}: ${${upperlib}_LIBRARY_DLL_${TYPE}}")
+              message(STATUS "Generating Install Rule for DLL Library ${${upperlib}_LIBRARY_DLL_${TYPE}}")
               INSTALL(FILES ${${upperlib}_LIBRARY_DLL_${TYPE}}
                 DESTINATION ${destination} 
                 CONFIGURATIONS ${BTYPE} 
