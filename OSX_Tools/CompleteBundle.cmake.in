@@ -45,6 +45,8 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   # By default, embed things right next to the main bundle executable:
   #
   set(path "@executable_path/../../Contents/MacOS")
+  #message(STATUS "%%%=> item: ${item}")
+  #message(STATUS "%%%=> default_embedded_path_var: ${default_embedded_path_var}")
 
   set(overridden 0)
   # For Qt Based Plugins for the image formats, the plugins MUST reside in
@@ -58,19 +60,22 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   
   # First look for plugins that have a ".plugin" extension
   if(item MATCHES "\\.plugin$")
+    #message(STATUS "Just a Plugin")
     set(path "@executable_path/../Plugins")
     set(overridden 1)
   endif(item MATCHES "\\.plugin$")
   
   # Next look for the Qt Image Format Plugins in case those are needed
   if ( item MATCHES "imageformats/libq?")
+    #message(STATUS "^^^^^^==> Qt Image Format Plugin Found")
     set(path "@executable_path/../Plugins/imageformats")
     set(overridden 1)
-  # Lastly ick up any plugins that simply have the ".dylib" extension
+  # Lastly pick up any plugins that simply have the ".dylib" extension
   elseif(item MATCHES "\\.dylib$")
+    #message(STATUS "Dylib that needs fixing")
     set(path "@executable_path/../lib")
     set(overridden 1)
-  endif(item MATCHES "imageformats/libq?")
+  endif()
   
   # Embed frameworks in the embedded "Frameworks" directory (sibling of MacOS):
   #
@@ -82,12 +87,12 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   endif(NOT overridden)
 
   set(${default_embedded_path_var} "${path}" PARENT_SCOPE)
-endfunction(gp_item_default_embedded_path_override)
+endfunction()
 
 
 #-- Be sure all the internal directories are created first before calling the 'fixup_bundle'
-file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Libraries")
-file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Plugins")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/lib")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/plugins")
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Frameworks")
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Support")
 
@@ -102,8 +107,54 @@ if ("@Q_WS_MAC@" STREQUAL "1")
     file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Resources/qt_menu.nib")
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "@QT_LIBRARY_DIR@/QtGui.framework/Resources/qt_menu.nib" "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/Resources/qt_menu.nib")
   endif()
+
 endif()
+
+# --------------------------------------------------------------------
+# Copy the Qt Plugins into the proper location of the App package
+# This MUST be done BEFORE fixup_bundle is run
+set (COMPLETE_PLUGIN_LIST "@PLUGIN_LIST@")
+SET (PLUGIN_LIST "")
+
+# --------------------------------------------------------------------
+# This loop will look at each plugin and run a simple REGEX to determine if the
+# plugin is a Qt based plugin or if the plugin was built as part of the project.
+# The reason for the distinction is that we need to manually copy the plugin from
+# its current location into its new location inside the App bundle. Qt Plugins
+# have specific locations that they MUST be located in. Our own plugins will
+# be placed loose in the 'plugins' directory.
+foreach(p ${COMPLETE_PLUGIN_LIST})
+    #message(STATUS "p: ${p}")
+    if(p MATCHES "@QT_PLUGINS_DIR@")
+        #message(STATUS "Found Qt Plugin!!!!!!")
+        get_filename_component(qt_plugin_name "${p}" NAME)
+        get_filename_component(qt_plugin_type_path "${p}" PATH)
+        get_filename_component(qt_plugin_type "${qt_plugin_type_path}" NAME)
+        file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/plugins/${qt_plugin_type}")
+        message(STATUS "Copying Qt Plugin\n    Source: ${p}\n    Destination: ${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/plugins/${qt_plugin_type}")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+                        "${p}" 
+                        "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/plugins/${qt_plugin_type}/.")
+        LIST( APPEND PLUGIN_LIST
+                        "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/plugins/${qt_plugin_type}/${qt_plugin_name}")
+    else()
+        get_filename_component(plugin_name "${p}" NAME)
+        message(STATUS "Copying Plugin\n    Source: ${p}\n    Destination: ${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/plugins/")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+                        "${p}" 
+                        "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/plugins/.")
+        LIST( APPEND PLUGIN_LIST
+                        "${CMAKE_INSTALL_PREFIX}/@target@.app/Contents/plugins/${plugin_name}")
+    endif()
+  
+endforeach(p ${PLUGIN_LIST})
 
 # -- Run the BundleUtilities cmake code
 include(BundleUtilities)
-fixup_bundle("${CMAKE_INSTALL_PREFIX}/@target@.app" "@COMPLETE_PLUGIN_LIST@" "@PLUGIN_SEARCH_DIRS@")
+if (1)
+fixup_bundle("${CMAKE_INSTALL_PREFIX}/@target@.app" 
+             # Plugins to Install
+             "${PLUGIN_LIST}"
+             # Directories to Search for Libraries
+             "@LIB_SEARCH_DIRS@")
+endif()
