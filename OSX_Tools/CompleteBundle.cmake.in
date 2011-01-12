@@ -92,7 +92,7 @@ endfunction()
 
 # -- Run the BundleUtilities cmake code
 include(BundleUtilities)
-fixup_bundle("${CMAKE_INSTALL_PREFIX}/@target@.app" 
+fixup_bundle("${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app" 
              # Plugins to Install
              "@app_plugin_list@"
              # Directories to Search for Libraries
