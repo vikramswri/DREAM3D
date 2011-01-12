@@ -165,8 +165,9 @@ function(BuildQtAppBundle)
         get_filename_component(qt_plugin_type "${qt_plugin_type_path}" NAME)
         install(PROGRAMS ${pi}
                 DESTINATION "${pi_dest}/Contents/plugins/${qt_plugin_type}"
+                COMPONENT ${QAB_COMPONENT} 
         )
-        list(APPEND app_plugin_list "${CMAKE_INSTALL_PREFIX}/${pi_dest}/Contents/plugins/${qt_plugin_type}/${qt_plugin_name}")
+        list(APPEND app_plugin_list "\${CMAKE_INSTALL_PREFIX}/${pi_dest}/Contents/plugins/${qt_plugin_type}/${qt_plugin_name}")
     endforeach()
     list(REMOVE_DUPLICATES lib_search_dirs)
     
@@ -176,8 +177,9 @@ function(BuildQtAppBundle)
         get_filename_component(plugin_name "${pi}" NAME)
         install(PROGRAMS ${pi}
                 DESTINATION "${pi_dest}/Contents/plugins"
+                COMPONENT ${QAB_COMPONENT}
         )
-        list(APPEND app_plugin_list "${CMAKE_INSTALL_PREFIX}/${pi_dest}/Contents/plugins/${plugin_name}")
+        list(APPEND app_plugin_list "\${CMAKE_INSTALL_PREFIX}/${pi_dest}/Contents/plugins/${plugin_name}")
     endforeach()
     
     
@@ -190,7 +192,7 @@ function(BuildQtAppBundle)
     CONFIGURE_FILE("${CMP_OSX_TOOLS_SOURCE_DIR}/CompleteBundle.cmake.in"
             "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
      
-    install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}")
+    install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT ${QAB_COMPONENT})
  
 endfunction()
 
