@@ -1,4 +1,4 @@
-
+message(FATAL_ERROR "THIS IS NOT USED ANYMORE")
 include(GetPrerequisites)
 
 
