@@ -51,7 +51,7 @@ ENDMACRO (cmp_IDE_SOURCE_PROPERTIES NAME HEADERS SOURCES INSTALL_FILES)
 #  VERSION_STRING - The version string that you wish to use for the bundle. For OS X
 #   this string is usually XXXX.YY.ZZ in type. Look at the Apple docs for more info
 #-------------------------------------------------------------------------------
-macro(ConfigureMacOSXBundlePlist PROJECT_NAME DEBUG_EXTENSION ICON_FILE_PATH VERSION_STRING)
+macro(ConfigureMacOSXBundlePlist TARGET_NAME DEBUG_EXTENSION ICON_FILE_PATH VERSION_STRING)
   # message(STATUS "ConfigureMacOSXBundlePlist for ${PROJECT_NAME} ")
   IF(CMAKE_BUILD_TYPE MATCHES "Release")
     SET(DBG_EXTENSION "")
@@ -60,21 +60,20 @@ macro(ConfigureMacOSXBundlePlist PROJECT_NAME DEBUG_EXTENSION ICON_FILE_PATH VER
   endif()
   get_filename_component(ICON_FILE_NAME "${ICON_FILE_PATH}" NAME)
     
- #CFBundleGetInfoString
- SET(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}${DBG_EXTENSION} Version ${VERSION_STRING}, Copyright 2009 BlueQuartz Software.")
- SET(MACOSX_BUNDLE_ICON_FILE ${ICON_FILE_NAME})
- SET(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_NAME}${DBG_EXTENSION}")
- #CFBundleLongVersionString
- SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}${DBG_EXTENSION} Version ${VERSION_STRING}")
- SET(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}${DBG_EXTENSION})
- SET(MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION_STRING})
- SET(MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION_STRING})
- SET(MACOSX_BUNDLE_COPYRIGHT "Copyright 2010, BlueQuartz Software. All Rights Reserved.")
+ set_target_properties(${TARGET_NAME} PROPERTIES
+     MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}${DBG_EXTENSION} Version ${VERSION_STRING}, Copyright 2009 BlueQuartz Software."
+     MACOSX_BUNDLE_ICON_FILE ${ICON_FILE_NAME}
+     MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_NAME}${DBG_EXTENSION}"
+     MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}${DBG_EXTENSION} Version ${VERSION_STRING}"
+     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}${DBG_EXTENSION}
+     MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION_STRING}
+     MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION_STRING}
+     MACOSX_BUNDLE_COPYRIGHT "Copyright 2011, BlueQuartz Software. All Rights Reserved."
+ )
  
  SET(${PROJECT_NAME}_PROJECT_SRCS ${${PROJECT_NAME}_PROJECT_SRCS} ${ICON_FILE_PATH})
  SET_SOURCE_FILES_PROPERTIES(${ICON_FILE_PATH} PROPERTIES
-                             MACOSX_PACKAGE_LOCATION Resources)
-                             
+                             MACOSX_PACKAGE_LOCATION Resources)  
 endmacro()
 
 # --------------------------------------------------------------------
@@ -113,10 +112,6 @@ function(BuildQtAppBundle)
     #-- Configure the OS X Bundle Plist
     if (APPLE)
         SET(GUI_TYPE MACOSX_BUNDLE)
-        ConfigureMacOSXBundlePlist( ${QAB_TARGET} ${QAB_DEBUG_EXTENSION} ${QAB_ICON_FILE} 
-                                "${QAB_VERSION_MAJOR}.${QAB_VERSION_MINOR}.${QAB_VERSION_PATCH}" )
-    
-                              
 #-- Make sure the qt_menu.nib is copied if we are using Qt Cocoa by setting the
 # source files properties of the qt_menu.nib package
         IF(QT_MAC_USE_COCOA)
@@ -138,13 +133,13 @@ function(BuildQtAppBundle)
         ENDIF(QT_MAC_USE_COCOA)
         
 #-- Write out a qt.conf file to place in our App bundle
-#        set(qt_conf_file ${${QAB_TARGET}_BINARY_DIR}/qt.conf)
-#        file(WRITE ${qt_conf_file})
-#        set_source_files_properties(${qt_conf_file}
-#                                PROPERTIES
-#                                MACOSX_PACKAGE_LOCATION Resources)        
+        set(qt_conf_file ${${QAB_TARGET}_BINARY_DIR}/qt.conf)
+        file(WRITE ${qt_conf_file})
+        set_source_files_properties(${qt_conf_file}
+                                PROPERTIES
+                                MACOSX_PACKAGE_LOCATION Resources)        
 
-        list(APPEND QAB_SOURCES ${qt_menu_nib_sources})
+        list(APPEND QAB_SOURCES ${qt_menu_nib_sources} ${qt_conf_file})
     elseif(WIN32)
         SET(GUI_TYPE WIN32)
         FILE (WRITE "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc"
@@ -152,6 +147,7 @@ function(BuildQtAppBundle)
           "// remains consistent on all systems.\n"
           "IDI_ICON1 ICON \"${QAB_ICON_FILE}\"")
         SET(QAB_ICON_FILE "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc")
+        cmp_IDE_GENERATED_PROPERTIES("Generated_qrc" "${QAB_ICON_FILE}" "")
     endif(APPLE)
     
 #-- Append the Icon file/Image/Resource file to the list of Sources to compile
@@ -161,12 +157,11 @@ function(BuildQtAppBundle)
     ADD_EXECUTABLE( ${QAB_TARGET} ${GUI_TYPE} ${QAB_SOURCES} )
     TARGET_LINK_LIBRARIES( ${QAB_TARGET}
                         ${QAB_LINK_LIBRARIES} )
-                        
+                     
 #-- Make sure we have a proper bundle icon. This must occur AFTER the ADD_EXECUTABLE command
     if (APPLE)
-        get_filename_component(ICON_FILE_NAME "${QAB_ICON_FILE}" NAME)
-        SET_TARGET_PROPERTIES(${QAB_TARGET} PROPERTIES
-                              MACOSX_BUNDLE_ICON_FILE ${ICON_FILE_NAME})     
+        ConfigureMacOSXBundlePlist( ${QAB_TARGET} ${QAB_DEBUG_EXTENSION} ${QAB_ICON_FILE} 
+                                "${QAB_VERSION_MAJOR}.${QAB_VERSION_MINOR}.${QAB_VERSION_PATCH}" )
     endif(APPLE)
     
 #-- Set the Debug Suffix for the application
