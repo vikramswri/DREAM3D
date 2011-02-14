@@ -89,7 +89,6 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   set(${default_embedded_path_var} "${path}" PARENT_SCOPE)
 endfunction()
 
-
 # -- Run the BundleUtilities cmake code
 include(BundleUtilities)
 fixup_bundle("${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app" 
