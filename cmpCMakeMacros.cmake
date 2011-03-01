@@ -140,6 +140,7 @@ function(BuildQtAppBundle)
 #                                MACOSX_PACKAGE_LOCATION Resources)        
 #
 #        list(APPEND QAB_SOURCES ${qt_menu_nib_sources} ${qt_conf_file})
+         list(APPEND QAB_SOURCES ${qt_menu_nib_sources})
     elseif(WIN32)
         SET(GUI_TYPE WIN32)
         FILE (WRITE "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc"
