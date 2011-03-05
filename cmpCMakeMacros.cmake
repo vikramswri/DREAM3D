@@ -112,8 +112,8 @@ function(BuildQtAppBundle)
     #-- Configure the OS X Bundle Plist
     if (APPLE)
         SET(GUI_TYPE MACOSX_BUNDLE)
-#-- Make sure the qt_menu.nib is copied if we are using Qt Cocoa by setting the
-# source files properties of the qt_menu.nib package
+        #-- Make sure the qt_menu.nib is copied if we are using Qt Cocoa by setting the
+        # source files properties of the qt_menu.nib package
         IF(QT_MAC_USE_COCOA)
             GET_FILENAME_COMPONENT(qt_menu_nib
               "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
@@ -229,7 +229,7 @@ function(BuildQtAppBundle)
             list(APPEND app_plugin_list "\${CMAKE_INSTALL_PREFIX}/${pi_dest}/${plugin_name}")
         endforeach()
     endif(APPLE)
-    
+        
 #-- Create last install rule that will run fixup_bundle() on OS X Machines. Other platforms we
 #-- are going to create the install rules elsewhere
     if(APPLE)
