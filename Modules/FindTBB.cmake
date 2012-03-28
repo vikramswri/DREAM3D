@@ -90,7 +90,6 @@ endif (CMAKE_SYSTEM MATCHES "SunOS.*")
 #-- Clear the public variables
 set (TBB_FOUND "NO")
 
-message(STATUS "TBB_INSTALL_DIR: ${TBB_INSTALL_DIR}")
 #-- Find TBB install dir and set ${_TBB_INSTALL_DIR} and cached ${TBB_INSTALL_DIR}
 # first: use CMake variable TBB_INSTALL_DIR
 if (TBB_INSTALL_DIR)
@@ -128,6 +127,7 @@ if (NOT TBB_INSTALL_DIR)
     mark_as_advanced(TBB_INSTALL_DIR)
 endif (NOT TBB_INSTALL_DIR)
 
+message(STATUS "TBB_INSTALL_DIR: ${TBB_INSTALL_DIR}")
 
 #-- A macro to rewrite the paths of the library. This is necessary, because 
 #   find_library() always found the intel64/vc9 version of the TBB libs
