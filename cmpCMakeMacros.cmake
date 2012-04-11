@@ -811,7 +811,7 @@ endmacro()
 #
 function(cmpVersionStringsFromGit)
     set(options)
-    set(oneValueArgs GENERATED_FILE_PATH NAMESPACE cmpProjectName)
+    set(oneValueArgs GENERATED_HEADER_FILE_PATH GENERATED_SOURCE_FILE_PATH NAMESPACE cmpProjectName EXPORTS_DEFINE WORKING_DIRECTORY)
     cmake_parse_arguments(GVS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
     
    # message(STATUS "--------------------------------------------")
@@ -820,14 +820,13 @@ function(cmpVersionStringsFromGit)
    # message(STATUS "GVS_GENERATED_FILE_PATH: ${GVS_GENERATED_FILE_PATH}")
     
     Find_package(Git)
-       # message(STATUS "GVS_cmpProjectName: ${GVS_cmpProjectName}")
-       # message(STATUS "${GVS_cmpProjectName}_SOURCE_DIR: ${${GVS_cmpProjectName}_SOURCE_DIR}")
+        
         if (GIT_FOUND)
         execute_process(COMMAND ${GIT_EXECUTABLE} describe
             OUTPUT_VARIABLE DVERS
             RESULT_VARIABLE did_run
             ERROR_VARIABLE git_error
-            WORKING_DIRECTORY ${${GVS_cmpProjectName}_SOURCE_DIR} 
+            WORKING_DIRECTORY ${GVS_WORKING_DIRECTORY} 
          )
         string(STRIP ${DVERS} DVERS)
        # message(STATUS "DVERS: ${DVERS}")
@@ -839,6 +838,12 @@ function(cmpVersionStringsFromGit)
     
         set (VERSION_GEN_NAMESPACE "${GVS_NAMESPACE}")
         set (VERSION_GEN_NAME "${GVS_cmpProjectName}")
+        set (VERSION_GEN_EXPORTS "")
+        if (NOT ${GVS_EXPORTS_DEFINE} STREQUAL "")
+            set (VERSION_GEN_EXPORTS "${GVS_EXPORTS_DEFINE}")
+            set (VERSION_DLL_EXPORT 1)
+        endif()
+        
       #  message(STATUS "VERSION_GEN_VER_MAJOR: ${VERSION_GEN_VER_MAJOR}")
        # message(STATUS "VERSION_GEN_VER_MINOR: ${VERSION_GEN_VER_MINOR}")
        # message(STATUS "VERSION_GEN_VER_PATCH: ${VERSION_GEN_VER_PATCH}")
@@ -856,7 +861,8 @@ function(cmpVersionStringsFromGit)
          
         mark_as_advanced( ${GVS_cmpProjectName}_VER_MAJOR ${GVS_cmpProjectName}_VER_MINOR ${GVS_cmpProjectName}_VER_PATCH)
         set (PROJECT_PREFIX "${GVS_cmpProjectName}")
-        configure_file(${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in   ${GVS_GENERATED_FILE_PATH}  )
+        configure_file(${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in   ${GVS_GENERATED_HEADER_FILE_PATH}  )
+        configure_file(${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.cpp.in   ${GVS_GENERATED_SOURCE_FILE_PATH}  )
     #    MARK_AS_ADVANCED(${CMP_PROJECT_NAME}_VERSION ${CMP_PROJECT_NAME}_VER_MAJOR ${CMP_PROJECT_NAME}_VER_MINOR ${CMP_PROJECT_NAME}_VER_PATCH)
     else()
        cmpGenerateVersionString( ${GVS_GENERATED_FILE_PATH} ${GVS_NAMESPACE} ${GVS_cmpProjectName} )
