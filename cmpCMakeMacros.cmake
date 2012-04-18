@@ -736,70 +736,48 @@ ENDMACRO()
 #   ${CMP_PROJECT_NAME}_VER_PATCH
 #
 #-------------------------------------------------------------------------------
-macro(cmpGenerateVersionString GENERATED_FILE_PATH NAMESPACE cmpProjectName)
-    INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
+macro(cmpGenerateVersionString)
+
+    set(options)
+    set(oneValueArgs GENERATED_HEADER_FILE_PATH GENERATED_SOURCE_FILE_PATH NAMESPACE 
+                     cmpProjectName EXPORTS_DEFINE WORKING_DIRECTORY
+                     MAJOR MINOR PATCH)
+    cmake_parse_arguments(GVS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
     
-    if ( CMP_HAVE_TIME_GETTIMEOFDAY )
-      set ( VERSION_COMPILE_FLAGS "-DHAVE_TIME_GETTIMEOFDAY")
-    endif()
-    
-    if ( CMP_HAVE_SYS_TIME_GETTIMEOFDAY )
-        set ( VERSION_COMPILE_FLAGS "-DHAVE_SYS_TIME_GETTIMEOFDAY")
-    endif()
-    
-    if (NOT CMP_HAVE_TIME_GETTIMEOFDAY AND NOT CMP_HAVE_SYS_TIME_GETTIMEOFDAY)
-      set (VERSION_GEN_VER_MAJOR "0")
-      set (VERSION_GEN_VER_MINOR "0")
-      set (VERSION_GEN_VER_PATCH "1")
-      set (VERSION_GEN_COMPLETE "0.0.1" )
-      set (VERSION_GEN_NAME "${CMP_PROJECT_NAME}")
-      set (VERSION_GEN_NAMESPACE "${NAMESPACE}")
-      set (${cmpProjectName}_VERSION   ${VERSION_GEN_COMPLETE}  CACHE STRING "Complete Version String")
-      set (${cmpProjectName}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
-      set (${cmpProjectName}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
-      set (${cmpProjectName}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
-    else()
-      # message(STATUS "Running version generation executable")
-      try_run(VERSION_RUN_RESULT VERSION_COMPILE_RESULT 
-              ${CMAKE_CURRENT_BINARY_DIR} ${CMP_CORE_TESTS_SOURCE_DIR}/cmpGenerateVersionString.cpp
-              COMPILE_DEFINITIONS ${VERSION_COMPILE_FLAGS}
-              COMPILE_OUTPUT_VARIABLE VERSION_COMPILE_OUTPUT
-              RUN_OUTPUT_VARIABLE VERSION_RUN_OUTPUT )
-      set(VERSION_RUN_RESULT "1" CACHE INTERNAL "")
+  # message(STATUS "--------------------------------------------")
+  #  message(STATUS "GVS_NAMESPACE: ${GVS_NAMESPACE}")
+  #  message(STATUS "GVS_cmpProjectName: ${GVS_cmpProjectName}")
+  # message(STATUS "GVS_GENERATED_FILE_PATH: ${GVS_GENERATED_FILE_PATH}")
   
-                 
-      if (NOT VERSION_RUN_OUTPUT) 
-          message(STATUS "VERSION_COMPILE_OUTPUT: ${VERSION_COMPILE_OUTPUT}")
-          message(STATUS "VERSION_RUN_OUTPUT: ${VERSION_RUN_OUTPUT}")
-          FILE(APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-              "Attempting to Generate a Version Number from a GetTimeofDay() function failed with the following output\n"
-              "----------- COMPILE OUTPUT ---------------------------------------------------\n"
-              "${VERSION_COMPILE_OUTPUT}\n"
-              "----------- RUN OUTPUT ---------------------------------------------------\n"
-              "${VERSION_RUN_OUTPUT}\n"
-              "--------------------------------------------------------------\n" )
-           message(FATAL_ERROR "The program to generate a version was not able to be run. Are we cross compiling? Do we have the GetTimeOfDay() function?")
-            
-      endif()
-
-      # and now the version string given by qmake
-      STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MAJOR "${VERSION_RUN_OUTPUT}")
-      STRING(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\.[0-9]+.*" "\\1" VERSION_GEN_VER_MINOR "${VERSION_RUN_OUTPUT}")
-      STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_GEN_VER_PATCH "${VERSION_RUN_OUTPUT}")
-    
-      set (VERSION_GEN_COMPLETE ${VERSION_RUN_OUTPUT} )
-      set (VERSION_GEN_NAME "${cmpProjectName}")
-      set (VERSION_GEN_NAMESPACE "${NAMESPACE}")
-      set (${cmpProjectName}_VERSION   ${VERSION_RUN_OUTPUT}    CACHE STRING "Complete Version String")
-      set (${cmpProjectName}_VER_MAJOR ${VERSION_GEN_VER_MAJOR} CACHE STRING "Major Version String")
-      set (${cmpProjectName}_VER_MINOR ${VERSION_GEN_VER_MINOR} CACHE STRING "Minor Version String")
-      set (${cmpProjectName}_VER_PATCH ${VERSION_GEN_VER_PATCH} CACHE STRING "Patch Version String")
-      mark_as_advanced(${cmpProjectName}_VERSION ${cmpProjectName}_VER_MAJOR ${cmpProjectName}_VER_MINOR ${cmpProjectName}_VER_PATCH)
-
+    set (VERSION_GEN_NAMESPACE "${GVS_NAMESPACE}")
+    set (VERSION_GEN_NAME "${GVS_cmpProjectName}")
+    set (VERSION_GEN_EXPORTS "")
+    if (NOT ${GVS_EXPORTS_DEFINE} STREQUAL "")
+    set (VERSION_GEN_EXPORTS "${GVS_EXPORTS_DEFINE}")
+    set (VERSION_DLL_EXPORT 1)
     endif()
-    set (PROJECT_PREFIX "${cmpProjectName}")
-    configure_file(${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in   ${GENERATED_FILE_PATH}  )
-    MARK_AS_ADVANCED(${CMP_PROJECT_NAME}_VERSION ${CMP_PROJECT_NAME}_VER_MAJOR ${CMP_PROJECT_NAME}_VER_MINOR ${CMP_PROJECT_NAME}_VER_PATCH)
+        
+      #  message(STATUS "VERSION_GEN_VER_MAJOR: ${VERSION_GEN_VER_MAJOR}")
+       # message(STATUS "VERSION_GEN_VER_MINOR: ${VERSION_GEN_VER_MINOR}")
+       # message(STATUS "VERSION_GEN_VER_PATCH: ${VERSION_GEN_VER_PATCH}")
+    
+    set (${GVS_cmpProjectName}_VER_MAJOR ${GVS_MAJOR} CACHE STRING "" FORCE)
+    set (${GVS_cmpProjectName}_VER_MINOR ${GVS_MINOR} CACHE STRING "" FORCE)
+    set (${GVS_cmpProjectName}_VER_PATCH ${GVS_PATCH} CACHE STRING "" FORCE)
+    set(VERSION_GEN_COMPLETE "${GVS_MAJOR}.${GVS_MINOR}.${GVS_PATCH}" )
+       # message(STATUS "VERSION_GEN_COMPLETE: ${VERSION_GEN_COMPLETE}")
+       # message(STATUS "${GVS_cmpProjectName}_VER_MAJOR: ${${GVS_cmpProjectName}_VER_MAJOR}")
+       # message(STATUS "${GVS_cmpProjectName}_VER_MINOR: ${${GVS_cmpProjectName}_VER_MINOR}")
+       # message(STATUS "${GVS_cmpProjectName}_VER_PATCH: ${${GVS_cmpProjectName}_VER_PATCH}")
+    
+    set(${GVS_cmpProjectName}_VERSION "${${GVS_cmpProjectName}_VER_MAJOR}.${${GVS_cmpProjectName}_VER_MINOR}.${${GVS_cmpProjectName}_VER_PATCH}" CACHE STRING "Full Version Number" FORCE)
+     
+    mark_as_advanced( ${GVS_cmpProjectName}_VER_MAJOR ${GVS_cmpProjectName}_VER_MINOR ${GVS_cmpProjectName}_VER_PATCH)
+    set (PROJECT_PREFIX "${GVS_cmpProjectName}")
+    configure_file(${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in   ${GVS_GENERATED_HEADER_FILE_PATH}  )
+    configure_file(${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.cpp.in   ${GVS_GENERATED_SOURCE_FILE_PATH}  )
+    #    MARK_AS_ADVANCED(${CMP_PROJECT_NAME}_VERSION ${CMP_PROJECT_NAME}_VER_MAJOR ${CMP_PROJECT_NAME}_VER_MINOR ${CMP_PROJECT_NAME}_VER_PATCH)
+     
 endmacro()
 
 #-------------------------------------------------------------------------------
