@@ -406,9 +406,10 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
       if (APPLE)
           OPTION (CMP_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
           IF(CMP_BUILD_WITH_INSTALL_NAME)
+             # message(STATUS "${CMP_PROJECT_NAME}_VER_MAJOR: ${${CMP_PROJECT_NAME}_VER_MAJOR}")
               SET_TARGET_PROPERTIES(${targetName}
                  PROPERTIES
-                 LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VERSION} -compatibility_version ${${CMP_PROJECT_NAME}_VERSION}"
+                 LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VER_MAJOR} -compatibility_version ${${CMP_PROJECT_NAME}_VER_MAJOR}"
                  INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
                  BUILD_WITH_INSTALL_RPATH ${CMP_BUILD_WITH_INSTALL_NAME}
               )   
@@ -441,7 +442,7 @@ macro(QtDesignerPluginProperties targetName DEBUG_EXTENSION)
           IF(CMP_BUILD_WITH_INSTALL_NAME)
               SET_TARGET_PROPERTIES(${targetName}
                  PROPERTIES
-                 LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VERSION} -compatibility_version ${${CMP_PROJECT_NAME}_VERSION}"
+                 LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VER_MAJOR} -compatibility_version ${${CMP_PROJECT_NAME}_VER_MAJOR}"
                  INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
                  BUILD_WITH_INSTALL_RPATH ${CMP_BUILD_WITH_INSTALL_NAME}
               )   
