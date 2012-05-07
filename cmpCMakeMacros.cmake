@@ -419,6 +419,51 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
 
 endmacro(LibraryProperties DEBUG_EXTENSION)
 
+
+# --------------------------------------------------------------------
+#
+macro(QtDesignerPluginProperties targetName DEBUG_EXTENSION)
+   if ( NOT BUILD_SHARED_LIBS AND MSVC)
+      SET_TARGET_PROPERTIES( ${targetName} 
+        PROPERTIES
+        DEBUG_OUTPUT_NAME lib${targetName}
+        RELEASE_OUTPUT_NAME lib${targetName}  )
+    endif()
+    
+    #-- Set the Debug and Release names for the libraries
+    SET_TARGET_PROPERTIES( ${targetName} 
+        PROPERTIES
+        DEBUG_POSTFIX ${DEBUG_EXTENSION} )
+        
+    IF (BUILD_SHARED_LIBS)
+      if (APPLE)
+          OPTION (CMP_BUILD_WITH_INSTALL_NAME "Build Libraries with the install_name set to the installation prefix. This is good if you are going to run from the installation location" OFF)
+          IF(CMP_BUILD_WITH_INSTALL_NAME)
+              SET_TARGET_PROPERTIES(${targetName}
+                 PROPERTIES
+                 LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VERSION} -compatibility_version ${${CMP_PROJECT_NAME}_VERSION}"
+                 INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+                 BUILD_WITH_INSTALL_RPATH ${CMP_BUILD_WITH_INSTALL_NAME}
+              )   
+         ENDIF(CMP_BUILD_WITH_INSTALL_NAME)
+     endif(APPLE)
+ 
+   ENDIF( BUILD_SHARED_LIBS)
+  
+  # Give the user the option of installing the plugin into the local Qt installation. Some users
+  # will NOT be able to do this due to privs on the system. 
+  option(QWT_INSTALL_DESIGNER_PLUGIN "Install the Qwt Plugin into the Current Qt Installation" OFF)
+  if (QWT_INSTALL_DESIGNER_PLUGIN)
+  INSTALL(TARGETS ${targetName} 
+        LIBRARY DESTINATION ${QT_PLUGINS_DIR}/designer
+        RUNTIME DESTINATION ${QT_PLUGINS_DIR}/designer
+        ARCHIVE DESTINATION ${QT_PLUGINS_DIR}/designer
+        COMPONENT Runtime)
+   endif()
+   
+endmacro(QtDesignerPluginProperties DEBUG_EXTENSION)
+
+
 # --------------------------------------------------------------------
 macro(StaticLibraryProperties targetName )
     if (WIN32 AND NOT MINGW)
