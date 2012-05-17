@@ -25,7 +25,10 @@ endif()
 # Look for the header file.
 SET(QWT_INCLUDE_SEARCH_DIRS
   ${QWT_INSTALL}/include/qwt
+  ${QWT_INSTALL}/include/qwt5
   ${QWT_INSTALL}/include
+  /usr/include/qwt
+  /usr/include/qwt5
 )
 
 SET (QWT_LIB_SEARCH_DIRS
