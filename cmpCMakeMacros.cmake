@@ -409,7 +409,7 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
              # message(STATUS "${CMP_PROJECT_NAME}_VER_MAJOR: ${${CMP_PROJECT_NAME}_VER_MAJOR}")
               SET_TARGET_PROPERTIES(${targetName}
                  PROPERTIES
-                 LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VER_MAJOR} -compatibility_version ${${CMP_PROJECT_NAME}_VER_MAJOR}"
+            #     LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VER_MAJOR} -compatibility_version ${${CMP_PROJECT_NAME}_VER_MAJOR}"
                  INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
                  BUILD_WITH_INSTALL_RPATH ${CMP_BUILD_WITH_INSTALL_NAME}
               )   
@@ -442,7 +442,7 @@ macro(QtDesignerPluginProperties targetName DEBUG_EXTENSION)
           IF(CMP_BUILD_WITH_INSTALL_NAME)
               SET_TARGET_PROPERTIES(${targetName}
                  PROPERTIES
-                 LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VER_MAJOR} -compatibility_version ${${CMP_PROJECT_NAME}_VER_MAJOR}"
+           #      LINK_FLAGS "-current_version ${${CMP_PROJECT_NAME}_VER_MAJOR} -compatibility_version ${${CMP_PROJECT_NAME}_VER_MAJOR}"
                  INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
                  BUILD_WITH_INSTALL_RPATH ${CMP_BUILD_WITH_INSTALL_NAME}
               )   
