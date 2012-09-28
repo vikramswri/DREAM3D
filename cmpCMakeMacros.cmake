@@ -174,6 +174,9 @@ function(BuildQtAppBundle)
 
 #-- Create install rules for any Qt Plugins that are needed
     set(pi_dest ${QAB_INSTALL_DEST}/plugins)
+    if (UNIX AND NOT APPLE)
+        set(pi_dest ./plugins)
+    endif()
     # if we are on OS X then we set the plugin installation location to inside the App bundle
     if (APPLE)
         set(pi_dest ${QAB_TARGET}.app/Contents/plugins)
