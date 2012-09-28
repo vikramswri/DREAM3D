@@ -252,6 +252,18 @@ function(BuildQtAppBundle)
         install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT ${QAB_COMPONENT})
     endif(APPLE)
     
+#-- This should be called when we are on Linux
+    if(NOT APPLE AND UNIX)
+        set (linux_app_name ${QAB_TARGET})
+        set (LINUX_MAKE_STANDALONE_LAUNCH_SCRIPT
+                    "${QAB_BINARY_DIR}/LINUX_Scripts/${QAB_TARGET}.sh")
+        CONFIGURE_FILE("${CMP_LINUX_TOOLS_SOURCE_DIR}/launch_script.sh.in"
+                "${LINUX_MAKE_STANDALONE_LAUNCH_SCRIPT}" @ONLY IMMEDIATE)
+        install(PROGRAMS "${LINUX_MAKE_STANDALONE_LAUNCH_SCRIPT}"
+                DESTINATION "bin"
+                COMPONENT ${QAB_COMPONENT} )
+    endif()
+
 
 endfunction()
 
