@@ -697,6 +697,23 @@ macro (CMP_QT_LIBRARIES_INSTALL_RULES QTLIBLIST destination)
             ENDFOREACH(qtlib)
         endif(DEFINED QT_QMAKE_EXECUTABLE)
     endif()
+    
+    #-- This will create install rules for the dylibs on linux hopefully creating
+    #-- a stand alone .zip or .tgz file
+        if (UNIX AND NOT APPLE)
+            if (DEFINED QT_QMAKE_EXECUTABLE)
+                GET_FILENAME_COMPONENT(QT_LIB_PATH ${QT_QMAKE_EXECUTABLE} PATH)
+                GET_FILENAME_COMPONENT(QT_LIB_PATH ${QT_LIB_PATH} PATH)
+                set(QT_LIB_PATH ${QT_LIB_PATH}/lib)
+                FOREACH(qtlib ${QTLIBLIST})
+                   FILE(GLOB libFiles ${QT_LIB_PATH}/lib${qtlib}.so*)
+                   INSTALL(FILES ${libFiles}
+                        DESTINATION "lib"
+                        CONFIGURATIONS ${CMAKE_BUILD_TYPE}
+                        COMPONENT Applications)
+                ENDFOREACH(qtlib)
+            endif()
+        endif(UNIX AND NOT APPLE)
 endmacro()
 
 # --------------------------------------------------------------------
@@ -794,7 +811,40 @@ MACRO (CMP_LIBRARIES_INSTALL_RULES _libraryList destination)
         
         ENDFOREACH(BTYPE ${TYPES})
     ENDFOREACH(lib ${_libraryList})
-  ENDIF(MSVC) 
+  ENDIF(MSVC)
+  
+    #-- This will create install rules for the dylibs on linux hopefully creating
+    #-- a stand alone .zip or .tgz file
+        if (UNIX AND NOT APPLE)
+          FOREACH(lib ${_libraryList})
+            STRING(TOUPPER ${lib} upperlib)
+
+            set(BTYPE "RELEASE" )
+              STRING(TOUPPER ${BTYPE} TYPE)
+              get_filename_component(lib_path ${${upperlib}_LIBRARY_${TYPE}} PATH)
+              get_filename_component(lib_name ${${upperlib}_LIBRARY_${TYPE}} NAME_WE)
+
+              find_file(${upperlib}_LIBRARY_SO_${TYPE}
+                            NAMES ${lib_name}.so
+                            PATHS  ${lib_path}/../bin ${lib_path}/.. ${lib_path}/ ${${upperlib}_BIN_DIR}
+                            NO_DEFAULT_PATH )
+             # message(STATUS "${upperlib}_LIBRARY_SO_${TYPE}: ${${upperlib}_LIBRARY_SO_${TYPE}}")
+              mark_as_advanced(${upperlib}_LIBRARY_SO_${TYPE})
+              if ( "${${upperlib}_LIBRARY_SO_${TYPE}}" STREQUAL  "${upperlib}_LIBRARY_SO_${TYPE}-NOTFOUND")
+                 message(STATUS "A shared library for ${upperlib}_LIBRARY_${TYPE} was NOT found which usually means\n"
+                                    " that the library was NOT built as a .so. I looked in the \n"
+                                    " following locations:\n  ${lib_path}\n  ${lib_path}/..\n  ${lib_path}/../bin\n  ${${upperlib}_BIN_DIR}")
+              else()
+               #   message(STATUS "${upperlib}_LIBRARY_SO_${TYPE}: ${${upperlib}_LIBRARY_SO_${TYPE}}")
+               #   message(STATUS "Generating Install Rule for .so Library ${${upperlib}_LIBRARY_SO_${TYPE}}")
+                  INSTALL(FILES ${${upperlib}_LIBRARY_SO_${TYPE}}
+                    DESTINATION "lib"
+                    CONFIGURATIONS ${BTYPE}
+                    COMPONENT Applications)
+              endif()
+          ENDFOREACH(lib ${_libraryList})
+        endif()
+
 ENDMACRO()
 
 #-------------------------------------------------------------------------------
