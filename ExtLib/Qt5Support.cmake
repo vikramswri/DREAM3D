@@ -299,135 +299,140 @@ function(AddQWebEngineSupportFiles)
 endfunction()
 
 # ------------------------------------------------------------------------------
-#  Qt 5 Section:
-# This section is the base cmake code that will find Qt5 on the computer and
-# setup all the necessary Qt5 modules that need to be used.
+#  Macro CMP_AddQt5Support
+#  @param Qt5Components These are the Qt Components that the project needs. The
+#    possible values are: Core Widgets Network Gui Concurrent Script Svg Xml OpenGL PrintSupport
+#    Note that one OR more components can be selected.
+#  @param NeedQtWebEngine Does the project need QWebEngine. Possible values are TRUE or FALSE
+#  @param ProjectBinaryDir The Directory where to write any output files
 # ------------------------------------------------------------------------------
-# Find includes in corresponding build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Find the QtWidgets library
-set(Qt5_COMPONENTS
-    Core
-    Widgets
-    Network
-    Gui
-    Concurrent
-    Script
-    Svg
-    Xml
-    OpenGL
-    PrintSupport
+macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir)
+  # ------------------------------------------------------------------------------
+  # Qt 5 Section:
+  # This section is the base cmake code that will find Qt5 on the computer and
+  # setup all the necessary Qt5 modules that need to be used.
+  # ------------------------------------------------------------------------------
+  # Find includes in corresponding build directories
+  set(CMAKE_INCLUDE_CURRENT_DIR ON)
+  
+  # Find the QtWidgets library
+  set(Qt5_COMPONENTS ${Qt5Components})
+
+  if(NeedQtWebEngine)
+    set(Qt5_COMPONENTS
+      ${Qt5_COMPONENTS}
+      Positioning
+      WebEngine
+      WebEngineWidgets
+      WebEngineCore
+      WebChannel
+      Quick
+      QuickWidgets
+      Qml
   )
 
+  endif()
 
-option(DREAM3D_USE_QtWebEngine "DREAM.3D Uses QtWebEngine to show help" ON)
-if(DREAM3D_USE_QtWebEngine)
-  set(Qt5_COMPONENTS
-    ${Qt5_COMPONENTS}
-    Positioning
-    WebEngine
-    WebEngineWidgets
-    WebEngineCore
-    WebChannel
-    Quick
-    QuickWidgets
-    Qml
-)
+  # On Linux we need the DBus library
+  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    set(Qt5_COMPONENTS ${Qt5_COMPONENTS} DBus)
+  endif()
 
-endif()
+  find_package(Qt5 COMPONENTS ${Qt5_COMPONENTS})
+  if(NOT Qt5_FOUND)
+    message(FATAL_ERROR "Qt5 is Required for ${PROJECT_NAME} to build. Please install it.")
+  endif()
 
-# On Linux we need the DBus library
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-  set(Qt5_COMPONENTS ${Qt5_COMPONENTS} DBus)
-endif()
+  # We need the location of QMake for later on in order to find the plugins directory
+  get_target_property(QtQMake_location Qt5::qmake LOCATION)
+  execute_process(COMMAND "${QtQMake_location}" -query QT_INSTALL_PREFIX OUTPUT_VARIABLE QM_QT_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+  message(STATUS "Qt5 Location: ${QM_QT_INSTALL_PREFIX}")
+  execute_process(COMMAND "${QtQMake_location}" -query QT_VERSION OUTPUT_VARIABLE QM_QT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  message(STATUS "Qt5 Version: ${QM_QT_VERSION} ")
 
-find_package(Qt5 COMPONENTS ${Qt5_COMPONENTS})
-if(NOT Qt5_FOUND)
-  message(FATAL_ERROR "Qt5 is Required for DREAM3D to build. Please install it.")
-endif()
+  # This is really just needed for Windows
+  CopyQt5RunTimeLibraries(LIBRARIES ${Qt5_COMPONENTS} PREFIX Qt5)
+  #CopyQt5RunTimeLibraries(LIBRARIES Multimedia MultimediaWidgets Qml Quick Positioning Sql WebChannel
+  #                        PREFIX Qt5)
 
-# We need the location of QMake for later on in order to find the plugins directory
-get_target_property(QtQMake_location Qt5::qmake LOCATION)
-execute_process(COMMAND "${QtQMake_location}" -query QT_INSTALL_PREFIX OUTPUT_VARIABLE QM_QT_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-message(STATUS "Qt5 Location: ${QM_QT_INSTALL_PREFIX}")
-execute_process(COMMAND "${QtQMake_location}" -query QT_VERSION OUTPUT_VARIABLE QM_QT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-message(STATUS "Qt5 Version: ${QM_QT_VERSION} ")
+  # This is pretty much needed on all the platforms.
+  AddQt5LibraryInstallRule(LIBRARIES ${Qt5_COMPONENTS})
 
-# This is really just needed for Windows
-CopyQt5RunTimeLibraries(LIBRARIES ${Qt5_COMPONENTS} PREFIX Qt5)
-#CopyQt5RunTimeLibraries(LIBRARIES Multimedia MultimediaWidgets Qml Quick Positioning Sql WebChannel
-#                        PREFIX Qt5)
+  if (QM_QT_VERSION VERSION_GREATER 5.4.0 OR QM_QT_VERSION VERSION_EQUAL 5.4.0)
+    set(Qt5_ICU_COMPONENTS icudt53 icuin53 icuuc53)
+  endif()
+  if (QM_QT_VERSION VERSION_GREATER 5.5.0 OR QM_QT_VERSION VERSION_EQUAL 5.5.0)
+    set(Qt5_ICU_COMPONENTS icudt54 icuin54 icuuc54)
+  endif()
+  if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
+    set(Qt5_ICU_COMPONENTS "ICU Libraries NOT Defined for Qt 5.6")
+    message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.6. Please update teh Qt5Support.cmake file")
+  endif()
 
-# This is pretty much needed on all the platforms.
-AddQt5LibraryInstallRule(LIBRARIES ${Qt5_COMPONENTS})
+  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    set(Qt5_ICU_COMPONENTS icui18n icuuc icudata)
+  endif()
+  # Each Platform has a set of support libraries that need to be copied
+  AddQt5SupportLibraryCopyInstallRules( LIBRARIES ${Qt5_ICU_COMPONENTS} PREFIX "" DEBUG_SUFFIX "")
 
-if (QM_QT_VERSION VERSION_GREATER 5.4.0 OR QM_QT_VERSION VERSION_EQUAL 5.4.0)
-  set(Qt5_ICU_COMPONENTS icudt53 icuin53 icuuc53)
-endif()
-if (QM_QT_VERSION VERSION_GREATER 5.5.0 OR QM_QT_VERSION VERSION_EQUAL 5.5.0)
-  set(Qt5_ICU_COMPONENTS icudt54 icuin54 icuuc54)
-endif()
-if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
-  set(Qt5_ICU_COMPONENTS "ICU Libraries NOT Defined for Qt 5.6")
-  message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.6. Please update teh Qt5Support.cmake file")
-endif()
+  #-- Let CMake determine which files need to have 'moc' run on them
+  set(CMAKE_AUTOMOC FALSE)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-  set(Qt5_ICU_COMPONENTS icui18n icuuc icudata)
-endif()
-# Each Platform has a set of support libraries that need to be copied
-AddQt5SupportLibraryCopyInstallRules( LIBRARIES ${Qt5_ICU_COMPONENTS} PREFIX "" DEBUG_SUFFIX "")
+  set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "Qt5AutoMocTargets")
 
-#-- Let CMake determine which files need to have 'moc' run on them
-set(CMAKE_AUTOMOC FALSE)
+  #-- Make sure we include the proper Qt5 include directories
+  foreach(qtlib ${Qt5_COMPONENTS})
+    include_directories( ${Qt5${qtlib}_INCLUDE_DIRS})
+  endforeach()
 
-set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "Qt5AutoMocTargets")
+  set(QT_PLUGINS_FILE_TEMPLATE "${ProjectBinaryDir}/Qt_Plugins.cmake.in")
+  set(QT_PLUGINS_FILE "${ProjectBinaryDir}/Qt_Plugins.txt")
 
-#-- Make sure we include the proper Qt5 include directories
-foreach(qtlib ${Qt5_COMPONENTS})
-  include_directories( ${Qt5${qtlib}_INCLUDE_DIRS})
-endforeach()
+  file(WRITE ${QT_PLUGINS_FILE_TEMPLATE} "")
+  file(WRITE ${QT_PLUGINS_FILE} "")
 
-set(QT_PLUGINS_FILE_TEMPLATE "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.cmake.in")
-set(QT_PLUGINS_FILE "${DREAM3DProj_BINARY_DIR}/Qt_Plugins.txt")
+  list(FIND ${Qt5_COMPONENTS} "Gui" NeedsGui)
+  if(NeedsGui GREATER -1)
+    AddQt5Plugins(PLUGIN_NAMES QDDS QGif QICNS QICO QJp2 QJpeg QMng QTga QTiff QWbmp QWebp
+                PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                PLUGIN_SUFFIX Plugin
+                PLUGIN_TYPE imageformats)
+  endif()
 
-file(WRITE ${QT_PLUGINS_FILE_TEMPLATE} "")
-file(WRITE ${QT_PLUGINS_FILE} "")
+  if(WIN32)
+    AddQt5Plugins(PLUGIN_NAMES QWindowsIntegration
+                PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                PLUGIN_SUFFIX Plugin
+                PLUGIN_TYPE platforms)
+  endif()
 
-AddQt5Plugins(PLUGIN_NAMES QDDS QGif QICNS QICO QJp2 QJpeg QMng QTga QTiff QWbmp QWebp
-              PLUGIN_FILE "${QT_PLUGINS_FILE}"
-              PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
-              PLUGIN_SUFFIX Plugin
-              PLUGIN_TYPE imageformats)
-if(WIN32)
-  AddQt5Plugins(PLUGIN_NAMES QWindowsIntegration
-              PLUGIN_FILE "${QT_PLUGINS_FILE}"
-              PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
-              PLUGIN_SUFFIX Plugin
-              PLUGIN_TYPE platforms)
-endif()
+  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    AddQt5Plugins(PLUGIN_NAMES QXcbIntegration
+                PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                PLUGIN_SUFFIX Plugin
+                PLUGIN_TYPE platforms)
+  endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-  AddQt5Plugins(PLUGIN_NAMES QXcbIntegration
-              PLUGIN_FILE "${QT_PLUGINS_FILE}"
-              PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
-              PLUGIN_SUFFIX Plugin
-              PLUGIN_TYPE platforms)
-endif()
+  #-----------------------------------------------------------------------------------
+  # Copy over the proper QWebEngine Components
+  AddQWebEngineSupportFiles(QT_INSTALL_PREFIX ${QM_QT_INSTALL_PREFIX})
 
-#-----------------------------------------------------------------------------------
-# Copy over the proper QWebEngine Components
-AddQWebEngineSupportFiles(QT_INSTALL_PREFIX ${QM_QT_INSTALL_PREFIX})
+  if(0)
+    AddQt5Plugins(PLUGIN_NAMES AccessibleFactory
+                PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                PLUGIN_TYPE accessible)
+  endif()
 
-if(0)
-  AddQt5Plugins(PLUGIN_NAMES AccessibleFactory
-              PLUGIN_FILE "${QT_PLUGINS_FILE}"
-              PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
-              PLUGIN_TYPE accessible)
-endif()
+  # Append the locations of the Qt libraries to our Library Search Paths
+  list(APPEND CMP_LIB_SEARCH_DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR} )
 
-# Append the locations of the Qt libraries to our Library Search Paths
-list(APPEND CMP_LIB_SEARCH_DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR} )
+  # Append the locations of the Qt libraries to our Library Search Paths
+  list(APPEND CMP_LIB_SEARCH_DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR} )
 
-# Append the locations of the Qt libraries to our Library Search Paths
-list(APPEND CMP_LIB_SEARCH_DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR} )
+endmacro()
+
+

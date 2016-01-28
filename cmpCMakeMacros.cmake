@@ -452,7 +452,7 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
 
         # when building, don't use the install RPATH already
         # (but later on when installing)
-        SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+        SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
         SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
@@ -913,7 +913,7 @@ function(cmpGitRevisionString)
 
     set(VERSION_GEN_VER_PATCH "0")
     set(VERSION_GEN_VER_REVISION "0")
-    
+
     list(LENGTH VERSION_LIST LIST_LENGTH)
     if(LIST_LENGTH GREATER 1)
       list(GET VERSION_LIST 1 VERSION_GEN_VER_PATCH)

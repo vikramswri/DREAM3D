@@ -42,7 +42,6 @@ BuildDir="@CMAKE_RUNTIME_OUTPUT_DIRECTORY@"
 
 echo "Starting Fix up of Tool @osx_app_name@ to share the frameworks, libraries and plugins"
 
-
 TmpDir="/tmp"
 
 #-------------------------------------------------------------------------------
@@ -175,13 +174,14 @@ function UpdateLibraryDependencies()
 function UpdateFrameworkInstallName()
 {
   printStatus "  |- UpdateFrameworkInstallName"
-  printStatus "     |  ${1}"
-  printStatus "     |  ${2}"
+  printStatus "     |  1: ${1}"
+  printStatus "     |  2: ${2}"
   local frameworkBundle
   local frameworkName
   local frameworkRootDir
   local libName
   local frameworkRootPath
+
   if [[ -e ${1} ]]; then
     #-- Copy the Framework using the current "install_name" as the path
     printStatus "     |  Copying Framework '${1}' into app bundle"
@@ -215,6 +215,42 @@ function UpdateFrameworkInstallName()
     UpdateLibraryDependencies "${FrameworkPath}/${1#${frameworkRootDir}*}"
   fi
 
+  isRPath=`expr "${1}" : '@rpath/'`
+  if [[ ! "$isRPath" = "0" ]]; then
+    base=`basename ${1}`
+    for p in $(echo $libSearchDirs | sed "s/;/ /g")
+      do
+        pathToCopy=${p}/${base}.framework
+        if [[ -e ${pathToCopy} ]]; then
+          #-- Copy the library from the current build directory as the path
+          printStatus "  |- Copying Framework '${pathToCopy}' into app bundle"
+          libName=$base
+          frameworkName="${libName}.framework"
+          frameworkRootDir="${p%${frameworkName}*}"
+          frameworkBundle="${frameworkRootDir}/${frameworkName}"
+          frameworkRootPath=`dirname ${frameworkRootDir}`
+          printStatus "     |  frameworkRootDir: ${frameworkRootDir}"
+          printStatus "     |  frameworkBundle: ${frameworkBundle}"
+          printStatus "     |  frameworkRootPath: ${frameworkRootPath}"
+          printStatus "     |  ${FrameworkPath}/${p#${frameworkRootDir}*}"
+
+          if [[ -e "${FrameworkPath}/${base}.framework" ]]; then
+            rm -rf "${FrameworkPath}/${base}.framework"
+          fi
+
+          mkdir -p "${FrameworkPath}"
+          cp -R "${pathToCopy}" "${FrameworkPath}/"
+
+          if [[ -e "${FrameworkPath}/${base}.framework/Versions/Current/Headers" ]]; then
+            rm -rf "${FrameworkPath}/${base}.framework/Versions/Current/Headers"
+          fi
+          if [[ -e "${FrameworkPath}/${base}.framework/Versions/Current/${base}_debug" ]]; then
+            rm -rf "${FrameworkPath}/${base}.framework/Versions/Current/${base}_debug"
+          fi
+          
+        fi
+    done
+  fi
 }
 
 # -----------------------------------------------------------------------------
@@ -304,6 +340,9 @@ function UpdateExecutableDependencies()
    fi
 }
 
+# -----------------------------------------------------------------------------
+qtLibDir=`"@QtQMake_location@" -query QT_INSTALL_LIBS`
+libSearchDirs="@lib_search_dirs@;${qtLibDir}"
 
 # -----------------------------------------------------------------------------
 #  Script really starts here
@@ -324,5 +363,6 @@ while read -u 9 line
 done
 exec 9<&-
 
-rm -rf ${tmpFile}
+rm -rf "${tmpFile}"
+rm -rf "${TmpDir}/$OUTDIR"
 
