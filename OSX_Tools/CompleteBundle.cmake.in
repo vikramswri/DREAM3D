@@ -109,7 +109,7 @@ file(READ "@QAB_PLUGIN_LIST_FILE@" DREAM3D_PLUGINS)
 set(d3d_Plugins "")
 # -- Loop on each DREAM3D Plugin to make it is fixed up
 foreach(plugin ${DREAM3D_PLUGINS})
-  message(STATUS "Copying DREAM3D Plugin ${plugin} into ${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins")
+  message(STATUS "Copying Plugin ${plugin} into ${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins")
   file(COPY ${plugin} DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins")
   get_filename_component(d3d_plugin_name "${plugin}" NAME)
   set(d3d_Plugins "${d3d_Plugins};${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins/${d3d_plugin_name}")
@@ -171,8 +171,9 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_STRIP_TRAILING_WHITESPACE
 )
 
-if("@SIMPLib_USE_ITK@" STREQUAL "ON")
-    if("@CMAKE_BUILD_TYPE" STREQUAL "Debug")
+# Ensure ITK_FOUND and SIMPLib_USE_ITK are both ON
+if("@ITK_FOUND@" STREQUAL "ON" AND "@SIMPLib_USE_ITK@" STREQUAL "ON" )
+  if("@CMAKE_BUILD_TYPE@" STREQUAL "Debug")
     set(d3d_Plugins "${d3d_Plugins};${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/lib/lib@SimpleITKExplicit_LIB_NAME@@EXE_DEBUG_EXTENSION@.dylib")
   else()
     set(d3d_Plugins "${d3d_Plugins};${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/lib/lib@SimpleITKExplicit_LIB_NAME@.dylib")

@@ -306,21 +306,21 @@ endfunction()
 #  @param NeedQtWebEngine Does the project need QWebEngine. Possible values are TRUE or FALSE
 #  @param ProjectBinaryDir The Directory where to write any output files
 # ------------------------------------------------------------------------------
-macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir)
+macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix)
   # ------------------------------------------------------------------------------
   # Qt 5 Section:
   # This section is the base cmake code that will find Qt5 on the computer and
   # setup all the necessary Qt5 modules that need to be used.
+
   # ------------------------------------------------------------------------------
   # Find includes in corresponding build directories
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
-  
-  # Find the QtWidgets library
-  set(Qt5_COMPONENTS ${Qt5Components})
 
-  if(NeedQtWebEngine)
-    set(Qt5_COMPONENTS
-      ${Qt5_COMPONENTS}
+  # Find the QtWidgets library
+  set(Qt5_COMPONENTS "${Qt5Components}")
+  set(Qt5_WebEngine_Components "")
+  if("${NeedQtWebEngine}" STREQUAL "ON" OR "${NeedQtWebEngine}" STREQUAL "TRUE")
+    set(Qt5_WebEngine_Components
       Positioning
       WebEngine
       WebEngineWidgets
@@ -329,9 +329,12 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir)
       Quick
       QuickWidgets
       Qml
-  )
-
+    )
+    set(Qt5_COMPONENTS ${Qt5_COMPONENTS} ${Qt5_WebEngine_Components})
   endif()
+
+  # This line gets the list of Qt5 components into the calling context.
+  set(${VarPrefix}_Qt5_Components ${Qt5_COMPONENTS} CACHE STRING "" FORCE)
 
   # On Linux we need the DBus library
   if(CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -390,8 +393,7 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir)
 
   file(WRITE ${QT_PLUGINS_FILE_TEMPLATE} "")
   file(WRITE ${QT_PLUGINS_FILE} "")
-
-  list(FIND ${Qt5_COMPONENTS} "Gui" NeedsGui)
+  list(FIND Qt5_COMPONENTS "Gui" NeedsGui)
   if(NeedsGui GREATER -1)
     AddQt5Plugins(PLUGIN_NAMES QDDS QGif QICNS QICO QJp2 QJpeg QMng QTga QTiff QWbmp QWebp
                 PLUGIN_FILE "${QT_PLUGINS_FILE}"
