@@ -33,21 +33,25 @@ function(CopyQt5RunTimeLibraries)
       # message(STATUS "Copy Rule for Qt library ${P_PREFIX}${qtlib}${TYPE}.dll")
       # We need to copy both the Debug and Release versions of the libraries into their respective
       # subfolders for Visual Studio builds
-      add_custom_target(ZZ_${P_PREFIX}${qtlib}${TYPE}-Debug-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${P_PREFIX}${qtlib}${TYPE}.dll
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/
-                          # COMMENT "Copying ${P_PREFIX}${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/"
-                          )
-      set_target_properties(ZZ_${P_PREFIX}${qtlib}${TYPE}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+      if(NOT TARGET ZZ_${P_PREFIX}${qtlib}${TYPE}-Debug-Copy)
+        add_custom_target(ZZ_${P_PREFIX}${qtlib}${TYPE}-Debug-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${P_PREFIX}${qtlib}${TYPE}.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/
+                            # COMMENT "Copying ${P_PREFIX}${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/"
+                            )
+        set_target_properties(ZZ_${P_PREFIX}${qtlib}${TYPE}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+      endif()
+
     #   message(STATUS "Generating Copy Rule for Qt Release DLL Library ${QT_DLL_PATH_tmp}/${qtlib}d.dll")
       set(TYPE "")
-      add_custom_target(ZZ_${P_PREFIX}${qtlib}${TYPE}-Release-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${P_PREFIX}${qtlib}.dll
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/
-                          # COMMENT "Copying ${P_PREFIX}${qtlib}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/"
-                          )
-      set_target_properties(ZZ_${P_PREFIX}${qtlib}${TYPE}-Release-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-
+      if(NOT TARGET ZZ_${P_PREFIX}${qtlib}${TYPE}-Release-Copy)
+        add_custom_target(ZZ_${P_PREFIX}${qtlib}${TYPE}-Release-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${P_PREFIX}${qtlib}.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/
+                            # COMMENT "Copying ${P_PREFIX}${qtlib}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/"
+                            )
+        set_target_properties(ZZ_${P_PREFIX}${qtlib}${TYPE}-Release-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+      endif()
     endforeach(qtlib)
   elseif(SUPPORT_LIB_OPTION EQUAL 1)
     # This will get hit if Ninja, MinGW, MSYS, Cygwin is used for the build system
@@ -63,11 +67,13 @@ function(CopyQt5RunTimeLibraries)
 
       # message(STATUS "Copy Rule for Qt library ${P_PREFIX}${qtlib}${TYPE}.dll")
       # We need to copy the library into the "Bin" Folder
-      add_custom_target(ZZ_${qtlib}-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${P_PREFIX}${qtlib}${TYPE}.dll
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-                          COMMENT "Copying ${P_PREFIX}${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
-      set_target_properties(ZZ_${qtlib}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+      if(NOT TARGET ZZ_${qtlib}-Copy)
+        add_custom_target(ZZ_${qtlib}-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${P_PREFIX}${qtlib}${TYPE}.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                            COMMENT "Copying ${P_PREFIX}${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
+        set_target_properties(ZZ_${qtlib}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+      endif()
     endforeach(qtlib)
   endif()
 endfunction()
@@ -105,27 +111,29 @@ function(AddQt5SupportLibraryCopyInstallRules)
     # We need to copy both the Debug and Release versions of the libraries into their respective
     # subfolders for Visual Studio builds
     foreach(qtlib ${P_LIBRARIES})
-      set(SUFFIX ${P_DEBUG_SUFFIX})
+
       set(INT_DIR "Debug")
-
       # message(STATUS "Copy Rule for Qt Support library ${qtlib}${SUFFIX}.dll")
+      if(NOT TARGET ZZ_${qtlib}-${INT_DIR}-Copy)
+        set(SUFFIX ${P_DEBUG_SUFFIX})
+        add_custom_target(ZZ_${qtlib}-${INT_DIR}-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
+                            COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
+        set_target_properties(ZZ_${qtlib}-${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
+      endif()
 
-      add_custom_target(ZZ_${qtlib}-${INT_DIR}-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
-                          COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
-      set_target_properties(ZZ_${qtlib}-${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-      install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
-
-      set(SUFFIX "")
       set(INT_DIR "Release")
-      add_custom_target(ZZ_${qtlib}-${INT_DIR}-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
-                          COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
-      set_target_properties(ZZ_${qtlib}-${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-      install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
-
+      if(NOT TARGET ZZ_${qtlib}-${INT_DIR}-Copy)
+        set(SUFFIX "")
+        add_custom_target(ZZ_${qtlib}-${INT_DIR}-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
+                            COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
+        set_target_properties(ZZ_${qtlib}-${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
+      endif()
     endforeach(qtlib)
 
   elseif(SUPPORT_LIB_OPTION EQUAL 1)
@@ -138,13 +146,14 @@ function(AddQt5SupportLibraryCopyInstallRules)
     foreach(qtlib ${P_LIBRARIES})
       # message(STATUS "Copy Rule for Qt Support library ${P_PREIX}${qtlib}${SUFFIX}.dll")
       # We need to copy the library into the "Bin" folder
-      add_custom_target(ZZ_${qtlib}-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-                          COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-      set_target_properties(ZZ_${qtlib}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-      install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${CMAKE_BUILD_TYPE} COMPONENT Applications)
-
+      if(NOT TARGET ZZ_${qtlib}-Copy)
+        add_custom_target(ZZ_${qtlib}-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                            COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+        set_target_properties(ZZ_${qtlib}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${CMAKE_BUILD_TYPE} COMPONENT Applications)
+        endif()
     endforeach(qtlib)
 
   endif()
@@ -299,7 +308,9 @@ function(AddQWebEngineSupportFiles)
 endfunction()
 
 # ------------------------------------------------------------------------------
-#  Macro CMP_AddQt5Support
+# Macro CMP_AddQt5Support
+# Qt 5 Section: This section is the base cmake code that will find Qt5 on the computer and
+# setup all the necessary Qt5 modules that need to be used.
 #  @param Qt5Components These are the Qt Components that the project needs. The
 #    possible values are: Core Widgets Network Gui Concurrent Script Svg Xml OpenGL PrintSupport
 #    Note that one OR more components can be selected.
@@ -307,10 +318,6 @@ endfunction()
 #  @param ProjectBinaryDir The Directory where to write any output files
 # ------------------------------------------------------------------------------
 macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix)
-  # ------------------------------------------------------------------------------
-  # Qt 5 Section:
-  # This section is the base cmake code that will find Qt5 on the computer and
-  # setup all the necessary Qt5 modules that need to be used.
 
   # ------------------------------------------------------------------------------
   # Find includes in corresponding build directories
@@ -347,12 +354,13 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   endif()
 
   # We need the location of QMake for later on in order to find the plugins directory
-  get_target_property(QtQMake_location Qt5::qmake LOCATION)
-  execute_process(COMMAND "${QtQMake_location}" -query QT_INSTALL_PREFIX OUTPUT_VARIABLE QM_QT_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-  message(STATUS "Qt5 Location: ${QM_QT_INSTALL_PREFIX}")
-  execute_process(COMMAND "${QtQMake_location}" -query QT_VERSION OUTPUT_VARIABLE QM_QT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-  message(STATUS "Qt5 Version: ${QM_QT_VERSION} ")
-
+  if(NOT DEFINED QtQMake_location)
+    get_target_property(QtQMake_location Qt5::qmake LOCATION)
+    execute_process(COMMAND "${QtQMake_location}" -query QT_INSTALL_PREFIX OUTPUT_VARIABLE QM_QT_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "Qt5 Location: ${QM_QT_INSTALL_PREFIX}")
+    execute_process(COMMAND "${QtQMake_location}" -query QT_VERSION OUTPUT_VARIABLE QM_QT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "Qt5 Version: ${QM_QT_VERSION} ")
+  endif()
   # This is really just needed for Windows
   CopyQt5RunTimeLibraries(LIBRARIES ${Qt5_COMPONENTS} PREFIX Qt5)
   #CopyQt5RunTimeLibraries(LIBRARIES Multimedia MultimediaWidgets Qml Quick Positioning Sql WebChannel
@@ -369,7 +377,7 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   endif()
   if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
     set(Qt5_ICU_COMPONENTS "ICU Libraries NOT Defined for Qt 5.6")
-    message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.6. Please update teh Qt5Support.cmake file")
+    message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.6. Please update the Qt5Support.cmake file")
   endif()
 
   if(CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -400,27 +408,28 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
                 PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
                 PLUGIN_SUFFIX Plugin
                 PLUGIN_TYPE imageformats)
-  endif()
+    if(WIN32)
+      AddQt5Plugins(PLUGIN_NAMES QWindowsIntegration
+                  PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                  PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                  PLUGIN_SUFFIX Plugin
+                  PLUGIN_TYPE platforms)
+    endif()
 
-  if(WIN32)
-    AddQt5Plugins(PLUGIN_NAMES QWindowsIntegration
-                PLUGIN_FILE "${QT_PLUGINS_FILE}"
-                PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
-                PLUGIN_SUFFIX Plugin
-                PLUGIN_TYPE platforms)
-  endif()
-
-  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    AddQt5Plugins(PLUGIN_NAMES QXcbIntegration
-                PLUGIN_FILE "${QT_PLUGINS_FILE}"
-                PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
-                PLUGIN_SUFFIX Plugin
-                PLUGIN_TYPE platforms)
+    if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+      AddQt5Plugins(PLUGIN_NAMES QXcbIntegration
+                  PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                  PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                  PLUGIN_SUFFIX Plugin
+                  PLUGIN_TYPE platforms)
+    endif()
   endif()
 
   #-----------------------------------------------------------------------------------
   # Copy over the proper QWebEngine Components
-  AddQWebEngineSupportFiles(QT_INSTALL_PREFIX ${QM_QT_INSTALL_PREFIX})
+  if("${NeedQtWebEngine}" STREQUAL "ON" OR "${NeedQtWebEngine}" STREQUAL "TRUE")
+    AddQWebEngineSupportFiles(QT_INSTALL_PREFIX ${QM_QT_INSTALL_PREFIX})
+  endif()
 
   if(0)
     AddQt5Plugins(PLUGIN_NAMES AccessibleFactory

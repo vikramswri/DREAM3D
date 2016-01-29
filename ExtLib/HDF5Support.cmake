@@ -31,19 +31,15 @@ function(AddHDF5CopyInstallRules)
     #message(STATUS "LibPath: ${LibPath}")
     if(NOT "${LibPath}" STREQUAL "LibPath-NOTFOUND")
       #message(STATUS "Creating Install Rule for ${LibPath}")
-      install(FILES ${LibPath}
-        DESTINATION "${Z_INSTALL_DIR}"
-        CONFIGURATIONS ${BTYPE}
-        COMPONENT Applications)
-
-
-      ADD_CUSTOM_TARGET(ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LibPath}
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
-                          # COMMENT "  Copy: ${LibPath} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
-                          )
-      set_target_properties(ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-
+      if(NOT TARGET ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy)
+        ADD_CUSTOM_TARGET(ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LibPath}
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
+                            # COMMENT "  Copy: ${LibPath} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
+                            )
+        set_target_properties(ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        install(FILES ${LibPath} DESTINATION "${Z_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
+      endif()
     endif()
 
     # Now get the path that the library is in
@@ -61,18 +57,15 @@ function(AddHDF5CopyInstallRules)
     if(NOT "${${Z_LIBVAR}_${TYPE}}" STREQUAL "${Z_LIBVAR}_${TYPE}-NOTFOUND" AND NOT WIN32)
       set(SYMLINK_PATH "${${Z_LIBVAR}_DIR}/${${Z_LIBVAR}_${TYPE}}")
       #message(STATUS "Creating Install Rule for ${SYMLINK_PATH}")
-      install(FILES ${SYMLINK_PATH}
-        DESTINATION "${Z_INSTALL_DIR}"
-        CONFIGURATIONS ${BTYPE}
-        COMPONENT Applications)
-
-      ADD_CUSTOM_TARGET(ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SYMLINK_PATH}
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
-                          # COMMENT "  Copy: ${SYMLINK_PATH} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
-                          )
-      set_target_properties(ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
-
+      if(NOT TARGET ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy)
+        ADD_CUSTOM_TARGET(ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SYMLINK_PATH}
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
+                            # COMMENT "  Copy: ${SYMLINK_PATH} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
+                            )
+        set_target_properties(ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        install(FILES ${SYMLINK_PATH} DESTINATION "${Z_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
+      endif()
     endif()
 
   endforeach()
