@@ -396,11 +396,29 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
     include_directories( ${Qt5${qtlib}_INCLUDE_DIRS})
   endforeach()
 
-  set(QT_PLUGINS_FILE_TEMPLATE "${ProjectBinaryDir}/Qt_Plugins.cmake.in")
-  set(QT_PLUGINS_FILE "${ProjectBinaryDir}/Qt_Plugins.txt")
+  #set(QT_PLUGINS_FILE "${ProjectBinaryDir}/Qt_Plugins.txt")
+
+  get_property(QT_PLUGINS_FILE GLOBAL PROPERTY QtPluginsTxtFile)
+  if("${QT_PLUGINS_FILE}" STREQUAL "")
+    message(STATUS "Setting GLOBAL PROPERTY QtPluginsTxtFile")
+    set_property(GLOBAL PROPERTY QtPluginsTxtFile "${ProjectBinaryDir}/Qt_Plugins.txt")
+    get_property(QT_PLUGINS_FILE GLOBAL PROPERTY QtPluginsTxtFile)
+  endif()
+
+  #set(QT_PLUGINS_FILE_TEMPLATE "${ProjectBinaryDir}/Qt_Plugins.cmake.in")
+  get_property(QT_PLUGINS_FILE_TEMPLATE GLOBAL PROPERTY QtPluginsCMakeFile)
+  if("${QT_PLUGINS_FILE_TEMPLATE}" STREQUAL "")
+    message(STATUS "Setting GLOBAL PROPERTY QtPluginsCMakeFile")
+    set_property(GLOBAL PROPERTY QtPluginsCMakeFile "${ProjectBinaryDir}/Qt_Plugins.cmake.in")
+    get_property(QT_PLUGINS_FILE_TEMPLATE GLOBAL PROPERTY QtPluginsCMakeFile)
+  endif()
+
+
 
   file(WRITE ${QT_PLUGINS_FILE_TEMPLATE} "")
   file(WRITE ${QT_PLUGINS_FILE} "")
+
+
   list(FIND Qt5_COMPONENTS "Gui" NeedsGui)
   if(NeedsGui GREATER -1)
     AddQt5Plugins(PLUGIN_NAMES QDDS QGif QICNS QICO QJp2 QJpeg QMng QTga QTiff QWbmp QWebp
