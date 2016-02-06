@@ -61,14 +61,14 @@ macro(ConfigureMacOSXBundlePlist TARGET_NAME DEBUG_EXTENSION ICON_FILE_PATH VERS
   get_filename_component(ICON_FILE_NAME "${ICON_FILE_PATH}" NAME)
 
   set_target_properties(${TARGET_NAME} PROPERTIES
-    MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}${DBG_EXTENSION} Version ${VERSION_STRING}, Copyright 2015 BlueQuartz Software."
+    MACOSX_BUNDLE_INFO_STRING "${TARGET_NAME}${DBG_EXTENSION} Version ${VERSION_STRING}, Copyright 2016 BlueQuartz Software."
     MACOSX_BUNDLE_ICON_FILE ${ICON_FILE_NAME}
-    MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_NAME}"
-    MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}${DBG_EXTENSION} Version ${VERSION_STRING}"
-    MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}${DBG_EXTENSION}
+    MACOSX_BUNDLE_GUI_IDENTIFIER "${TARGET_NAME}"
+    MACOSX_BUNDLE_LONG_VERSION_STRING "${TARGET_NAME}${DBG_EXTENSION} Version ${VERSION_STRING}"
+    MACOSX_BUNDLE_BUNDLE_NAME ${TARGET_NAME}${DBG_EXTENSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION_STRING}
     MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION_STRING}
-    MACOSX_BUNDLE_COPYRIGHT "Copyright 2015, BlueQuartz Software, LLC All Rights Reserved."
+    MACOSX_BUNDLE_COPYRIGHT "Copyright 2016, BlueQuartz Software, LLC All Rights Reserved."
     MACOSX_BUNDLE_INFO_PLIST ${CMP_OSX_TOOLS_SOURCE_DIR}/MacOSXBundleInfo.plist.in
   )
 
@@ -597,11 +597,13 @@ macro(CMP_COPY_DEPENDENT_LIBRARIES _libraryList)
           if(SUPPORT_LIB_OPTION EQUAL 1)
             set(BTYPE ".")
           endif()
+          if(NOT TARGET ZZ_${upperlib}_DLL_${TYPE}-Copy)
           ADD_CUSTOM_TARGET(ZZ_${upperlib}_DLL_${TYPE}-Copy ALL
                           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${${upperlib}_LIBRARY_DLL_${TYPE}}
                           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/
                           COMMENT "  Copy: ${${upperlib}_LIBRARY_DLL_${TYPE}}\n    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/")
           set_target_properties(ZZ_${upperlib}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+          endif()
         ENDFOREACH(BTYPE ${TYPES})
       endif(${upperlib}_IS_SHARED)
     ENDFOREACH(lib ${_libraryList})
@@ -927,7 +929,7 @@ function(cmpGitRevisionString)
   set(${GVS_PROJECT_NAME}_VERSION_PATCH "${VERSION_GEN_VER_PATCH}" PARENT_SCOPE)
   set(${GVS_PROJECT_NAME}_VERSION_TWEAK "${VERSION_GEN_VER_REVISION}" PARENT_SCOPE)
 
-
+  
   cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_HEADER_FILE_PATH}
                                 CONFIGURED_TEMPLATE_PATH   ${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in )
 
