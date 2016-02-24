@@ -348,8 +348,8 @@ libSearchDirs="@lib_search_dirs@;${qtLibDir}"
 #  Script really starts here
 # -----------------------------------------------------------------------------
 OUTDIR=$RANDOM
-tmpFile="${TmpDir}/$OUTDIR/@osx_app_name@.out"
-mkdir -p "${TmpDir}/$OUTDIR"
+tmpFile="${TmpDir}/$OUTDIR-@osx_app_name@.out"
+#mkdir -p "${TmpDir}/$OUTDIR"
 otool -L "${ApplicationExe}" > "${tmpFile}"
 
 i=0
@@ -364,5 +364,5 @@ done
 exec 9<&-
 
 rm -rf "${tmpFile}"
-rm -rf "${TmpDir}/$OUTDIR"
+#rm -rf "${TmpDir}/$OUTDIR"
 
