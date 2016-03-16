@@ -897,7 +897,7 @@ endfunction()
 function(cmpGitRevisionString)
   set(options)
   set(oneValueArgs GENERATED_HEADER_FILE_PATH GENERATED_SOURCE_FILE_PATH
-                   NAMESPACE PROJECT_NAME EXPORT_MACRO )
+                   NAMESPACE PROJECT_NAME EXPORT_MACRO VERSION_MACRO_PATH)
   cmake_parse_arguments(GVS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
   if(0)
@@ -956,12 +956,21 @@ function(cmpGitRevisionString)
   set(${GVS_PROJECT_NAME}_VERSION_PATCH "${VERSION_GEN_VER_PATCH}" PARENT_SCOPE)
   set(${GVS_PROJECT_NAME}_VERSION_TWEAK "${VERSION_GEN_VER_REVISION}" PARENT_SCOPE)
 
-  
-  cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_HEADER_FILE_PATH}
+  if(NOT "${GVS_GENERATED_HEADER_FILE_PATH}" STREQUAL "")
+    cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_HEADER_FILE_PATH}
                                 CONFIGURED_TEMPLATE_PATH   ${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in )
-
-  cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_SOURCE_FILE_PATH}
+  endif()
+  
+  if(NOT "${GVS_GENERATED_SOURCE_FILE_PATH}" STREQUAL "")
+    cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_SOURCE_FILE_PATH}
                                 CONFIGURED_TEMPLATE_PATH   ${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.cpp.in )
+  endif()
+  
+  if(NOT "${GVS_VERSION_MACRO_PATH}" STREQUAL "")
+    cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_VERSION_MACRO_PATH}
+                                CONFIGURED_TEMPLATE_PATH   ${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersionMacro.h.in )
+  endif()
+  
 endfunction()
 
 
@@ -970,8 +979,8 @@ endfunction()
 #
 #
 function(cmpRevisionString)
-  set(options)
-  set(oneValueArgs GENERATED_HEADER_FILE_PATH GENERATED_SOURCE_FILE_PATH
+  set(options) 
+  set(oneValueArgs GENERATED_HEADER_FILE_PATH GENERATED_SOURCE_FILE_PATH GENERATED_MACRO_HEADER_PATH
                    NAMESPACE PROJECT_NAME EXPORT_MACRO )
   cmake_parse_arguments(GVS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -981,12 +990,14 @@ function(cmpRevisionString)
   if(GIT_FOUND)
     cmpGitRevisionString( GENERATED_HEADER_FILE_PATH "${GVS_GENERATED_HEADER_FILE_PATH}"
                           GENERATED_SOURCE_FILE_PATH "${GVS_GENERATED_SOURCE_FILE_PATH}"
+                          VERSION_MACRO_PATH "${GVS_GENERATED_MACRO_HEADER_PATH}"
                           NAMESPACE "${GVS_NAMESPACE}"
                           PROJECT_NAME "${GVS_PROJECT_NAME}"
                           EXPORT_MACRO "${GVS_EXPORT_MACRO}")
   else()
     cmpGenerateVersionString( GENERATED_HEADER_FILE_PATH "${GVS_GENERATED_HEADER_FILE_PATH}"
                               GENERATED_SOURCE_FILE_PATH "${GVS_GENERATED_SOURCE_FILE_PATH}"
+                              VERSION_MACRO_PATH "${GVS_GENERATED_MACRO_HEADER_PATH}"
                               NAMESPACE "${GVS_NAMESPACE}"
                               PROJECT_NAME "${GVS_PROJECT_NAME}"
                               EXPORT_MACRO "${GVS_EXPORT_MACRO}")
