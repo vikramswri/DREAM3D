@@ -408,7 +408,8 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   if (QM_QT_VERSION VERSION_GREATER 5.5.0 OR QM_QT_VERSION VERSION_EQUAL 5.5.0)
     set(Qt5_ICU_COMPONENTS icudt54 icuin54 icuuc54)
   endif()
-  if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
+  if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0
+      AND NOT (CMAKE_SYSTEM_NAME MATCHES "Linux"))
     set(Qt5_ICU_COMPONENTS "ICU Libraries NOT Defined for Qt 5.6")
     message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.6. Please update the Qt5Support.cmake file")
   endif()
