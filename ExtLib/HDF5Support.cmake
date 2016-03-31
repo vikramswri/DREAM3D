@@ -153,16 +153,30 @@ if(HDF5_FOUND)
     endif()
   endif()
   if(NOT APPLE)
+    set(HDF5_C_TARGET_NAME hdf5)
+    set(HDF5_CXX_TARGET_NAME hdf5_cpp)
+
+    if(NOT TARGET hdf5 AND TARGET hdf5-shared)
+      set(HDF5_C_TARGET_NAME hdf5-shared)
+    else()
+      message(FATAL_ERROR "hdf5 target not found.")
+    endif()
+
+    if(NOT TARGET hdf5_cpp AND TARGET hdf5_cpp-shared)
+      set(HDF5_CXX_TARGET_NAME hdf5_cpp-shared)
+    else()
+      message(FATAL_ERROR "hdf5_cpp target not found.")
+    endif()
+
     AddHDF5CopyInstallRules(LIBVAR HDF5_LIB
-                        LIBNAME hdf5
+                        LIBNAME ${HDF5_C_TARGET_NAME}
                         TYPES ${BUILD_TYPES})
     AddHDF5CopyInstallRules(LIBVAR HDF5_CPP_LIB
-                        LIBNAME hdf5_cpp
+                        LIBNAME ${HDF5_CXX_TARGET_NAME}
                         TYPES ${BUILD_TYPES})
   endif()
 
-  set(HDF5_COMPONENTS hdf5)
-
+  set(HDF5_COMPONENTS ${HDF5_C_TARGET_NAME} ${HDF5_CXX_TARGET_NAME})
 
 ELSE(HDF5_FOUND)
     MESSAGE(FATAL_ERROR "Cannot build without HDF5.  Please set HDF5_INSTALL environment variable to point to your HDF5 installation.")
