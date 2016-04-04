@@ -139,7 +139,8 @@ if(HDF5_FOUND)
   file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${HDF5_LIBRARY_DIRS};")
   # Add the library directory to the file that has all the search directories stored in it.
 
-  include_directories(${HDF5_INCLUDE_DIRS} )
+  include_directories(${HDF5_INCLUDE_DIRS}) #HDF5 1.8.15 and below
+  include_directories(${HDF5_INCLUDE_DIR}) #HDF5 1.8.16 and above
 
   message(STATUS "HDF5 Location: ${HDF5_INSTALL}")
   message(STATUS "HDF5 Version: ${HDF5_VERSION_STRING}")

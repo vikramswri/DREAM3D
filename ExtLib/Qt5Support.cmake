@@ -262,17 +262,17 @@ function(AddQt5Plugins)
   foreach(build_type ${build_types})
     # message(STATUS "build_type: ${build_type}")
     foreach(plugin ${P_PLUGIN_NAMES})
-
-      get_target_property(${build_type}_loc Qt5::${plugin}${P_PLUGIN_SUFFIX} LOCATION_${build_type})
-      # We only use install rules for Linux/Windows.
-      # OS X will get its own installation script that moves the Plugins correctly into the bundle
-      if(NOT APPLE)
-        install(FILES ${${build_type}_loc}
-            DESTINATION ./Plugins/${P_PLUGIN_TYPE}
-            CONFIGURATIONS ${build_type}
-            COMPONENT Applications)
+      if(TARGET Qt5::${plugin}${P_PLUGIN_SUFFIX})
+        get_target_property(${build_type}_loc Qt5::${plugin}${P_PLUGIN_SUFFIX} LOCATION_${build_type})
+        # We only use install rules for Linux/Windows.
+        # OS X will get its own installation script that moves the Plugins correctly into the bundle
+        if(NOT APPLE)
+          install(FILES ${${build_type}_loc}
+              DESTINATION ./Plugins/${P_PLUGIN_TYPE}
+              CONFIGURATIONS ${build_type}
+              COMPONENT Applications)
+        endif()
       endif()
-
     endforeach()
   endforeach()
 
@@ -408,10 +408,14 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   if (QM_QT_VERSION VERSION_GREATER 5.5.0 OR QM_QT_VERSION VERSION_EQUAL 5.5.0)
     set(Qt5_ICU_COMPONENTS icudt54 icuin54 icuuc54)
   endif()
-  if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0
+  if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
+    set(Qt5_ICU_COMPONENTS icudt54 icuin54 icuuc54)
+  endif()
+
+  if (QM_QT_VERSION VERSION_GREATER 5.7.0 OR QM_QT_VERSION VERSION_EQUAL 5.7.0
       AND NOT (CMAKE_SYSTEM_NAME MATCHES "Linux"))
-    set(Qt5_ICU_COMPONENTS "ICU Libraries NOT Defined for Qt 5.6")
-    message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.6. Please update the Qt5Support.cmake file")
+    set(Qt5_ICU_COMPONENTS "ICU Libraries NOT Defined for Qt 5.7")
+    message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.7. Please update the Qt5Support.cmake file")
   endif()
 
   if(CMAKE_SYSTEM_NAME MATCHES "Linux")
