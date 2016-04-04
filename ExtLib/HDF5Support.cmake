@@ -153,19 +153,22 @@ if(HDF5_FOUND)
     endif()
   endif()
   if(NOT APPLE)
-    set(HDF5_C_TARGET_NAME hdf5)
-    set(HDF5_CXX_TARGET_NAME hdf5_cpp)
 
-    if(NOT TARGET hdf5 AND TARGET hdf5-shared)
+
+    if(TARGET hdf5) 
+      set(HDF5_C_TARGET_NAME hdf5)
+    elseif(TARGET hdf5-shared)
       set(HDF5_C_TARGET_NAME hdf5-shared)
     else()
-      message(FATAL_ERROR "hdf5 target not found.")
+      message(FATAL_ERROR "Neither target hdf5 nor target hdf5-shared was found. Do you have HDF5 1.8.15 or HDF5 1.8.16 installed.")
     endif()
 
-    if(NOT TARGET hdf5_cpp AND TARGET hdf5_cpp-shared)
+    if(TARGET hdf5_cpp)
+      set(HDF5_CXX_TARGET_NAME hdf5_cpp)
+    elseif(TARGET hdf5_cpp-shared)
       set(HDF5_CXX_TARGET_NAME hdf5_cpp-shared)
     else()
-      message(FATAL_ERROR "hdf5_cpp target not found.")
+      message(FATAL_ERROR "Neither target hdf5_cpp nor target hdf5_cpp-shared was found. Do you have HDF5 1.8.15 or HDF5 1.8.16 installed.")
     endif()
 
     AddHDF5CopyInstallRules(LIBVAR HDF5_LIB
