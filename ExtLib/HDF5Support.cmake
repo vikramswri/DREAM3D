@@ -153,25 +153,24 @@ if(HDF5_FOUND)
         set(BUILD_TYPES "Debug")
     endif()
   endif()
+
+  if(TARGET hdf5) 
+    set(HDF5_C_TARGET_NAME hdf5)
+  elseif(TARGET hdf5-shared)
+    set(HDF5_C_TARGET_NAME hdf5-shared)
+  else()
+    message(FATAL_ERROR "Neither target hdf5 nor target hdf5-shared was found. Do you have HDF5 1.8.15 or HDF5 1.8.16 installed.")
+  endif()
+
+  if(TARGET hdf5_cpp)
+    set(HDF5_CXX_TARGET_NAME hdf5_cpp)
+  elseif(TARGET hdf5_cpp-shared)
+    set(HDF5_CXX_TARGET_NAME hdf5_cpp-shared)
+  else()
+    message(FATAL_ERROR "Neither target hdf5_cpp nor target hdf5_cpp-shared was found. Do you have HDF5 1.8.15 or HDF5 1.8.16 installed.")
+  endif()
+
   if(NOT APPLE)
-
-
-    if(TARGET hdf5) 
-      set(HDF5_C_TARGET_NAME hdf5)
-    elseif(TARGET hdf5-shared)
-      set(HDF5_C_TARGET_NAME hdf5-shared)
-    else()
-      message(FATAL_ERROR "Neither target hdf5 nor target hdf5-shared was found. Do you have HDF5 1.8.15 or HDF5 1.8.16 installed.")
-    endif()
-
-    if(TARGET hdf5_cpp)
-      set(HDF5_CXX_TARGET_NAME hdf5_cpp)
-    elseif(TARGET hdf5_cpp-shared)
-      set(HDF5_CXX_TARGET_NAME hdf5_cpp-shared)
-    else()
-      message(FATAL_ERROR "Neither target hdf5_cpp nor target hdf5_cpp-shared was found. Do you have HDF5 1.8.15 or HDF5 1.8.16 installed.")
-    endif()
-
     AddHDF5CopyInstallRules(LIBVAR HDF5_LIB
                         LIBNAME ${HDF5_C_TARGET_NAME}
                         TYPES ${BUILD_TYPES})
