@@ -84,7 +84,7 @@ done
 
 # ----------------------------------------------------
 # Copy the QtWebEngine parts of the QtWebEngineCore 
-if [ "@DREAM3D_USE_QtWebEngine@" = "ON" ];
+if [ "@SIMPLView_USE_QtWebEngine@" = "ON" ];
   then
     copyQtWebEngineFile "QtWebEngineProcess" "bin" "libexec"
     copyQtWebEngineFile "icudtl.dat" "bin" "."
