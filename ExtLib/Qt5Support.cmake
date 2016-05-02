@@ -393,6 +393,7 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
     message(STATUS "Qt5 Location: ${QM_QT_INSTALL_PREFIX}")
     execute_process(COMMAND "${QtQMake_location}" -query QT_VERSION OUTPUT_VARIABLE QM_QT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
     message(STATUS "Qt5 Version: ${QM_QT_VERSION} ")
+    execute_process(COMMAND "${QtQMake_location}" -v OUTPUT_VARIABLE QtQMake_VersionString OUTPUT_STRIP_TRAILING_WHITESPACE)
   endif()
   # This is really just needed for Windows
   CopyQt5RunTimeLibraries(LIBRARIES ${Qt5_COMPONENTS} PREFIX Qt5)
