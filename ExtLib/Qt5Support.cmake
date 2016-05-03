@@ -394,8 +394,15 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
     execute_process(COMMAND "${QtQMake_location}" -query QT_VERSION OUTPUT_VARIABLE QM_QT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
     message(STATUS "Qt5 Version: ${QM_QT_VERSION} ")
     execute_process(COMMAND "${QtQMake_location}" -v OUTPUT_VARIABLE QtQMake_VersionString OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(REGEX REPLACE "\r\n" "\\\\r\\\\n" tmp_VersionString ${QtQMake_VersionString})
-    string(REGEX REPLACE "\n" "\\\\n" QtQMake_VersionString ${tmp_VersionString})
+    string(REGEX REPLACE "\r\n" "\\\\r\\\\n" tmp_String ${QtQMake_VersionString})
+    string(REGEX REPLACE "\n" "\\\\n" QtQMake_VersionString ${tmp_String})
+
+    execute_process(COMMAND "${CMAKE_COMMAND}" -version OUTPUT_VARIABLE CMake_VersionString OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string(REGEX REPLACE "\r\n" "\\\\r\\\\n" tmp_String ${CMake_VersionString})
+    string(REGEX REPLACE "\n" "\\\\n" CMake_VersionString ${tmp_String})
+
+
+
   endif()
   # This is really just needed for Windows
   CopyQt5RunTimeLibraries(LIBRARIES ${Qt5_COMPONENTS} PREFIX Qt5)
