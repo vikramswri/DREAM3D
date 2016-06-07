@@ -269,15 +269,11 @@ function(BuildQtAppBundle)
         set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
                     "${QAB_BINARY_DIR}/OSX_Scripts/${QAB_TARGET}_CompleteBundle.cmake")
 
-        #set(OPTIMIZE_BUNDLE_SHELL_SCRIPT
-        #    "${QAB_BINARY_DIR}/OSX_Scripts/${QAB_TARGET}_OptimizeBundle.sh")
+        get_property(SIMPLLibSearchDirs GLOBAL PROPERTY SIMPLLibSearchDirs)
+
 
         configure_file("${CMP_OSX_TOOLS_SOURCE_DIR}/CompleteBundle.cmake.in"
                 "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
-
-        #set(PROJECT_INSTALL_DIR ${osx_app_name}.app)
-        #configure_file("${CMP_OSX_TOOLS_SOURCE_DIR}/ThinAndShareLibraries.sh.in"
-        #        "${OPTIMIZE_BUNDLE_SHELL_SCRIPT}" @ONLY IMMEDIATE)
 
         install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT ${QAB_COMPONENT})
     endif(APPLE)
