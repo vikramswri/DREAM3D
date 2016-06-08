@@ -9,7 +9,7 @@
 # in the file OSX_BundleTools.cmake
 # -----------------------------------------------------------------------------------
 
-message (STATUS "#------------ Starting OS X App Bundle Fixup --------------------------")
+message (STATUS "#------------ Starting OS X App Bundle Fixup @osx_app_name@.app--------------------------")
 
 include (CMakeParseArguments)
 
@@ -50,24 +50,24 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   # the Qt Frameworks AND the Plugins the below regex will suffice to separate
   # them from each other. On other projects we could use better logic to
   # put things where they go. Maybe using some "configured" CMake List of libraries
-  # then looking through each list for the currect library being fixed up.
+  # then looking through each list for the correct library being fixed up.
   #
 
   # First look for Plugins that have a ".plugin" extension
   if(item MATCHES "\\.plugin$")
-    message(STATUS "Just a Plugin: ${item}")
+    message(STATUS "++ Plugin: ${item}")
     set(path "@executable_path/../Plugins")
     set(overridden 1)
   endif(item MATCHES "\\.plugin$")
 
   # Next look for the Qt Image Format Plugins in case those are needed
   if ( item MATCHES "imageformats/libq?")
-    message(STATUS "^^^^^^==> Qt Image Format Plugin Found: ${item}")
+    message(STATUS "^^ Qt Plugin: ${item}")
     set(path "@executable_path/../Plugins/imageformats")
     set(overridden 1)
   # Lastly pick up any Plugins that simply have the ".dylib" extension
   elseif(item MATCHES "\\.dylib$")
-    message(STATUS "%%%%%==> Other Library Found: ${item}")
+    message(STATUS "%% Support Library: ${item}")
     set(path "@executable_path/../lib")
     set(overridden 1)
   endif()
@@ -112,7 +112,6 @@ foreach(plugin ${DREAM3D_PLUGINS})
   message(STATUS "Copying Plugin ${plugin} into ${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins")
   file(COPY ${plugin} DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins")
   get_filename_component(d3d_plugin_name "${plugin}" NAME)
-  #set(d3d_Plugins "${d3d_Plugins};${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins/${d3d_plugin_name}")
   list(APPEND d3d_Plugins ${CMAKE_INSTALL_PREFIX}/DREAM3D.app/Contents/Plugins/${d3d_plugin_name})
 endforeach(plugin $DREAM3D_PLUGINS)
 
