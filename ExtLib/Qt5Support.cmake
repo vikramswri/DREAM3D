@@ -297,6 +297,7 @@ function(AddQt5Plugins)
       FILE(WRITE ${PROJECT_BINARY_DIR}/qt.conf "[Paths]\nPlugins = ${QTPLUGINS_DIR}Plugins\n")
       FILE(APPEND ${PROJECT_BINARY_DIR}/qt.conf "Prefix = .\n")
       FILE(APPEND ${PROJECT_BINARY_DIR}/qt.conf "LibraryExecutables = .\n")
+      FILE(APPEND ${PROJECT_BINARY_DIR}/qt.conf "Data = .\n")
 
       install(FILES ${PROJECT_BINARY_DIR}/qt.conf
               DESTINATION ${QTCONF_DIR}
@@ -325,24 +326,9 @@ function(AddQWebEngineSupportFiles)
     set(QTCONF_DIR ".")
   endif()
 
-  if (QM_QT_VERSION VERSION_GREATER 5.4.0 OR QM_QT_VERSION VERSION_EQUAL 5.4.0)
-    message(FATAL_ERROR "Qt 5.4.x is not supported for SIMPLib development.")
-  endif()
-  if (QM_QT_VERSION VERSION_GREATER 5.5.0 OR QM_QT_VERSION VERSION_EQUAL 5.5.0)
-    if(WIN32)
-        install(FILES ${QM_QT_INSTALL_PREFIX}/icudtl.dat
-                      ${QM_QT_INSTALL_PREFIX}/qtwebengine_resources.pak 
-                      ${QM_QT_INSTALL_PREFIX}/qtwebengine_resources_100p.pak 
-                      ${QM_QT_INSTALL_PREFIX}/qtwebengine_resources_200p.pak
-                DESTINATION ${QTCONF_DIR}
-                COMPONENT Applications)
-        install(FILES ${QM_QT_INSTALL_PREFIX}/bin/QtWebEngineProcess.exe
-                  DESTINATION ${QTCONF_DIR}
-                  COMPONENT Applications)
-    endif()
-  endif()
-
-  if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
+  if (QM_QT_VERSION VERSION_GREATER 5.7.0 OR QM_QT_VERSION VERSION_EQUAL 5.7.0 )
+    message(FATAL_ERROR "Qt 5.7 is not supported for development.")
+  elseif (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
     if(WIN32)
         install(FILES ${QM_QT_INSTALL_PREFIX}/resources/icudtl.dat
                       ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources.pak 
@@ -353,16 +339,29 @@ function(AddQWebEngineSupportFiles)
         install(FILES ${QM_QT_INSTALL_PREFIX}/bin/QtWebEngineProcess.exe
                   DESTINATION ${QTCONF_DIR}
                   COMPONENT Applications)
+        install(DIRECTORY ${QM_QT_INSTALL_PREFIX}/translations/qtwebengine_locales
+                  DESTINATION ${QTCONF_DIR}/translations
+                  COMPONENT Applications)
+
     endif()
+  elseif (QM_QT_VERSION VERSION_GREATER 5.5.0 OR QM_QT_VERSION VERSION_EQUAL 5.5.0)
+    if(WIN32)
+        install(FILES ${QM_QT_INSTALL_PREFIX}/icudtl.dat
+                      ${QM_QT_INSTALL_PREFIX}/qtwebengine_resources.pak 
+                      ${QM_QT_INSTALL_PREFIX}/qtwebengine_resources_100p.pak 
+                      ${QM_QT_INSTALL_PREFIX}/qtwebengine_resources_200p.pak
+                DESTINATION ${QTCONF_DIR}
+                COMPONENT Applications)
+        install(FILES ${QM_QT_INSTALL_PREFIX}/bin/QtWebEngineProcess.exe
+                DESTINATION ${QTCONF_DIR}
+                COMPONENT Applications)
+        install(DIRECTORY ${QM_QT_INSTALL_PREFIX}/translations/qtwebengine_locales
+                DESTINATION ${QTCONF_DIR}/translations
+                COMPONENT Applications)
+    endif()
+  elseif (QM_QT_VERSION VERSION_GREATER 5.4.0 OR QM_QT_VERSION VERSION_EQUAL 5.4.0)
+    message(FATAL_ERROR "Qt 5.4.x is not supported for development.")
   endif()
-
-  if (QM_QT_VERSION VERSION_GREATER 5.7.0 OR QM_QT_VERSION VERSION_EQUAL 5.7.0
-      AND NOT (CMAKE_SYSTEM_NAME MATCHES "Linux"))
-
-    message(FATAL_ERROR "Qt 5.7 is not supported for SIMPLib development.")
-  endif()
-
-
   
   if(APPLE)
 
@@ -524,7 +523,7 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   #-----------------------------------------------------------------------------------
   # Copy over the proper QWebEngine Components
   if("${NeedQtWebEngine}" STREQUAL "ON" OR "${NeedQtWebEngine}" STREQUAL "TRUE")
-    AddQWebEngineSupportFiles(QT_INSTALL_PREFIX ${QM_QT_INSTALL_PREFIX} ${QM_QT_VERSION})
+    AddQWebEngineSupportFiles(QT_INSTALL_PREFIX ${QM_QT_INSTALL_PREFIX} QT_VERSION ${QM_QT_VERSION})
   endif()
 
   if(0)
