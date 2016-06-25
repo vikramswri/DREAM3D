@@ -42,17 +42,17 @@ function(AddQwtCopyInstallRules)
 	set(multiValueArgs)
 
 	cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-	# message(STATUS "Copying Qt5 Runtime Libraries: ${P_LIBRARIES}")
+	# message(STATUS "Copying Qwt Runtime Libraries: ${P_LIBRARIES}")
 	set(SUPPORT_LIB_OPTION 1)
 	if(MSVC_IDE)
-	set(SUPPORT_LIB_OPTION 0)
+		set(SUPPORT_LIB_OPTION 0)
 	elseif(APPLE) # Apple systems do NOT need this so just skip this entirely
-	set(SUPPORT_LIB_OPTION 2)
+		set(SUPPORT_LIB_OPTION 2)
 	elseif(UNIX AND NOT MSVC)
-	set(SUPPORT_LIB_OPTION 3)
+		set(SUPPORT_LIB_OPTION 3) # This should be Linux systems
 	endif()
 
-	 #message(STATUS "AddQwtCopyInstallRules SUPPORT_LIB_OPTION  = ${SUPPORT_LIB_OPTION}")
+	 message(STATUS "AddQwtCopyInstallRules SUPPORT_LIB_OPTION  = ${SUPPORT_LIB_OPTION}")
 
 	if(WIN32)
 		set(destination "./")
@@ -114,6 +114,13 @@ function(AddQwtCopyInstallRules)
 		              COMMENT "  Copy: ${DLL_VAR}    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
 		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
 		install(FILES ${DLL_VAR}  DESTINATION "${destination}" CONFIGURATIONS ${CMAKE_BUILD_TYPE} COMPONENT Applications)
+	elseif(SUPPORT_LIB_OPTION EQUAL 3)
+
+		if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+		  GET_FILENAME_COMPONENT (SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+			configure_file("${SELF_DIR}/Deploy_Qwt_Libs.sh.in"
+		                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../AdditionalInstallScripts/Deploy_Qwt_Libs.sh" @ONLY IMMEDIATE)
+		endif()
 	endif()
 endfunction()
 

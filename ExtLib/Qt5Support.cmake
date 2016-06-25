@@ -329,7 +329,7 @@ function(AddQWebEngineSupportFiles)
   if (QM_QT_VERSION VERSION_GREATER 5.7.0 OR QM_QT_VERSION VERSION_EQUAL 5.7.0 )
     message(FATAL_ERROR "Qt 5.7 is not supported for development.")
   elseif (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
-    if(WIN32)
+    if(WIN32 OR LINUX)
         install(FILES ${QM_QT_INSTALL_PREFIX}/resources/icudtl.dat
                       ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources.pak 
                       ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources_100p.pak 

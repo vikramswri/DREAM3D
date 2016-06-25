@@ -86,9 +86,15 @@ done
 # Copy the QtWebEngine parts of the QtWebEngineCore 
 if [ "@SIMPLView_USE_QtWebEngine@" = "ON" ];
   then
+    if [ ! -e "${InstallPrefix}/bin/resources" ];
+      then
+        mkdir "${InstallPrefix}/bin/resources"
+    fi
     copyQtWebEngineFile "QtWebEngineProcess" "bin" "libexec"
-    copyQtWebEngineFile "icudtl.dat" "bin" "."
-    copyQtWebEngineFile "qtwebengine_resources.pak" "bin" "."
+    copyQtWebEngineFile "icudtl.dat" "bin/resources" "resources"
+    copyQtWebEngineFile "qtwebengine_resources.pak" "bin/resources" "resources"
+    copyQtWebEngineFile "qtwebengine_resources_100p.pak" "bin/resources" "resources"
+    copyQtWebEngineFile "qtwebengine_resources_200p.pak" "bin/resources" "resources"
     if [ ! -e "${InstallPrefix}/bin/translations" ];
       then
         mkdir "${InstallPrefix}/bin/translations"
