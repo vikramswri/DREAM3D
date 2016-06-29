@@ -44,6 +44,9 @@ echo "Starting Fix up of Tool @osx_app_name@ to share the frameworks, libraries 
 
 TmpDir="/tmp"
 
+addFrameworksRPath=0
+addLibraryRPath=1
+
 #-------------------------------------------------------------------------------
 # List of Bundled Libraries to copy and correct. This list is a comma seperated
 # list of libraries. Each Library NEEDS to be in the form of an absolute path.
@@ -233,6 +236,7 @@ function UpdateFrameworkInstallName()
           printStatus "     |  frameworkBundle: ${frameworkBundle}"
           printStatus "     |  frameworkRootPath: ${frameworkRootPath}"
           printStatus "     |  ${FrameworkPath}/${p#${frameworkRootDir}*}"
+          addFrameworksRPath=1
 
           if [[ -e "${FrameworkPath}/${base}.framework" ]]; then
             rm -rf "${FrameworkPath}/${base}.framework"
@@ -303,6 +307,8 @@ function UpdateDylibInstallName()
     install_name_tool -id ${newPath} "${LibPath}/${libName}"
 
     UpdateLibraryDependencies "${LibPath}/${libName}"
+
+    addLibraryRPath = 1
   fi
 
 }
@@ -352,6 +358,7 @@ tmpFile="${TmpDir}/$OUTDIR-@osx_app_name@.out"
 #mkdir -p "${TmpDir}/$OUTDIR"
 otool -L "${ApplicationExe}" > "${tmpFile}"
 
+
 i=0
 exec 9<"${tmpFile}"
 while read -u 9 line
@@ -362,6 +369,18 @@ while read -u 9 line
   let i=i+1
 done
 exec 9<&-
+
+echo $addFrameworksRPath
+echo $addLibraryRPath
+
+
+if [[ "$addFrameworksRPath" = "1" ]]; then
+  install_name_tool -add_rpath "@executable_path/../Frameworks/" ${ApplicationExe}
+fi
+
+if [[ "$addLibraryRPath" = "1" ]]; then
+  install_name_tool -add_rpath "@executable_path/../lib/" ${ApplicationExe}
+fi
 
 rm -rf "${tmpFile}"
 #rm -rf "${TmpDir}/$OUTDIR"
