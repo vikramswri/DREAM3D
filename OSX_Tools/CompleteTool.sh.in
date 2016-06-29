@@ -308,7 +308,7 @@ function UpdateDylibInstallName()
 
     UpdateLibraryDependencies "${LibPath}/${libName}"
 
-    addLibraryRPath = 1
+    addLibraryRPath=1
   fi
 
 }
