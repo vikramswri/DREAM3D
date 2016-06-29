@@ -370,9 +370,6 @@ while read -u 9 line
 done
 exec 9<&-
 
-echo $addFrameworksRPath
-echo $addLibraryRPath
-
 
 if [[ "$addFrameworksRPath" = "1" ]]; then
   install_name_tool -add_rpath "@executable_path/../Frameworks/" ${ApplicationExe}
