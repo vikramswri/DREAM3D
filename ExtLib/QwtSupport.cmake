@@ -52,7 +52,7 @@ function(AddQwtCopyInstallRules)
 		set(SUPPORT_LIB_OPTION 3) # This should be Linux systems
 	endif()
 
-	 message(STATUS "AddQwtCopyInstallRules SUPPORT_LIB_OPTION  = ${SUPPORT_LIB_OPTION}")
+	# message(STATUS "AddQwtCopyInstallRules SUPPORT_LIB_OPTION  = ${SUPPORT_LIB_OPTION}")
 
 	if(WIN32)
 		set(destination "./")
