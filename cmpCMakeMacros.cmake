@@ -269,7 +269,7 @@ function(BuildQtAppBundle)
         set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
                     "${QAB_BINARY_DIR}/OSX_Scripts/${QAB_TARGET}_CompleteBundle.cmake")
 
-        get_property(SIMPLLibSearchDirs GLOBAL PROPERTY SIMPLLibSearchDirs)
+        get_property(SIMPLibSearchDirs GLOBAL PROPERTY SIMPLibSearchDirs)
 
 
         configure_file("${CMP_OSX_TOOLS_SOURCE_DIR}/CompleteBundle.cmake.in"

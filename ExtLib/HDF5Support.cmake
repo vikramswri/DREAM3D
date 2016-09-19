@@ -134,9 +134,7 @@ endif()
 find_package(HDF5 NAMES hdf5)
 if(HDF5_FOUND)
 
-  GET_FILENAME_COMPONENT (HDF5_LIBRARY_DIRS "${HDF5_INCLUDE_DIR}" PATH)
-  set(HDF5_LIBRARY_DIRS ${HDF5_LIBRARY_DIRS}/lib)
-  file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${HDF5_LIBRARY_DIRS};")
+
   # Add the library directory to the file that has all the search directories stored in it.
 
   include_directories(${HDF5_INCLUDE_DIRS}) #HDF5 1.8.15 and below
@@ -147,6 +145,11 @@ if(HDF5_FOUND)
     message(STATUS "HDF5 Location: ${HDF5_INSTALL}")
     message(STATUS "HDF5 Version: ${HDF5_VERSION_STRING}")
     set_property(GLOBAL PROPERTY HDF5_STATUS_PRINTED TRUE)
+
+    GET_FILENAME_COMPONENT (HDF5_LIBRARY_DIRS "${HDF5_INCLUDE_DIR}" PATH)
+    set(HDF5_LIBRARY_DIRS ${HDF5_LIBRARY_DIRS}/lib)
+    file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${HDF5_LIBRARY_DIRS};")
+  
   endif()
 
   if(MSVC_IDE)

@@ -174,7 +174,7 @@ execute_process(
 
 # This is old code that is NOT going to be used on OS X. The ITK libraries should
 # be found because the directory where they are located is supplied to this cmake script
-# through the SIMPLLibSearchDirs variable which this script will read. Because we
+# through the SIMPLibSearchDirs variable which this script will read. Because we
 # are updating the libraries using install_name_tool and we link against SimpleITKExplicit
 # at some point, if everything goes correctly a chain reaction is setup where all the
 # libraries are updated recursively.
