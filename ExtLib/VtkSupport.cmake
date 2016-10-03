@@ -5,7 +5,7 @@
 function(AddVtkCopyInstallRules)
   set(options )
   set(oneValueArgs )
-  set(multiValueArgs LIBS )
+  set(multiValueArgs LIBS TYPES)
   cmake_parse_arguments(vtk "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   set(INTER_DIR ".")
 
