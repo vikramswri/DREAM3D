@@ -5,7 +5,7 @@
 function(AddVtkCopyInstallRules)
   set(options )
   set(oneValueArgs )
-  set(multiValueArgs LIBS TYPES)
+  set(multiValueArgs LIBS)
   cmake_parse_arguments(vtk "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   set(INTER_DIR ".")
 
@@ -81,7 +81,7 @@ function(AddVtkCopyInstallRules)
           get_target_property(DllLibPath ${vtk_LIBNAME} IMPORTED_LOCATION_${UpperBType})
           #message(STATUS "  DllLibPath: ${DllLibPath}")
           if(NOT "${DllLibPath}" STREQUAL "LibPath-NOTFOUND")
-            #message(STATUS "  Creating Install Rule for ${DllLibPath}")
+            message(STATUS "  Creating Install Rule for ${DllLibPath}")
             if(NOT TARGET ZZ_${vtk_LIBVAR}_DLL_${UpperBType}-Copy)
               add_custom_target(ZZ_${vtk_LIBVAR}_DLL_${UpperBType}-Copy ALL
                                   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllLibPath}
@@ -162,7 +162,7 @@ endif()
 # If we are NOT on Apple platform then create the copy and install rules
 # for all of the dependant Vtk libraries.
 if(NOT APPLE)
-  AddVtkCopyInstallRules(LIBS ${VtkToolbox_VtkComponents} TYPES ${BUILD_TYPES})
+  AddVtkCopyInstallRules(LIBS ${VtkToolbox_VtkComponents})
 endif()
 
 
