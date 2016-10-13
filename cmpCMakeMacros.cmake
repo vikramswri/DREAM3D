@@ -625,7 +625,7 @@ macro(CMP_COPY_DEPENDENT_LIBRARIES _libraryList)
                           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${${upperlib}_LIBRARY_DLL_${TYPE}}
                           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/
                           COMMENT "  Copy: ${${upperlib}_LIBRARY_DLL_${TYPE}}\n    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/")
-          set_target_properties(ZZ_${upperlib}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+          set_target_properties(ZZ_${upperlib}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/${upperlib})
           endif()
         ENDFOREACH(BTYPE ${TYPES})
       endif(${upperlib}_IS_SHARED)

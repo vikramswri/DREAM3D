@@ -20,9 +20,9 @@ function(AddVtkCopyInstallRules)
   endif()
 
 
-  #message(STATUS "vtk_LIBNAME: ${vtk_LIBNAME}")
-  #message(STATUS "vtk_LIBVAR: ${vtk_LIBVAR}")
-  #message(STATUS "vtk_TYPES: ${vtk_TYPES}")
+  # message(STATUS "vtk_LIBNAME: ${vtk_LIBNAME}")
+  # message(STATUS "vtk_LIBVAR: ${vtk_LIBVAR}")
+  # message(STATUS "vtk_TYPES: ${vtk_TYPES}")
 
   set(vtk_INSTALL_DIR "lib")
   if(WIN32)
@@ -32,10 +32,10 @@ function(AddVtkCopyInstallRules)
 
   set(STACK "")
   list(APPEND STACK ${vtk_LIBS})
-  #message(STATUS "STACK: ${STACK}")
+  # message(STATUS "STACK: ${STACK}")
   # While the depth-first search stack is not empty
   list(LENGTH STACK STACK_LENGTH)
-  #message(STATUS "STACK_LENGTH: ${STACK_LENGTH}")
+  # message(STATUS "STACK_LENGTH: ${STACK_LENGTH}")
 
   while(STACK_LENGTH GREATER 0)
 
@@ -53,10 +53,10 @@ function(AddVtkCopyInstallRules)
     if(NOT FOUND_${vtk_LIBNAME})
       set(FOUND_${vtk_LIBNAME} TRUE)
       if(${IsQt5Lib} EQUAL -1 AND "${IsVtkLib}" STREQUAL "vtk")
-        #message(STATUS "    ${vtk_LIBNAME}: ${FOUND_${vtk_LIBNAME}}  IsVtkLib: ${IsVtkLib}")
+        # message(STATUS "    ${vtk_LIBNAME}: ${FOUND_${vtk_LIBNAME}}  IsVtkLib: ${IsVtkLib}")
         set(vtk_LIBVAR ${vtk_LIBNAME})
         foreach(BTYPE ${vtk_TYPES} )
-          #message(STATUS "  BTYPE: ${BTYPE}")
+          # message(STATUS "  BTYPE: ${BTYPE}")
           string(TOUPPER ${BTYPE} UpperBType)
           if(MSVC_IDE)
             set(INTER_DIR "${BTYPE}")
@@ -74,21 +74,21 @@ function(AddVtkCopyInstallRules)
           if(NOT "${vtkLibDeps}" STREQUAL "vtkLibDeps-NOTFOUND" )
             list(APPEND STACK ${vtkLibDeps})
           else()
-            #message(STATUS "---->${vtk_LIBNAME} INTERFACE_LINK_LIBRARIES NOT FOUND")
+            # message(STATUS "---->${vtk_LIBNAME} INTERFACE_LINK_LIBRARIES NOT FOUND")
           endif()
 
           # Get the Actual Library Path and create Install and copy rules
           get_target_property(DllLibPath ${vtk_LIBNAME} IMPORTED_LOCATION_${UpperBType})
-          #message(STATUS "  DllLibPath: ${DllLibPath}")
+          # message(STATUS "  DllLibPath: ${DllLibPath}")
           if(NOT "${DllLibPath}" STREQUAL "LibPath-NOTFOUND")
-            message(STATUS "  Creating Install Rule for ${DllLibPath}")
+            # message(STATUS "  Creating Install Rule for ${DllLibPath}")
             if(NOT TARGET ZZ_${vtk_LIBVAR}_DLL_${UpperBType}-Copy)
               add_custom_target(ZZ_${vtk_LIBVAR}_DLL_${UpperBType}-Copy ALL
                                   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllLibPath}
                                   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
                                   # COMMENT "  Copy: ${DllLibPath} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
                                   )
-              set_target_properties(ZZ_${vtk_LIBVAR}_DLL_${UpperBType}-Copy PROPERTIES FOLDER ZZ_Vtk_COPY_FILES)
+              set_target_properties(ZZ_${vtk_LIBVAR}_DLL_${UpperBType}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/Vtk)
               install(FILES ${DllLibPath} DESTINATION "${vtk_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
             endif()
           endif()
@@ -106,17 +106,17 @@ function(AddVtkCopyInstallRules)
 
           #----------------------------------------------------------------------
           # This section for Linux only
-          #message(STATUS "  ${vtk_LIBVAR}_${UpperBType}: ${${vtk_LIBVAR}_${UpperBType}}")
+          # message(STATUS "  ${vtk_LIBVAR}_${UpperBType}: ${${vtk_LIBVAR}_${UpperBType}}")
           if(NOT "${${vtk_LIBVAR}_${UpperBType}}" STREQUAL "${vtk_LIBVAR}_${UpperBType}-NOTFOUND" AND NOT WIN32)
             set(SYMLINK_PATH "${${vtk_LIBVAR}_DIR}/${${vtk_LIBVAR}_${UpperBType}}")
-            #message(STATUS "  Creating Install Rule for ${SYMLINK_PATH}")
+            # message(STATUS "  Creating Install Rule for ${SYMLINK_PATH}")
             if(NOT TARGET ZZ_${vtk_LIBVAR}_SYMLINK_${UpperBType}-Copy)
               add_custom_target(ZZ_${vtk_LIBVAR}_SYMLINK_${UpperBType}-Copy ALL
                                   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SYMLINK_PATH}
                                   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
                                   # COMMENT "  Copy: ${SYMLINK_PATH} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
                                   )
-              set_target_properties(ZZ_${vtk_LIBVAR}_SYMLINK_${UpperBType}-Copy PROPERTIES FOLDER ZZ_Vtk_COPY_FILES)
+              set_target_properties(ZZ_${vtk_LIBVAR}_SYMLINK_${UpperBType}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/Vtk)
               install(FILES ${SYMLINK_PATH} DESTINATION "${vtk_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
             endif()
           endif()

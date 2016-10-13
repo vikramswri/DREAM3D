@@ -9,17 +9,18 @@ function(AddPCLCopyInstallRules)
   cmake_parse_arguments(pcl "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   set(INTER_DIR ".")
 
-  message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  #message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
   if(MSVC_IDE)
-    set(pcl_TYPES Debug Release)
+    set(build_types Debug Release)
   else()
-    set(pcl_TYPES "${CMAKE_BUILD_TYPE}")
-    if("${pcl_TYPES}" STREQUAL "")
-        set(pcl_TYPES "Debug")
+    set(build_types "${CMAKE_BUILD_TYPE}")
+    if("${build_types}" STREQUAL "")
+        set(build_types "Debug")
     endif()
   endif()
 
   set(pcl_INSTALL_DIR "lib")
+
   if(WIN32)
     set(pcl_INSTALL_DIR ".")
   endif()
@@ -43,8 +44,8 @@ function(AddPCLCopyInstallRules)
       set(FOUND_${pcl_LIBNAME} TRUE)
       # message(STATUS "    ${pcl_LIBNAME}: ${FOUND_${pcl_LIBNAME}}  IsPCLLib: ${IsPCLLib}")
       set(pcl_LIBVAR ${pcl_LIBNAME})
-      foreach(BTYPE ${pcl_TYPES} )
-        # message(STATUS "  BTYPE: ${BTYPE}")
+      foreach(BTYPE ${build_types} )
+
         string(TOUPPER ${BTYPE} UpperBType)
         if(MSVC_IDE)
           set(INTER_DIR "${BTYPE}")
@@ -54,27 +55,31 @@ function(AddPCLCopyInstallRules)
         list(APPEND STACK ${pcl_${pcl_LIBVAR}_int_dep})
         STRING(TOUPPER ${pcl_LIBVAR} PCOMP)
 
+        set(VarSuffix "")
+        if("${BTYPE}" STREQUAL "Debug")
+          set(VarSuffix "_${UpperBType}")
+        endif()
         # Get the Actual Library Path and create Install and copy rules
-        GET_FILENAME_COMPONENT(PCL_COMP_NAME "${PCL_${PCOMP}_LIBRARY_${UpperBType}}" NAME_WE)
-        GET_FILENAME_COMPONENT(PCL_LIB_DIR "${PCL_${PCOMP}_LIBRARY_${UpperBType}}" DIRECTORY)
+        GET_FILENAME_COMPONENT(PCL_COMP_NAME "${PCL_${PCOMP}_LIBRARY${VarSuffix}}" NAME_WE)
+        GET_FILENAME_COMPONENT(PCL_LIB_DIR "${PCL_${PCOMP}_LIBRARY${VarSuffix}}" DIRECTORY)
         GET_FILENAME_COMPONENT(PCL_LIB_DIR "${PCL_LIB_DIR}" DIRECTORY)
-        set(DllLibPath ${PCL_LIB_DIR}/bin/${PCL_COMP_NAME}.dll)
-
-        if(EXISTS "${DllLibPath}")
-          #message(STATUS "  Creating Install Rule for ${DllLibPath}")
+        set(pcl_DLL_LIB_PATH ${PCL_LIB_DIR}/bin/${PCL_COMP_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+        # message(STATUS "pcl_DLL_LIB_PATH: ${pcl_DLL_LIB_PATH}")
+        if(EXISTS "${pcl_DLL_LIB_PATH}")
+          # message(STATUS "  Creating Install Rule for ${pcl_DLL_LIB_PATH}")
           if(NOT TARGET ZZ_${pcl_LIBVAR}_DLL_${UpperBType}-Copy)
             add_custom_target(ZZ_${pcl_LIBVAR}_DLL_${UpperBType}-Copy ALL
-                                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllLibPath}
+                                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${pcl_DLL_LIB_PATH}
                                 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
-                                # COMMENT "  Copy: ${DllLibPath} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
+                                # COMMENT "  Copy: ${pcl_DLL_LIB_PATH} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
                                 )
-            set_target_properties(ZZ_${pcl_LIBVAR}_DLL_${UpperBType}-Copy PROPERTIES FOLDER ZZ_PCL_COPY_FILES)
-            install(FILES ${DllLibPath} DESTINATION "${pcl_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
+            set_target_properties(ZZ_${pcl_LIBVAR}_DLL_${UpperBType}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/PCL)
+            install(FILES ${pcl_DLL_LIB_PATH} DESTINATION "${pcl_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
           endif()
         endif()
 
         # Now get the path that the library is in
-        # get_filename_component(${pcl_LIBVAR}_DIR ${DllLibPath} PATH)
+        # get_filename_component(${pcl_LIBVAR}_DIR ${pcl_DLL_LIB_PATH} PATH)
         # message(STATUS " ${pcl_LIBVAR}_DIR: ${${pcl_LIBVAR}_DIR}")
 
         # Now piece together a complete path for the symlink that Linux Needs to have
@@ -96,7 +101,7 @@ function(AddPCLCopyInstallRules)
                                 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
                                 # COMMENT "  Copy: ${SYMLINK_PATH} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
                                 )
-            set_target_properties(ZZ_${pcl_LIBVAR}_SYMLINK_${UpperBType}-Copy PROPERTIES FOLDER ZZ_PCL_COPY_FILES)
+            set_target_properties(ZZ_${pcl_LIBVAR}_SYMLINK_${UpperBType}-Copy PROPERTIES FOLDER ZZ_PCL_COPY_FILES/${BTYPE}/PCL)
             install(FILES ${SYMLINK_PATH} DESTINATION "${pcl_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
           endif()
         endif()

@@ -26,7 +26,7 @@ function(AddBoostCopyInstallRules)
     GET_TARGET_PROPERTY(LibPath ${Z_LIBNAME} IMPORTED_LOCATION_${TYPE})
     GET_FILENAME_COMPONENT(Boost_COMP_NAME "${LibPath}" NAME_WE)
     GET_FILENAME_COMPONENT(Boost_LIB_DIR "${LibPath}" DIRECTORY)
-    set(LibPath ${Boost_LIB_DIR}/${Boost_COMP_NAME}.dll)
+    set(LibPath ${Boost_LIB_DIR}/${Boost_COMP_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
     # message(STATUS "LibPath: ${LibPath}")
     if(NOT "${LibPath}" STREQUAL "LibPath-NOTFOUND")
@@ -37,7 +37,7 @@ function(AddBoostCopyInstallRules)
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
                             # COMMENT "  Copy: ${LibPath} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
                             )
-        set_target_properties(ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        set_target_properties(ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/Boost)
         install(FILES ${LibPath} DESTINATION "${Z_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
       endif()
     endif()
@@ -57,7 +57,7 @@ function(AddBoostCopyInstallRules)
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
                             # COMMENT "  Copy: ${SYMLINK_PATH} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
                             )
-        set_target_properties(ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        set_target_properties(ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/Boost)
         install(FILES ${SYMLINK_PATH} DESTINATION "${Z_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
       endif()
     endif()

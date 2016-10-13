@@ -72,7 +72,7 @@ function(CopyQt5RunTimeLibraries)
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/
                             # COMMENT "Copying ${P_PREFIX}${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/"
                             )
-        set_target_properties(ZZ_${P_PREFIX}${qtlib}${TYPE}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        set_target_properties(ZZ_${P_PREFIX}${qtlib}${TYPE}-Debug-Copy PROPERTIES FOLDER ZZ_COPY_FILES/Debug/Qt5)
       endif()
 
     #   message(STATUS "Generating Copy Rule for Qt Release DLL Library ${QT_DLL_PATH_tmp}/${qtlib}d.dll")
@@ -83,7 +83,7 @@ function(CopyQt5RunTimeLibraries)
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/
                             # COMMENT "Copying ${P_PREFIX}${qtlib}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/"
                             )
-        set_target_properties(ZZ_${P_PREFIX}${qtlib}${TYPE}-Release-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        set_target_properties(ZZ_${P_PREFIX}${qtlib}${TYPE}-Release-Copy PROPERTIES FOLDER ZZ_COPY_FILES/Release/Qt5)
       endif()
     endforeach(qtlib)
   elseif(SUPPORT_LIB_OPTION EQUAL 1)
@@ -105,7 +105,7 @@ function(CopyQt5RunTimeLibraries)
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH_tmp}/${P_PREFIX}${qtlib}${TYPE}.dll
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                             COMMENT "Copying ${P_PREFIX}${qtlib}${TYPE}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
-        set_target_properties(ZZ_${qtlib}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        set_target_properties(ZZ_${qtlib}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/Qt5)
       endif()
     endforeach(qtlib)
   endif()
@@ -153,7 +153,7 @@ function(AddQt5SupportLibraryCopyInstallRules)
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
                             COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
-        set_target_properties(ZZ_${qtlib}-${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        set_target_properties(ZZ_${qtlib}-${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${INT_DIR}/Qt5)
         install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
       endif()
 
@@ -164,7 +164,7 @@ function(AddQt5SupportLibraryCopyInstallRules)
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
                             COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
-        set_target_properties(ZZ_${qtlib}-${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        set_target_properties(ZZ_${qtlib}-${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${INT_DIR}/Qt5)
         install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
       endif()
     endforeach(qtlib)
@@ -184,7 +184,7 @@ function(AddQt5SupportLibraryCopyInstallRules)
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll
                             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                             COMMENT "Copying ${P_PREIX}${qtlib}${SUFFIX}.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-        set_target_properties(ZZ_${qtlib}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+        set_target_properties(ZZ_${qtlib}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${INT_DIR}/Qt5)
         install(FILES ${QT_DLL_PATH}/${P_PREIX}${qtlib}${SUFFIX}.dll  DESTINATION "${destination}" CONFIGURATIONS ${CMAKE_BUILD_TYPE} COMPONENT Applications)
         endif()
     endforeach(qtlib)

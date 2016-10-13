@@ -82,7 +82,7 @@ function(AddQwtCopyInstallRules)
 		              COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_VAR}
 		              ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
 		              COMMENT "  Copy: ${DLL_VAR}    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
-		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${INT_DIR}/Qwt)
 		install(FILES ${DLL_VAR}  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
 
 		# Create a Copy/Install for the Release Builds
@@ -94,7 +94,7 @@ function(AddQwtCopyInstallRules)
 		              COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_VAR}
 		              ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
 		              COMMENT "  Copy: ${DLL_VAR}    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
-		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${INT_DIR}/Qwt)
 		install(FILES ${DLL_VAR}  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
 
 	elseif(SUPPORT_LIB_OPTION EQUAL 1)
@@ -112,7 +112,7 @@ function(AddQwtCopyInstallRules)
 		              COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_VAR}
 		              ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/
 		              COMMENT "  Copy: ${DLL_VAR}    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
-		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES)
+		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${INT_DIR}/Qwt)
 		install(FILES ${DLL_VAR}  DESTINATION "${destination}" CONFIGURATIONS ${CMAKE_BUILD_TYPE} COMPONENT Applications)
 	elseif(SUPPORT_LIB_OPTION EQUAL 3)
 
