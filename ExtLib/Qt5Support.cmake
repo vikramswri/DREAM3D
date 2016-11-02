@@ -424,27 +424,15 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   if(NOT Qt5_STATUS_PRINTED)
     message(STATUS "Qt5 Location: ${QM_QT_INSTALL_PREFIX}")
     message(STATUS "Qt5 Version: ${QM_QT_VERSION} ")
-#    execute_process(COMMAND "${QtQMake_location}" -v OUTPUT_VARIABLE QtQMake_VersionString OUTPUT_STRIP_TRAILING_WHITESPACE)
-#    string(REGEX REPLACE "\r\n" "\\\\r\\\\n" tmp_String ${QtQMake_VersionString})
-#    string(REGEX REPLACE "\n" "\\\\n" QtQMake_VersionString ${tmp_String})
-
-#    execute_process(COMMAND "${CMAKE_COMMAND}" -version OUTPUT_VARIABLE CMake_VersionString OUTPUT_STRIP_TRAILING_WHITESPACE)
-#    string(REGEX REPLACE "\r\n" "\\\\r\\\\n" tmp_String ${CMake_VersionString})
-#    string(REGEX REPLACE "\n" "\\\\n" CMake_VersionString ${tmp_String})
-
     set_property(GLOBAL PROPERTY Qt5_STATUS_PRINTED TRUE)
   endif()
+
   # This is really just needed for Windows
   CopyQt5RunTimeLibraries(LIBRARIES ${Qt5_COMPONENTS} PREFIX Qt5)
-  #CopyQt5RunTimeLibraries(LIBRARIES Multimedia MultimediaWidgets Qml Quick Positioning Sql WebChannel
-  #                        PREFIX Qt5)
 
   # This is pretty much needed on all the platforms.
   AddQt5LibraryInstallRule(LIBRARIES ${Qt5_COMPONENTS})
 
-  if (QM_QT_VERSION VERSION_GREATER 5.4.0 OR QM_QT_VERSION VERSION_EQUAL 5.4.0)
-    set(Qt5_ICU_COMPONENTS icudt53 icuin53 icuuc53)
-  endif()
   if (QM_QT_VERSION VERSION_GREATER 5.5.0 OR QM_QT_VERSION VERSION_EQUAL 5.5.0)
     set(Qt5_ICU_COMPONENTS icudt54 icuin54 icuuc54)
   endif()
