@@ -418,10 +418,11 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   # We need the location of QMake for later on in order to find the plugins directory
   get_target_property(QtQMake_location Qt5::qmake LOCATION)
   get_property(Qt5_STATUS_PRINTED GLOBAL PROPERTY Qt5_STATUS_PRINTED)
+  execute_process(COMMAND "${QtQMake_location}" -query QT_INSTALL_PREFIX OUTPUT_VARIABLE QM_QT_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND "${QtQMake_location}" -query QT_VERSION OUTPUT_VARIABLE QM_QT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+
   if(NOT Qt5_STATUS_PRINTED)
-    execute_process(COMMAND "${QtQMake_location}" -query QT_INSTALL_PREFIX OUTPUT_VARIABLE QM_QT_INSTALL_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
     message(STATUS "Qt5 Location: ${QM_QT_INSTALL_PREFIX}")
-    execute_process(COMMAND "${QtQMake_location}" -query QT_VERSION OUTPUT_VARIABLE QM_QT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
     message(STATUS "Qt5 Version: ${QM_QT_VERSION} ")
 #    execute_process(COMMAND "${QtQMake_location}" -v OUTPUT_VARIABLE QtQMake_VersionString OUTPUT_STRIP_TRAILING_WHITESPACE)
 #    string(REGEX REPLACE "\r\n" "\\\\r\\\\n" tmp_String ${QtQMake_VersionString})
@@ -523,6 +524,7 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   #-----------------------------------------------------------------------------------
   # Copy over the proper QWebEngine Components
   if("${NeedQtWebEngine}" STREQUAL "ON" OR "${NeedQtWebEngine}" STREQUAL "TRUE")
+  message(STATUS "QM_QT_INSTALL_PREFIX: ${QM_QT_INSTALL_PREFIX}")
     AddQWebEngineSupportFiles(QT_INSTALL_PREFIX ${QM_QT_INSTALL_PREFIX} QT_VERSION ${QM_QT_VERSION})
   endif()
 
