@@ -141,11 +141,20 @@ endfunction()
 # --------------------------------------------------------------------
 # Look for Vtk 7.0 as we need it for the plugin GUI to be generated
 # These are the required component libraries
-set(VtkToolbox_VtkComponents
-    vtkGUISupportQt
-    vtkRenderingVolumeOpenGL2
-    vtkInteractionWidgets
-  )
+# The user of this module needs to set the VtkToolbox_VtkComponents
+# variable like the example below which will include all the needed
+# vtk modules.
+#
+#
+#set(VtkToolbox_VtkComponents
+#    vtkGUISupportQt
+#    vtkRenderingCore
+#    vtkRenderingFreeType
+#    vtkRenderingVolumeOpenGL2
+#    vtkRenderingAnnotation
+#    vtkInteractionWidgets
+#    vtkInteractionStyle
+#  )
 find_package(VTK COMPONENTS ${VtkToolbox_VtkComponents})
 if(NOT VTK_FOUND)
   message(FATAL_ERROR "Vtk is required for this build. One of the projects asked to find Vtk and Vtk was not located.")
