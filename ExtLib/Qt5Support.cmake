@@ -466,7 +466,7 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
 
   get_property(QT_PLUGINS_FILE GLOBAL PROPERTY QtPluginsTxtFile)
   if("${QT_PLUGINS_FILE}" STREQUAL "")
-    message(STATUS "Setting GLOBAL PROPERTY QtPluginsTxtFile")
+#    message(STATUS "Setting GLOBAL PROPERTY QtPluginsTxtFile")
     set_property(GLOBAL PROPERTY QtPluginsTxtFile "${ProjectBinaryDir}/Qt_Plugins.txt")
     get_property(QT_PLUGINS_FILE GLOBAL PROPERTY QtPluginsTxtFile)
   endif()
@@ -474,7 +474,7 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   #set(QT_PLUGINS_FILE_TEMPLATE "${ProjectBinaryDir}/Qt_Plugins.cmake.in")
   get_property(QT_PLUGINS_FILE_TEMPLATE GLOBAL PROPERTY QtPluginsCMakeFile)
   if("${QT_PLUGINS_FILE_TEMPLATE}" STREQUAL "")
-    message(STATUS "Setting GLOBAL PROPERTY QtPluginsCMakeFile")
+#    message(STATUS "Setting GLOBAL PROPERTY QtPluginsCMakeFile")
     set_property(GLOBAL PROPERTY QtPluginsCMakeFile "${ProjectBinaryDir}/Qt_Plugins.cmake.in")
     get_property(QT_PLUGINS_FILE_TEMPLATE GLOBAL PROPERTY QtPluginsCMakeFile)
   endif()
@@ -512,7 +512,6 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   #-----------------------------------------------------------------------------------
   # Copy over the proper QWebEngine Components
   if("${NeedQtWebEngine}" STREQUAL "ON" OR "${NeedQtWebEngine}" STREQUAL "TRUE")
-  message(STATUS "QM_QT_INSTALL_PREFIX: ${QM_QT_INSTALL_PREFIX}")
     AddQWebEngineSupportFiles(QT_INSTALL_PREFIX ${QM_QT_INSTALL_PREFIX} QT_VERSION ${QM_QT_VERSION})
   endif()
 

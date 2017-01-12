@@ -47,7 +47,7 @@ if(TBB_DEBUG)
 endif()
 
 # Figure out the TBB_ARCH_PLATFORM on Windows. Note that we only support
-# visual studio 9, 10, 11
+# visual studio 12, 14
 if(WIN32 )
 	set(TBB_ARCH_TYPE "ia32")
 	if( "${CMAKE_SIZEOF_VOID_P}" EQUAL "8" )
@@ -184,6 +184,11 @@ macro(TBB_CORRECT_LIB_DIR var_name)
     string(REPLACE vc7.1 "${_TBB_COMPILER}" ${var_name} ${${var_name}})
     string(REPLACE vc8 "${_TBB_COMPILER}" ${var_name} ${${var_name}})
     string(REPLACE vc9 "${_TBB_COMPILER}" ${var_name} ${${var_name}})
+    string(REPLACE vc10 "${_TBB_COMPILER}" ${var_name} ${${var_name}})
+    string(REPLACE vc11 "${_TBB_COMPILER}" ${var_name} ${${var_name}})
+    string(REPLACE vc12 "${_TBB_COMPILER}" ${var_name} ${${var_name}})
+    string(REPLACE vc14 "${_TBB_COMPILER}" ${var_name} ${${var_name}})
+    string(REPLACE vc15 "${_TBB_COMPILER}" ${var_name} ${${var_name}})
 endmacro(TBB_CORRECT_LIB_DIR var_content)
 
 
