@@ -381,7 +381,7 @@ function(BuildToolBundle)
 
 #-- Create last install rule that will run fixup_bundle() on OS X Machines. Other platforms we
 #-- are going to create the install rules elsewhere
-    if(APPLE)
+    if(0)
         list(APPEND lib_search_dirs "${QAB_LIB_SEARCH_DIRS}")
 
         set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
@@ -397,7 +397,7 @@ function(BuildToolBundle)
                 "${OPTIMIZE_BUNDLE_SHELL_SCRIPT}" @ONLY IMMEDIATE)
 
         install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT ${QAB_COMPONENT})
-    endif(APPLE)
+    endif()
   endif()
 endfunction()
 
