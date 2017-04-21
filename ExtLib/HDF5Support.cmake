@@ -10,9 +10,9 @@ function(AddHDF5CopyInstallRules)
   cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   set(INTER_DIR ".")
 
-  #message(STATUS "Z_LIBNAME: ${Z_LIBNAME}")
-  #message(STATUS "Z_LIBVAR: ${Z_LIBVAR}")
-  #message(STATUS "Z_TYPES: ${Z_TYPES}")
+  # message(STATUS "Z_LIBNAME: ${Z_LIBNAME}")
+  # message(STATUS "Z_LIBVAR: ${Z_LIBVAR}")
+  # message(STATUS "Z_TYPES: ${Z_TYPES}")
 
   set(Z_INSTALL_DIR "lib")
   if(WIN32)
@@ -28,9 +28,9 @@ function(AddHDF5CopyInstallRules)
 
     # Get the Actual Library Path and create Install and copy rules
     GET_TARGET_PROPERTY(LibPath ${Z_LIBNAME} IMPORTED_LOCATION_${TYPE})
-    #message(STATUS "LibPath: ${LibPath}")
+    # message(STATUS "LibPath: ${LibPath}")
     if(NOT "${LibPath}" STREQUAL "LibPath-NOTFOUND")
-      #message(STATUS "Creating Install Rule for ${LibPath}")
+      # message(STATUS "Creating Install Rule for ${LibPath}")
       if(NOT TARGET ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy)
         ADD_CUSTOM_TARGET(ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy ALL
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LibPath}
@@ -44,7 +44,7 @@ function(AddHDF5CopyInstallRules)
 
     # Now get the path that the library is in
     GET_FILENAME_COMPONENT(${Z_LIBVAR}_DIR ${LibPath} PATH)
-   # message(STATUS "${Z_LIBVAR}_DIR: ${${Z_LIBVAR}_DIR}")
+    # message(STATUS "${Z_LIBVAR}_DIR: ${${Z_LIBVAR}_DIR}")
 
     # Now piece together a complete path for the symlink that Linux Needs to have
     if(WIN32)
@@ -53,10 +53,10 @@ function(AddHDF5CopyInstallRules)
       GET_TARGET_PROPERTY(${Z_LIBVAR}_${TYPE} ${Z_LIBNAME} IMPORTED_SONAME_${TYPE})
     endif()
 
-    #message(STATUS "${Z_LIBVAR}_${TYPE}: ${${Z_LIBVAR}_${TYPE}}")
+    # message(STATUS "${Z_LIBVAR}_${TYPE}: ${${Z_LIBVAR}_${TYPE}}")
     if(NOT "${${Z_LIBVAR}_${TYPE}}" STREQUAL "${Z_LIBVAR}_${TYPE}-NOTFOUND" AND NOT WIN32)
       set(SYMLINK_PATH "${${Z_LIBVAR}_DIR}/${${Z_LIBVAR}_${TYPE}}")
-      #message(STATUS "Creating Install Rule for ${SYMLINK_PATH}")
+      # message(STATUS "Creating Install Rule for ${SYMLINK_PATH}")
       if(NOT TARGET ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy)
         ADD_CUSTOM_TARGET(ZZ_${Z_LIBVAR}_SYMLINK_${TYPE}-Copy ALL
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SYMLINK_PATH}
@@ -154,7 +154,13 @@ if(HDF5_FOUND)
                         TYPES ${BUILD_TYPES})
   endif()
 
-  set(HDF5_COMPONENTS ${HDF5_C_TARGET_NAME} ${HDF5_CXX_TARGET_NAME})
+  STRING(TOUPPER ${CMAKE_BUILD_TYPE} TYPE)
+  get_target_property(HDF5_C_LIB_PATH ${HDF5_C_TARGET_NAME} IMPORTED_LOCATION_${TYPE})
+  #message(STATUS "HDF5_C_LIB_PATH: ${HDF5_C_LIB_PATH}")
+  get_target_property(HDF5_CXX_LIB_PATH ${HDF5_CXX_TARGET_NAME} IMPORTED_LOCATION_${TYPE})
+  #message(STATUS "HDF5_CXX_LIB_PATH: ${HDF5_CXX_TARGET_NAME}")
+
+  set(HDF5_COMPONENTS ${HDF5_C_LIB_PATH} ${HDF5_CXX_LIB_PATH})
 
 ELSE(HDF5_FOUND)
     MESSAGE(FATAL_ERROR "Cannot build without HDF5.  Please set HDF5_INSTALL environment variable to point to your HDF5 installation.")
