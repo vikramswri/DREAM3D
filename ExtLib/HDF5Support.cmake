@@ -157,7 +157,7 @@ if(HDF5_FOUND)
   # The next CMake variable is needed for Linux to properly generate a shell script
   # that will properly install the HDF5 files.
   if(NOT APPLE AND NOT WIN32)
-    STRING(TOUPPER ${CMAKE_BUILD_TYPE} TYPE)
+    STRING(TOUPPER "${CMAKE_BUILD_TYPE}" TYPE)
     get_target_property(HDF5_C_LIB_PATH ${HDF5_C_TARGET_NAME} IMPORTED_LOCATION_${TYPE})
     get_target_property(HDF5_CXX_LIB_PATH ${HDF5_CXX_TARGET_NAME} IMPORTED_LOCATION_${TYPE})
     set(HDF5_COMPONENTS ${HDF5_C_LIB_PATH} ${HDF5_CXX_LIB_PATH})
