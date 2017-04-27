@@ -221,7 +221,7 @@ if(HDF5_FOUND)
     #############################################
 
     if(NOT HDF5_VERSION)
-        # We parse the version information from the boost/version.hpp header.
+        # We parse the version information from the hdf5/H5pubconf.h header.
         file(STRINGS ${HDF5_INCLUDE_DIRS}/H5pubconf.h HDF5_VERSIONSTR
           REGEX "#define[ ]+H5_PACKAGE_VERSION[ ]+\"[0-9]+\\.[0-9]+\\.[0-9]+\"")
         if(HDF5_VERSIONSTR)
