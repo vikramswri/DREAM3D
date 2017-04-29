@@ -81,10 +81,10 @@ if("${HDF5_INSTALL}" STREQUAL "")
     set(HDF5_INSTALL  $ENV{HDF5_INSTALL})
 endif()
 
-if( "${HDF5_INSTALL}" STREQUAL "")
-  message(FATAL_ERROR "The HDF5_INSTALL variable was not set. In order to find HDF5 you need to either\
-                      pass in the -DHDF5_INSTALL=.... or set the HDF5_INSTALL environment variable.")
-endif()
+# if( "${HDF5_INSTALL}" STREQUAL "")
+#   message(FATAL_ERROR "The HDF5_INSTALL variable was not set. In order to find HDF5 you need to either\
+#                       pass in the -DHDF5_INSTALL=.... or set the HDF5_INSTALL environment variable.")
+# endif()
 
 # We used to set the CMAKE_MODULE_PATH but HDF5 is changing where they put the 
 # cmake files from HDF5 1.8.14 to 1.8.15 so we are going to ask the user to set 
@@ -99,7 +99,13 @@ endif()
     #set(CMAKE_MODULE_PATH ${HDF5_INSTALL}/share/cmake/hdf5 ${CMAKE_MODULE_PATH})
 #endif()
 
+message(STATUS "HDF5_DIR: ${HDF5_DIR}")
+
 find_package(HDF5 NAMES hdf5)
+if(NOT HDF5_FOUND)
+  message(FATAL_ERROR "HDF5 was not found on your system. Please follow any instructions given to fix the problem")
+endif()
+
 if(HDF5_FOUND)
 
 
