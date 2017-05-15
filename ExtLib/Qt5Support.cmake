@@ -326,25 +326,43 @@ function(AddQWebEngineSupportFiles)
     set(QTCONF_DIR ".")
   endif()
 
-  if (QM_QT_VERSION VERSION_GREATER 5.7.0 OR QM_QT_VERSION VERSION_EQUAL 5.7.0 )
+  if (QM_QT_VERSION VERSION_GREATER 5.8.0 OR QM_QT_VERSION VERSION_EQUAL 5.8.0 )
+    if(WIN32 OR LINUX)
+      install(FILES ${QM_QT_INSTALL_PREFIX}/resources/icudtl.dat
+                    ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources.pak 
+                    ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources_100p.pak 
+                    ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources_200p.pak
+                    ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_devtools_resources.pak
+              DESTINATION ${QTCONF_DIR}/resources
+              COMPONENT Applications)
+      install(FILES ${QM_QT_INSTALL_PREFIX}/bin/QtWebEngineProcess.exe
+                    ${QM_QT_INSTALL_PREFIX}/bin/libEGL.dll
+                    ${QM_QT_INSTALL_PREFIX}/bin/libGLESv2.dll
+                DESTINATION ${QTCONF_DIR}
+                COMPONENT Applications)
+      install(DIRECTORY ${QM_QT_INSTALL_PREFIX}/translations/qtwebengine_locales
+                DESTINATION ${QTCONF_DIR}/translations
+                COMPONENT Applications)
+
+    endif()
+  elseif (QM_QT_VERSION VERSION_GREATER 5.7.0 OR QM_QT_VERSION VERSION_EQUAL 5.7.0 )
     message(FATAL_ERROR "Qt 5.7 is not supported for development.")
   elseif (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
     if(WIN32 OR LINUX)
-        install(FILES ${QM_QT_INSTALL_PREFIX}/resources/icudtl.dat
-                      ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources.pak 
-                      ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources_100p.pak 
-                      ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources_200p.pak
-                DESTINATION ${QTCONF_DIR}/resources
+      install(FILES ${QM_QT_INSTALL_PREFIX}/resources/icudtl.dat
+                    ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources.pak 
+                    ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources_100p.pak 
+                    ${QM_QT_INSTALL_PREFIX}/resources/qtwebengine_resources_200p.pak
+              DESTINATION ${QTCONF_DIR}/resources
+              COMPONENT Applications)
+      install(FILES ${QM_QT_INSTALL_PREFIX}/bin/QtWebEngineProcess.exe
+                    ${QM_QT_INSTALL_PREFIX}/bin/libEGL.dll
+                    ${QM_QT_INSTALL_PREFIX}/bin/libGLESv2.dll
+                DESTINATION ${QTCONF_DIR}
                 COMPONENT Applications)
-        install(FILES ${QM_QT_INSTALL_PREFIX}/bin/QtWebEngineProcess.exe
-                      ${QM_QT_INSTALL_PREFIX}/bin/libEGL.dll
-                      ${QM_QT_INSTALL_PREFIX}/bin/libGLESv2.dll
-                  DESTINATION ${QTCONF_DIR}
-                  COMPONENT Applications)
-        install(DIRECTORY ${QM_QT_INSTALL_PREFIX}/translations/qtwebengine_locales
-                  DESTINATION ${QTCONF_DIR}/translations
-                  COMPONENT Applications)
-
+      install(DIRECTORY ${QM_QT_INSTALL_PREFIX}/translations/qtwebengine_locales
+                DESTINATION ${QTCONF_DIR}/translations
+                COMPONENT Applications)
     endif()
   elseif (QM_QT_VERSION VERSION_GREATER 5.5.0 OR QM_QT_VERSION VERSION_EQUAL 5.5.0)
     message(FATAL_ERROR "Qt 5.5.x is not supported for development.")
@@ -430,6 +448,10 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
       AND NOT (CMAKE_SYSTEM_NAME MATCHES "Linux"))
     set(Qt5_ICU_COMPONENTS "ICU Libraries NOT Defined for Qt 5.7")
     message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.7. Please update the Qt5Support.cmake file")
+  endif()
+
+  if (QM_QT_VERSION VERSION_GREATER 5.8.0 OR QM_QT_VERSION VERSION_EQUAL 5.8.0)
+    set(Qt5_ICU_COMPONENTS "")
   endif()
 
   if(CMAKE_SYSTEM_NAME MATCHES "Linux")
