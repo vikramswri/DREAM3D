@@ -440,17 +440,29 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   # This is pretty much needed on all the platforms.
   AddQt5LibraryInstallRule(LIBRARIES ${Qt5_COMPONENTS})
 
-  if (QM_QT_VERSION VERSION_GREATER 5.6.0 OR QM_QT_VERSION VERSION_EQUAL 5.6.0)
+  #----------------------------------------------------------------------------
+  # This is a wierd way to bracket the Qt releases but there has NEVER been 
+  # an official version of Qt with a 5.x.99 version so we are going to use that
+  # range to bracket each release of Qt that we Support.
+  # QT 5.6.x
+  if (QM_QT_VERSION VERSION_GREATER 5.5.99 AND QM_QT_VERSION VERSION_LESS 5.6.99)
     set(Qt5_ICU_COMPONENTS icudt54 icuin54 icuuc54)
   endif()
 
-  if (QM_QT_VERSION VERSION_GREATER 5.7.0 OR QM_QT_VERSION VERSION_EQUAL 5.7.0
+  # QT 5.7.x
+  if (QM_QT_VERSION VERSION_GREATER 5.6.99 AND QM_QT_VERSION VERSION_LESS 5.7.99
       AND NOT (CMAKE_SYSTEM_NAME MATCHES "Linux"))
-    set(Qt5_ICU_COMPONENTS "ICU Libraries NOT Defined for Qt 5.7")
-    message(FATAL_ERROR "ICU Libraries NOT Defined for Qt 5.7. Please update the Qt5Support.cmake file")
+    set(Qt5_ICU_COMPONENTS icudt54 icuin54 icuuc54)
+    message(WARNING "Qt 5.7 has never been tested. It may not package correctly")
   endif()
 
-  if (QM_QT_VERSION VERSION_GREATER 5.8.0 OR QM_QT_VERSION VERSION_EQUAL 5.8.0)
+  # QT 5.8.x
+  if (QM_QT_VERSION VERSION_GREATER 5.7.99 AND QM_QT_VERSION VERSION_LESS 5.8.99)
+    set(Qt5_ICU_COMPONENTS "")
+  endif()
+
+  # QT 5.9.x
+  if (QM_QT_VERSION VERSION_GREATER 5.8.99 AND QM_QT_VERSION VERSION_LESS 5.9.99)
     set(Qt5_ICU_COMPONENTS "")
   endif()
 
