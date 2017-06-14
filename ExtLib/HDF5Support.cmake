@@ -134,20 +134,24 @@ if(HDF5_FOUND)
     endif()
   endif()
 
-  if(TARGET hdf5) 
+  if(TARGET hdf5) # Up through 1.8.14
     set(HDF5_C_TARGET_NAME hdf5)
-  elseif(TARGET hdf5-shared)
+  elseif(TARGET hdf5-shared) # 1.8.15 & 1.8.16
     set(HDF5_C_TARGET_NAME hdf5-shared)
+  elseif(TARGET hdf5::hdf5-shared) # 1.8.17 and above
+    set(HDF5_C_TARGET_NAME hdf5::hdf5-shared)
   else()
-    message(FATAL_ERROR "Neither target hdf5 nor target hdf5-shared was found. Do you have HDF5 1.8.15 or HDF5 1.8.16 installed.")
+    message(FATAL_ERROR "Neither target hdf5, hdf5-shared nor hdf5::hdf5-shared was found.")
   endif()
 
-  if(TARGET hdf5_cpp)
+  if(TARGET hdf5_cpp)# Up through 1.8.14
     set(HDF5_CXX_TARGET_NAME hdf5_cpp)
-  elseif(TARGET hdf5_cpp-shared)
+  elseif(TARGET hdf5_cpp-shared) # 1.8.15 & 1.8.16
     set(HDF5_CXX_TARGET_NAME hdf5_cpp-shared)
+  elseif(TARGET hdf5::hdf5_cpp-shared) # 1.8.17 and above
+    set(HDF5_C_TARGET_NAME hdf5::hdf5_cpp-shared)
   else()
-    message(FATAL_ERROR "Neither target hdf5_cpp nor target hdf5_cpp-shared was found. Do you have HDF5 1.8.15 or HDF5 1.8.16 installed.")
+    message(FATAL_ERROR "Neither target hdf5_cpp, hdf5_cpp-shared nor hdf5::hdf5_cpp-shared was found.")
   endif()
 
   if(NOT APPLE)
