@@ -931,7 +931,7 @@ function(cmpGitRevisionString)
 
   #-- Make sure that actually worked and if not just generate some dummy values
   if(DVERS STREQUAL "")
-    message(STATUS "DVERS was Empty. Generating Default version strings")
+    message(STATUS "[${GVS_PROJECT_NAME}] DVERS was Empty. Generating Default version strings")
   else()
     string(STRIP ${DVERS} DVERS)
     string(REPLACE  "-" ";" VERSION_LIST ${DVERS})
