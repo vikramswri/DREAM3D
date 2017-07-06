@@ -84,6 +84,13 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
   set(${default_embedded_path_var} "${path}" PARENT_SCOPE)
 endfunction()
 
+
+set(MAC_OS_APP_NAME @osx_app_name@.app)
+set(BUILD_TYPE "${CMAKE_BUILD_TYPE}")
+if("${BUILD_TYPE}" STREQUAL "Debug")
+  set(MAC_OS_APP_NAME @osx_app_name@${EXE_DEBUG_EXTENSION}.app)
+endif()
+
 if(0)
   # -- Create the Internal Symlinks to the Frameworks, lib and Plugin Directories
   # so that all the frameworks, plugins and libraries can be shared among the
@@ -102,7 +109,7 @@ if(0)
     COMMAND ln -s ../../Frameworks Frameworks
     COMMAND ln -s ../../Plugins Plugins
     COMMAND ln -s ../../lib lib
-    WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/"
+    WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/"
     )
 
 endif()
@@ -110,12 +117,14 @@ endif()
 # -- These are DREAM3D Plugins that need to be installed
 file(READ "@QAB_PLUGIN_LIST_FILE@" DREAM3D_PLUGINS)
 set(d3d_Plugins "")
+
+
 # -- Loop on each DREAM3D Plugin to make it is fixed up
 foreach(plugin ${DREAM3D_PLUGINS})
-  message(STATUS "Copying Plugin ${plugin} into ${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins")
-  file(COPY ${plugin} DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins")
+  message(STATUS "Copying Plugin ${plugin} into ${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Plugins")
+  file(COPY ${plugin} DESTINATION "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Plugins")
   get_filename_component(d3d_plugin_name "${plugin}" NAME)
-  list(APPEND d3d_Plugins ${CMAKE_INSTALL_PREFIX}/DREAM3D.app/Contents/Plugins/${d3d_plugin_name})
+  list(APPEND d3d_Plugins ${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Plugins/${d3d_plugin_name})
 endforeach(plugin $DREAM3D_PLUGINS)
 
 
@@ -127,9 +136,9 @@ function(CopyQt5Plugin)
   cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
   set(ORIG_PLUGIN "${P_QT5_PLUGIN_DIR}/${P_PLUGIN_GROUP}/${P_PLUGIN_NAME}")
-  message(STATUS "Copying Qt Plugin ${P_QT5_PLUGIN_DIR}/${P_PLUGIN_GROUP}/${P_PLUGIN_NAME} into ${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins/${P_PLUGIN_GROUP}/")
-  file(COPY "${ORIG_PLUGIN}" DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins/${P_PLUGIN_GROUP}")
-  set(d3d_qt_Plugins "${d3d_qt_Plugins};${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Plugins/${P_PLUGIN_GROUP}/${P_PLUGIN_NAME}" PARENT_SCOPE)
+  message(STATUS "Copying Qt Plugin ${P_QT5_PLUGIN_DIR}/${P_PLUGIN_GROUP}/${P_PLUGIN_NAME} into ${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Plugins/${P_PLUGIN_GROUP}/")
+  file(COPY "${ORIG_PLUGIN}" DESTINATION "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Plugins/${P_PLUGIN_GROUP}")
+  set(d3d_qt_Plugins "${d3d_qt_Plugins};${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Plugins/${P_PLUGIN_GROUP}/${P_PLUGIN_NAME}" PARENT_SCOPE)
 endfunction()
 
 # This is our list of Plugins to install
@@ -181,7 +190,7 @@ file(READ "@SIMPLibSearchDirs@" lib_search_dirs)
 # ----------------------------------------------------
 # This is where the actual patching of the install_names is going to take place.
 include(BundleUtilities)
-fixup_bundle("${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app"
+fixup_bundle("${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}"
              # Plugins to Install
              "${d3d_Plugins};${d3d_qt_Plugins}"
              # Directories to Search for Libraries
@@ -190,28 +199,28 @@ fixup_bundle("${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app"
 
 # ----------------------------------------------------
 # Create a qt.conf file in the app bundle
-file(WRITE "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Resources/qt.conf")
-file(APPEND "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Resources/qt.conf" "[Paths]\nPlugins = Plugins\n")
-FILE(APPEND "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Resources/qt.conf" "Prefix = .\n")
-FILE(APPEND "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Resources/qt.conf" "LibraryExecutables = bin\n")
+file(WRITE "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Resources/qt.conf")
+file(APPEND "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Resources/qt.conf" "[Paths]\nPlugins = Plugins\n")
+FILE(APPEND "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Resources/qt.conf" "Prefix = .\n")
+FILE(APPEND "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Resources/qt.conf" "LibraryExecutables = bin\n")
 
 # ----------------------------------------------------
 # Copy the QtWebEngine parts of the QtWebEngineCore Framework
 if ("@SIMPLView_USE_QtWebEngine@" STREQUAL "ON")
 
   FILE(COPY "${qtLibDir}/QtWebEngineCore.framework/Versions/5/Helpers"
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Frameworks/QtWebEngineCore.framework/Versions/5/")
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Frameworks/QtWebEngineCore.framework/Versions/5/")
   FILE(COPY "${qtLibDir}/QtWebEngineCore.framework/Helpers"
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Frameworks/QtWebEngineCore.framework/")
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Frameworks/QtWebEngineCore.framework/")
   if(NOT EXISTS "${CMAKE_INSTALL_PREFIX}/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents/Frameworks")
     execute_process( COMMAND ln -s "../../../../../../../Frameworks" "Frameworks"
-                     WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents" )
+                     WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents" )
   endif()
 endif()
 
 # Copy the Help directory
 
 FILE(COPY "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@/Help"
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/@osx_app_name@.app/Contents")
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents")
 
 
