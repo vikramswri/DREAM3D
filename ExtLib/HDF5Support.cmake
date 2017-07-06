@@ -10,8 +10,8 @@ function(AddHDF5CopyInstallRules)
   cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   set(INTER_DIR ".")
 
-  # message(STATUS "Z_LIBNAME: ${Z_LIBNAME}")
   # message(STATUS "Z_LIBVAR: ${Z_LIBVAR}")
+  # message(STATUS "Z_LIBNAME: ${Z_LIBNAME}")
   # message(STATUS "Z_TYPES: ${Z_TYPES}")
 
   set(Z_INSTALL_DIR "lib")
@@ -149,7 +149,7 @@ if(HDF5_FOUND)
   elseif(TARGET hdf5_cpp-shared) # 1.8.15 & 1.8.16
     set(HDF5_CXX_TARGET_NAME hdf5_cpp-shared)
   elseif(TARGET hdf5::hdf5_cpp-shared) # 1.8.17 and above
-    set(HDF5_C_TARGET_NAME hdf5::hdf5_cpp-shared)
+    set(HDF5_CXX_TARGET_NAME hdf5::hdf5_cpp-shared)
   else()
     message(FATAL_ERROR "Neither target hdf5_cpp, hdf5_cpp-shared nor hdf5::hdf5_cpp-shared was found.")
   endif()
