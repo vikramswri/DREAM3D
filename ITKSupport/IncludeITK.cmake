@@ -57,8 +57,8 @@ function(AddItkCopyInstallRules)
             get_target_property(itkLibDeps ${itk_LIBNAME} IMPORTED_LINK_INTERFACE_LIBRARIES_${UpperBType})
             if(NOT "${itkLibDeps}" STREQUAL "itkLibDeps-NOTFOUND" )
               list(APPEND STACK ${itkLibDeps})
-            else()
-              message(STATUS "---->${itk_LIBNAME} IMPORTED_LINK_INTERFACE_LIBRARIES_${UpperBType} NOT FOUND")
+            # else()
+            #   message(STATUS "---->${itk_LIBNAME} IMPORTED_LINK_INTERFACE_LIBRARIES_${UpperBType} NOT FOUND")
             endif()
 
             # get_target_property(itkLibDeps ${itk_LIBNAME} INTERFACE_LINK_LIBRARIES)
@@ -71,20 +71,22 @@ function(AddItkCopyInstallRules)
             # Get the Actual Library Path and create Install and copy rules
             get_target_property(DllLibPath ${itk_LIBNAME} IMPORTED_LOCATION_${UpperBType})
             string(REGEX MATCH "\.dll$" IsDLL ${DllLibPath})
-            # message(STATUS "  DllLibPath:(${IsDLL}) ${DllLibPath}")
-            if(NOT "${DllLibPath}" STREQUAL "LibPath-NOTFOUND" AND NOT "${IsDLL}" STREQUAL "")
-              # message(STATUS "  Creating Install Rule for ${DllLibPath}")
-              if(NOT TARGET ZZ_${itk_LIBVAR}_DLL_${UpperBType}-Copy)
-                add_custom_target(ZZ_${itk_LIBVAR}_DLL_${UpperBType}-Copy ALL
-                                    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllLibPath}
-                                    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
-                                    # COMMENT "  Copy: ${DllLibPath} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
-                                    )
-                set_target_properties(ZZ_${itk_LIBVAR}_DLL_${UpperBType}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/Itk)
-                install(FILES ${DllLibPath} DESTINATION "${itk_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
+            #message(STATUS "  DllLibPath:(${IsDLL}) ${DllLibPath}")
+            if(EXISTS "${DllLibPath}")
+              if(NOT "${DllLibPath}" STREQUAL "LibPath-NOTFOUND" AND NOT "${IsDLL}" STREQUAL "")
+                
+                if(NOT TARGET ZZ_${itk_LIBVAR}_DLL_${UpperBType}-Copy)
+                  # message(STATUS "  Creating Copy and Install Rule for ${DllLibPath}")
+                  add_custom_target(ZZ_${itk_LIBVAR}_DLL_${UpperBType}-Copy ALL
+                                      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DllLibPath}
+                                      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/
+                                      # COMMENT "  Copy: ${DllLibPath} To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INTER_DIR}/"
+                                      )
+                  set_target_properties(ZZ_${itk_LIBVAR}_DLL_${UpperBType}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/Itk)
+                  install(FILES ${DllLibPath} DESTINATION "${itk_INSTALL_DIR}" CONFIGURATIONS ${BTYPE} COMPONENT Applications)
+                endif()
               endif()
             endif()
-
             # Now get the path that the library is in
             get_filename_component(${itk_LIBVAR}_DIR ${DllLibPath} PATH)
             # message(STATUS " ${itk_LIBVAR}_DIR: ${${itk_LIBVAR}_DIR}")
