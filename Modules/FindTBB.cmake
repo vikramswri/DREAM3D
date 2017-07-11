@@ -175,6 +175,10 @@ if (WIN32 AND MSVC)
     set(COMPILER_PREFIX "vc12")
   elseif(MSVC_VERSION EQUAL 1900)
     set(COMPILER_PREFIX "vc14")
+  elseif(MSVC_VERSION EQUAL 1910) #Visual Studio 2017 uses same libs as 2015
+    set(COMPILER_PREFIX "vc14")
+  else()
+    message(FATAL_ERROR "Unknown version of MSVC: ${MSVC_VERSION}")
   endif ()
 
   # for each prefix path, add ia32/64\${COMPILER_PREFIX}\lib to the lib search path
