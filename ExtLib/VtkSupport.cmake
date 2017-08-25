@@ -146,16 +146,18 @@ endfunction()
 # vtk modules.
 #
 #
-#set(VtkToolbox_VtkComponents
-#    vtkGUISupportQt
-#    vtkRenderingCore
-#    vtkRenderingFreeType
-#    vtkRenderingVolumeOpenGL2
-#    vtkRenderingAnnotation
-#    vtkInteractionWidgets
-#    vtkInteractionStyle
-#  )
-find_package(VTK COMPONENTS ${VtkToolbox_VtkComponents})
+set(VtkComponents
+   vtkGUISupportQt
+   vtkRenderingCore
+   vtkRenderingFreeType
+   vtkRenderingVolumeOpenGL2
+   vtkRenderingAnnotation
+   vtkInteractionWidgets
+   vtkInteractionStyle
+   vtkIOLegacy
+   vtkIOImage
+ )
+find_package(VTK COMPONENTS ${VtkComponents})
 if(NOT VTK_FOUND)
   message(FATAL_ERROR "Vtk is required for this build. One of the projects asked to find Vtk and Vtk was not located.")
 endif()
