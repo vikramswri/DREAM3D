@@ -173,7 +173,7 @@ endif()
 # If we are NOT on Apple platform then create the copy and install rules
 # for all of the dependant Vtk libraries.
 if(NOT APPLE)
-  AddVtkCopyInstallRules(LIBS ${VtkToolbox_VtkComponents})
+  AddVtkCopyInstallRules(LIBS ${VtkComponents})
 endif()
 
 
