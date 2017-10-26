@@ -111,8 +111,7 @@ if(HDF5_FOUND)
 
   # Add the library directory to the file that has all the search directories stored in it.
 
-  include_directories(${HDF5_INCLUDE_DIRS}) #HDF5 1.8.15 and below
-  include_directories(${HDF5_INCLUDE_DIR}) #HDF5 1.8.16 and above
+ #  include_directories(${HDF5_INCLUDE_DIR}) #HDF5 1.8.16 and above
 
   get_property(HDF5_STATUS_PRINTED GLOBAL PROPERTY HDF5_STATUS_PRINTED)
   if(NOT HDF5_STATUS_PRINTED)

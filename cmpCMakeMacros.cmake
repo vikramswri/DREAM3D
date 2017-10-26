@@ -907,6 +907,7 @@ function(cmpGitRevisionString)
     message(STATUS "GVS_EXPORT_MACRO: ${GVS_EXPORT_MACRO}")
     message(STATUS "${GVS_PROJECT_NAME}_BUILD_DATE: ${${GVS_PROJECT_NAME}_BUILD_DATE}")
     message(STATUS "${GVS_PROJECT_NAME}_SOURCE_DIR: ${${GVS_PROJECT_NAME}_SOURCE_DIR}")
+    message(STATUS "--------------------------------------------")
   endif()
 
 
@@ -954,16 +955,19 @@ function(cmpGitRevisionString)
   set(${GVS_PROJECT_NAME}_VERSION_TWEAK "${VERSION_GEN_VER_REVISION}" PARENT_SCOPE)
 
   if(NOT "${GVS_GENERATED_HEADER_FILE_PATH}" STREQUAL "")
+    #message(STATUS "Generating: ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_HEADER_FILE_PATH}")
     cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_HEADER_FILE_PATH}
                                 CONFIGURED_TEMPLATE_PATH   ${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.h.in )
   endif()
   
   if(NOT "${GVS_GENERATED_SOURCE_FILE_PATH}" STREQUAL "")
+    #message(STATUS "Generating: ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_SOURCE_FILE_PATH}")
     cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_SOURCE_FILE_PATH}
                                 CONFIGURED_TEMPLATE_PATH   ${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersion.cpp.in )
   endif()
   
   if(NOT "${GVS_VERSION_MACRO_PATH}" STREQUAL "")
+    #message(STATUS "Generating: ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_VERSION_MACRO_PATH}")
     cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_VERSION_MACRO_PATH}
                                 CONFIGURED_TEMPLATE_PATH   ${CMP_CONFIGURED_FILES_SOURCE_DIR}/cmpVersionMacro.h.in )
   endif()
@@ -1040,6 +1044,37 @@ function(COMPILE_TOOL)
         COMPONENT     Applications
         INSTALL_DEST  "${D3DTOOL_INSTALL_DEST}"
     )
+
+endfunction()
+
+#-------------------------------------------------------------------------------
+# 
+function(CMP_MODULE_INCLUDE_DIRS)
+  set(options)
+  set(oneValueArgs TARGET LIBVARS)
+  set(multiValueArgs )
+  cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  foreach(LIB ${Z_LIBVARS})
+    target_include_directories(${Z_TARGET} PUBLIC ${${LIB}_INCLUDE_DIRS})
+    target_include_directories(${Z_TARGET} PUBLIC ${${LIB}_INCLUDE_DIR})
+  endforeach()
+
+
+endfunction()
+
+#-------------------------------------------------------------------------------
+#
+function(CMP_ADD_Qt5_INCLUDE_DIR)
+  set(options)
+  set(oneValueArgs TARGET)
+  set(multiValueArgs COMPONENTS)
+  cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  #-- Make sure we include the proper Qt5 include directories
+  foreach(qtlib ${Z_COMPONENTS})
+    target_include_directories(${Z_TARGET} PUBLIC ${Qt5${qtlib}_INCLUDE_DIRS})
+  endforeach()
 
 endfunction()
 
