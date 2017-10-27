@@ -137,43 +137,63 @@ function(AddVtkCopyInstallRules)
 
 endfunction()
 
-
 # --------------------------------------------------------------------
-# Look for Vtk 7.0 as we need it for the plugin GUI to be generated
-# These are the required component libraries
-# The user of this module needs to set the VtkToolbox_VtkComponents
-# variable like the example below which will include all the needed
-# vtk modules.
-#
-#
-set(VtkComponents
-   vtkGUISupportQt
-   vtkRenderingCore
-   vtkRenderingFreeType
-   vtkRenderingVolumeOpenGL2
-   vtkRenderingAnnotation
-   vtkInteractionWidgets
-   vtkInteractionStyle
-   vtkIOLegacy
-   vtkIOImage
- )
-find_package(VTK COMPONENTS ${VtkComponents})
-if(NOT VTK_FOUND)
-  message(FATAL_ERROR "Vtk is required for this build. One of the projects asked to find Vtk and Vtk was not located.")
-endif()
+# 
+function(CMP_FindVtkComponents)
+  set(options)
+  set(oneValueArgs QT5_REQUIRED)
+  set(multiValueArgs COMPONENTS)
+  cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  find_package(VTK COMPONENTS ${Z_COMPONENTS})
+  if(NOT VTK_FOUND)
+    message(FATAL_ERROR "Vtk is required for this build. One of the projects asked to find Vtk and Vtk was not located.")
+  endif()
+
+  include(${VTK_USE_FILE})
+
+  if(Z_QT5_REQUIRED)
+    if("${VTK_QT_VERSION}" STREQUAL "")
+      message(FATAL_ERROR "VTK was not built with Qt")
+    endif()
+  endif()
+
+  # --------------------------------------------------------------------
+  # If we are NOT on Apple platform then create the copy and install rules
+  # for all of the dependant Vtk libraries.
+  if(NOT APPLE)
+    AddVtkCopyInstallRules(LIBS ${Z_COMPONENTS})
+  endif()
+
+endfunction()
+
+# # --------------------------------------------------------------------
+# # Look for Vtk 7.0 as we need it for the plugin GUI to be generated
+# # These are the required component libraries
+# # The user of this module needs to set the VtkComponents
+# # variable like the example below which will include all the needed
+# # vtk modules.
+# set(SIMPL_Base_VtkComponents
+#    vtkGUISupportQt
+#    vtkRenderingCore
+#    vtkRenderingFreeType
+#    vtkRenderingVolumeOpenGL2
+#    vtkRenderingAnnotation
+#    vtkInteractionWidgets
+#    vtkInteractionStyle
+#    vtkIOLegacy
+#    vtkIOImage
+#  )
+# if(NOT DEFINED SIMPL_Base_VtkComponents_Configured)
+#   set(SIMPL_Base_VtkComponents_Configured "ON" CACHE STRING "")
+#   list(APPEND CMP_VtkComponents ${SIMPL_Base_VtkComponents})
+# endif()
+# #--- Append on what another library or plugin wants
+# list(APPEND CMP_VtkComponents ${VtkComponents})
+# #--- Remove all the duplicate components
+# message(STATUS "CMP_VtkComponents: ${CMP_VtkComponents}")
+# list(REMOVE_DUPLICATES CMP_VtkComponents)
 
 
-include(${VTK_USE_FILE})
-if("${VTK_QT_VERSION}" STREQUAL "")
-  message(FATAL_ERROR "VTK was not built with Qt")
-endif()
-
-
-# --------------------------------------------------------------------
-# If we are NOT on Apple platform then create the copy and install rules
-# for all of the dependant Vtk libraries.
-if(NOT APPLE)
-  AddVtkCopyInstallRules(LIBS ${VtkComponents})
-endif()
 
 
