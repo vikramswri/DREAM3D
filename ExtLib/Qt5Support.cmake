@@ -477,13 +477,6 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
 
   set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "Qt5AutoMocTargets")
 
-  #-- Make sure we include the proper Qt5 include directories
-  foreach(qtlib ${Qt5_COMPONENTS})
-    #include_directories( ${Qt5${qtlib}_INCLUDE_DIRS})
-  endforeach()
-
-  #set(QT_PLUGINS_FILE "${ProjectBinaryDir}/Qt_Plugins.txt")
-
   get_property(QT_PLUGINS_FILE GLOBAL PROPERTY QtPluginsTxtFile)
   if("${QT_PLUGINS_FILE}" STREQUAL "")
 #    message(STATUS "Setting GLOBAL PROPERTY QtPluginsTxtFile")

@@ -237,5 +237,3 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   configure_file("${SELF_DIR}/Deploy_ITK_Libs.sh.in"
                  "${DREAM3DProj_BINARY_DIR}/AdditionalInstallScripts/Deploy_ITK_Libs.sh" @ONLY IMMEDIATE)
 endif()
-
-include_directories(${ITK_INCLUDE_DIRS})

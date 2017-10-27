@@ -129,7 +129,6 @@ endfunction()
 # Make sure we have Qwt installed and available
 find_package(Qwt)
 if(QWT_FOUND)
-    include_directories(${QWT_INCLUDE_DIR})
     get_property(SIMPLibSearchDirs GLOBAL PROPERTY SIMPLibSearchDirs)
 		file(APPEND "${SIMPLibSearchDirs}" "${QWT_LIB_DIR};")
     AddQwtCopyInstallRules(PREFIX "" CMAKE_VAR QWT_LIBRARY)

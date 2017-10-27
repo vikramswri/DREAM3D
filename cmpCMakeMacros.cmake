@@ -190,13 +190,13 @@ function(BuildQtAppBundle)
     endif(APPLE)
 
 #-- Set the Debug Suffix for the application
-    SET_TARGET_PROPERTIES( ${QAB_TARGET}
+    set_target_properties( ${QAB_TARGET}
                 PROPERTIES
                 DEBUG_OUTPUT_NAME ${QAB_TARGET}${QAB_DEBUG_EXTENSION}
                 RELEASE_OUTPUT_NAME ${QAB_TARGET}
     )
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-        SET_TARGET_PROPERTIES( ${QAB_TARGET}
+        set_target_properties( ${QAB_TARGET}
                 PROPERTIES
                 INSTALL_RPATH \$ORIGIN/../lib
     )
@@ -353,18 +353,18 @@ function(BuildToolBundle)
                             ${QAB_LINK_LIBRARIES} )
 
 #-- Set the Debug Suffix for the application
-    SET_TARGET_PROPERTIES( ${QAB_TARGET}
+    set_target_properties( ${QAB_TARGET}
                 PROPERTIES
                 DEBUG_OUTPUT_NAME ${QAB_TARGET}${QAB_DEBUG_EXTENSION}
                 RELEASE_OUTPUT_NAME ${QAB_TARGET}
     )
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-      SET_TARGET_PROPERTIES( ${QAB_TARGET}
+      set_target_properties( ${QAB_TARGET}
             PROPERTIES
             INSTALL_RPATH \$ORIGIN/../lib )
     endif()
     if(NOT "${QAB_SOLUTION_FOLDER}" STREQUAL "")
-      SET_TARGET_PROPERTIES(${QAB_TARGET}
+      set_target_properties(${QAB_TARGET}
                           PROPERTIES FOLDER ${QAB_SOLUTION_FOLDER})
     endif()
 
@@ -417,7 +417,7 @@ if(0)
     message(STATUS "lib_search_dirs: ${lib_search_dirs}")
 endif()
 
-    SET_TARGET_PROPERTIES( ${EXE_NAME}
+    set_target_properties( ${EXE_NAME}
         PROPERTIES
         DEBUG_OUTPUT_NAME ${EXE_NAME}${EXE_DEBUG_EXTENSION}
         RELEASE_OUTPUT_NAME ${EXE_NAME}
@@ -454,7 +454,7 @@ endmacro()
 
 macro(LibraryProperties targetName DEBUG_EXTENSION)
     if( NOT BUILD_SHARED_LIBS AND MSVC)
-      SET_TARGET_PROPERTIES( ${targetName}
+      set_target_properties( ${targetName}
         PROPERTIES
         DEBUG_OUTPUT_NAME lib${targetName}
         RELEASE_OUTPUT_NAME lib${targetName}  )
@@ -464,7 +464,7 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
 
 
     #-- Set the Debug and Release names for the libraries
-    SET_TARGET_PROPERTIES( ${targetName}
+    set_target_properties( ${targetName}
         PROPERTIES
         DEBUG_POSTFIX ${DEBUG_EXTENSION} )
 
@@ -487,7 +487,7 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
 
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
       set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
-      SET_TARGET_PROPERTIES( ${targetName}
+      set_target_properties( ${targetName}
                 PROPERTIES
                 INSTALL_RPATH \$ORIGIN/../lib)
     endif()
@@ -515,7 +515,7 @@ macro(StaticLibraryProperties targetName )
 
 
     #-- Set the Debug and Release names for the libraries
-    SET_TARGET_PROPERTIES( ${targetName}
+    set_target_properties( ${targetName}
         PROPERTIES
         DEBUG_OUTPUT_NAME ${LIBRARY_DEBUG_NAME}
         RELEASE_OUTPUT_NAME ${LIBRARY_RELEASE_NAME}
@@ -528,14 +528,14 @@ endmacro(StaticLibraryProperties)
 #-------------------------------------------------------------------------------
 macro(PluginProperties targetName DEBUG_EXTENSION projectVersion binaryDir pluginfile)
     if( NOT BUILD_SHARED_LIBS AND MSVC)
-      SET_TARGET_PROPERTIES( ${targetName}
+      set_target_properties( ${targetName}
         PROPERTIES
         DEBUG_OUTPUT_NAME lib${targetName}
         RELEASE_OUTPUT_NAME lib${targetName}  )
     endif()
 
     #-- Set the Debug and Release names for the libraries
-    SET_TARGET_PROPERTIES( ${targetName}
+    set_target_properties( ${targetName}
         PROPERTIES
         DEBUG_POSTFIX ${DEBUG_EXTENSION}
         SUFFIX ".plugin" )
@@ -1028,7 +1028,7 @@ function(COMPILE_TOOL)
     cmake_parse_arguments(D3DTOOL "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     if( ${D3DTOOL_DEFINITION} )
-    add_definitions(-D${DEFINITION})
+    
     endif()
 
     BuildToolBundle(
@@ -1044,8 +1044,42 @@ function(COMPILE_TOOL)
         COMPONENT     Applications
         INSTALL_DEST  "${D3DTOOL_INSTALL_DEST}"
     )
+    target_compile_definitions(${D3DTOOL_TARGET} -D${DEFINITION})
 
 endfunction()
+
+# --------------------------------------------------------------------------
+# Converts file paths to use the '/' character so they are compatible with
+# C/C++ language. The use of the "\" character would make the compiler think
+# the following character would be escaped.
+#-- Convert all '\' to '\\' so that they are properly escaped in the header file
+macro(ConvertPathToHeaderCompatible INPUT)
+    if(WIN32)
+      STRING(REPLACE "\\" "\\\\" ${INPUT} ${${INPUT}} )
+      STRING(REPLACE "/" "\\\\" ${INPUT} ${${INPUT}}  )
+    endif()
+endmacro()
+
+# --------------------------------------------------------------------------
+# Adds a Unit Test 
+function(AddSIMPLUnitTest)
+    set(options)
+    set(oneValueArgs TESTNAME FOLDER)
+    set(multiValueArgs SOURCES LINK_LIBRARIES INCLUDE_DIRS)
+    cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+    add_executable( ${Z_TESTNAME} "${Z_SOURCES}")
+    if("${Z_FOLDER}" STREQUAL "")
+        set(Z_FOLDER "Test")
+    endif()
+    set_target_properties( ${Z_TESTNAME} PROPERTIES FOLDER ${Z_FOLDER})
+    cmp_IDE_SOURCE_PROPERTIES( "" "" "${Z_SOURCES}" "0")
+    target_include_directories(${Z_TESTNAME} PUBLIC ${Z_INCLUDE_DIRS})
+    target_link_libraries( ${Z_TESTNAME} ${Z_LINK_LIBRARIES})
+    add_test(${Z_TESTNAME} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${Z_TESTNAME})
+
+endfunction()
+
 
 #-------------------------------------------------------------------------------
 # 
@@ -1075,6 +1109,48 @@ function(CMP_ADD_Qt5_INCLUDE_DIR)
   foreach(qtlib ${Z_COMPONENTS})
     target_include_directories(${Z_TARGET} PUBLIC ${Qt5${qtlib}_INCLUDE_DIRS})
   endforeach()
+
+endfunction()
+
+
+#-------------------------------------------------------------------------------
+#
+function(CMP_AddDefinitions)
+  set(options)
+  set(oneValueArgs TARGET)
+  set(multiValueArgs)
+  cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  # --------------------------------------------------------------------
+  # Add in some compiler definitions
+  # --------------------------------------------------------------------
+  if( CMAKE_BUILD_TYPE MATCHES Debug )
+    target_compile_definitions(${Z_TARGET} PRIVATE -DDEBUG)
+  endif( CMAKE_BUILD_TYPE MATCHES Debug )
+
+  # On linux we need to set this because some of the libraries are Static
+  # and some are shared.
+  if( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" AND NOT MSVC )
+    target_compile_definitions(${Z_TARGET} PRIVATE -fPIC)
+  endif()
+
+  # --------------------------------------------------------------------
+  # If was are using GCC, make the compiler messages on a single line
+  if(CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fmessage-length=0")
+  endif(CMAKE_COMPILER_IS_GNUCC)
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
+  endif(CMAKE_COMPILER_IS_GNUCXX)
+
+  if(MSVC)
+    target_compile_definitions(${Z_TARGET} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(${Z_TARGET} PRIVATE -D_SCL_SECURE_NO_WARNINGS)
+    option(SIMPL_DISABLE_MSVC_WARNINGS "Disable some MSVC Compiler warnings" OFF)
+    if(SIMPL_DISABLE_MSVC_WARNINGS)
+      set(SIMPLib_DISABLE_MSVC_WARNINGS "1")
+    endif()
+  endif()
 
 endfunction()
 

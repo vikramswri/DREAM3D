@@ -134,8 +134,6 @@ find_package(PCL)
 if (NOT PCL_FOUND)
   message(FATAL_ERROR "Unable to locate PCL")
 endif()
-include_directories(${PCL_INCLUDE_DIRS})
-
 
 # --------------------------------------------------------------------
 # If we are NOT on Apple platform then create the copy and install rules
