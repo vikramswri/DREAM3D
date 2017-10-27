@@ -1060,27 +1060,6 @@ macro(ConvertPathToHeaderCompatible INPUT)
     endif()
 endmacro()
 
-# --------------------------------------------------------------------------
-# Adds a Unit Test 
-function(AddSIMPLUnitTest)
-    set(options)
-    set(oneValueArgs TESTNAME FOLDER)
-    set(multiValueArgs SOURCES LINK_LIBRARIES INCLUDE_DIRS)
-    cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-
-    add_executable( ${Z_TESTNAME} "${Z_SOURCES}")
-    if("${Z_FOLDER}" STREQUAL "")
-        set(Z_FOLDER "Test")
-    endif()
-    set_target_properties( ${Z_TESTNAME} PROPERTIES FOLDER ${Z_FOLDER})
-    cmp_IDE_SOURCE_PROPERTIES( "" "" "${Z_SOURCES}" "0")
-    target_include_directories(${Z_TESTNAME} PUBLIC ${Z_INCLUDE_DIRS})
-    target_link_libraries( ${Z_TESTNAME} ${Z_LINK_LIBRARIES})
-    add_test(${Z_TESTNAME} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${Z_TESTNAME})
-
-endfunction()
-
-
 #-------------------------------------------------------------------------------
 # 
 function(CMP_MODULE_INCLUDE_DIRS)
@@ -1147,6 +1126,28 @@ function(CMP_AddDefinitions)
     target_compile_definitions(${Z_TARGET} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_definitions(${Z_TARGET} PRIVATE -D_SCL_SECURE_NO_WARNINGS)
   endif()
+
+endfunction()
+
+
+# --------------------------------------------------------------------------
+# Adds a Unit Test 
+function(AddSIMPLUnitTest)
+    set(options)
+    set(oneValueArgs TESTNAME FOLDER)
+    set(multiValueArgs SOURCES LINK_LIBRARIES INCLUDE_DIRS)
+    cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+    add_executable( ${Z_TESTNAME} "${Z_SOURCES}")
+    if("${Z_FOLDER}" STREQUAL "")
+        set(Z_FOLDER "Test")
+    endif()
+    set_target_properties( ${Z_TESTNAME} PROPERTIES FOLDER ${Z_FOLDER})
+    CMP_AddDefinitions(TARGET ${Z_TESTNAME} )
+    cmp_IDE_SOURCE_PROPERTIES( "" "" "${Z_SOURCES}" "0")
+    target_include_directories(${Z_TESTNAME} PUBLIC ${Z_INCLUDE_DIRS})
+    target_link_libraries( ${Z_TESTNAME} ${Z_LINK_LIBRARIES})
+    add_test(${Z_TESTNAME} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${Z_TESTNAME})
 
 endfunction()
 
