@@ -1110,16 +1110,16 @@ function(CMP_AddDefinitions)
   # On linux we need to set this because some of the libraries are Static
   # and some are shared.
   if( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" AND NOT MSVC )
-    target_compile_definitions(${Z_TARGET} PRIVATE -fPIC)
+    target_compile_options(${Z_TARGET} PRIVATE -fPIC)
   endif()
 
   # --------------------------------------------------------------------
   # If was are using GCC, make the compiler messages on a single line
   if(CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fmessage-length=0")
+    target_compile_options(${Z_TARGET} PRIVATE -fmessage-length=0)
   endif(CMAKE_COMPILER_IS_GNUCC)
   if(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
+    target_compile_options(${Z_TARGET} PRIVATE -fmessage-length=0)
   endif(CMAKE_COMPILER_IS_GNUCXX)
 
   if(MSVC AND SIMPL_DISABLE_MSVC_WARNINGS)
