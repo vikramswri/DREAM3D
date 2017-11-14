@@ -15,13 +15,13 @@ function printStatus()
 printStatus "************** Fixing up Tool @osx_app_name@ **********************"
 
 
-InstallPrefix="${1}"
+InstallPrefix="${1}/@DREAM3D_PACKAGE_DEST_PREFIX@"
 printStatus "InstallPrefix = ${InstallPrefix}"
 ProjectBinaryDir=@PROJECT_INSTALL_DIR@
 printStatus "ProjectBinaryDir = ${ProjectBinaryDir}"
 
-InstallPrefix="${1}"
-PackageInstallDest="${1}"
+InstallPrefix="${1}/@DREAM3D_PACKAGE_DEST_PREFIX@"
+PackageInstallDest="${1}/@DREAM3D_PACKAGE_DEST_PREFIX@"
 ProjectBinaryDir=@PROJECT_INSTALL_DIR@
 ApplicationName="@osx_app_name@"
 ApplicationExe="${InstallPrefix}/${ProjectBinaryDir}/${ApplicationName}"
