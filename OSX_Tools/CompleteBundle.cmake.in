@@ -91,10 +91,6 @@ if("${BUILD_TYPE}" STREQUAL "Debug")
   set(MAC_OS_APP_NAME @osx_app_name@${EXE_DEBUG_EXTENSION}.app)
 endif()
 
-if(APPLE)
-  FILE(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/@osx_app_name@")
-endif()
-
 # -- These are DREAM3D Plugins that need to be installed
 file(READ "@QAB_PLUGIN_LIST_FILE@" DREAM3D_PLUGINS)
 set(d3d_Plugins "")
@@ -198,10 +194,4 @@ if ("@SIMPLView_USE_QtWebEngine@" STREQUAL "ON")
                      WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Frameworks/QtWebEngineCore.framework/Helpers/QtWebEngineProcess.app/Contents" )
   endif()
 endif()
-
-# ------------------------------------------------------------------------------
-# Copy the Small IN100 directory to just to take up some extra room on the 
-# DMG File. This will then get deleted during the signing phase.
-FILE(COPY "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@/Data/SmallIN100"
-       DESTINATION "${CMAKE_INSTALL_PREFIX}/DeleteMe")
 
