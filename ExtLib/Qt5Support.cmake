@@ -473,7 +473,7 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
   AddQt5SupportLibraryCopyInstallRules( LIBRARIES ${Qt5_ICU_COMPONENTS} PREFIX "" DEBUG_SUFFIX "")
 
   #-- Let CMake determine which files need to have 'moc' run on them
-  set(CMAKE_AUTOMOC FALSE)
+  set(CMAKE_AUTOMOC TRUE)
 
   set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "Qt5AutoMocTargets")
 
