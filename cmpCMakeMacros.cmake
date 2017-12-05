@@ -1138,7 +1138,7 @@ function(AddSIMPLUnitTest)
     set(multiValueArgs SOURCES LINK_LIBRARIES INCLUDE_DIRS)
     cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
-    add_executable( ${Z_TESTNAME} "${Z_SOURCES}")
+    add_executable( ${Z_TESTNAME} ${Z_SOURCES})
     if("${Z_FOLDER}" STREQUAL "")
         set(Z_FOLDER "Test")
     endif()
