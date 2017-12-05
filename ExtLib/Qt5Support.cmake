@@ -172,7 +172,7 @@ function(AddQt5SupportLibraryCopyInstallRules)
   elseif(SUPPORT_LIB_OPTION EQUAL 1)
   # This should be the code path for Ninja/NMake/Makefiles all on NON-OS X systems
     set(SUFFIX "")
-    if( ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    if( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
         set(SUFFIX ${P_DEBUG_SUFFIX})
     endif()
     set(INT_DIR "")
