@@ -37,8 +37,4 @@ namespace @VERSION_GEN_NAMESPACE@
   };
 }
 
-
-
-
-
 #endif /* _@VERSION_INCLUDE_GUARD@_version_h_ */
