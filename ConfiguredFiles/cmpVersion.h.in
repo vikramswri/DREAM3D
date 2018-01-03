@@ -5,8 +5,8 @@
  * --------------------------------------------------------------------------*/
 
 
-#ifndef _@VERSION_GEN_NAMESPACE@_VERSION_H_
-#define _@VERSION_GEN_NAMESPACE@_VERSION_H_
+#ifndef _@VERSION_INCLUDE_GUARD@_version_h_
+#define _@VERSION_INCLUDE_GUARD@_version_h_
 
 
 #include <QtCore/QString>
@@ -41,4 +41,4 @@ namespace @VERSION_GEN_NAMESPACE@
 
 
 
-#endif /* _@VERSION_GEN_NAMESPACE@_VERSION_H_ */
+#endif /* _@VERSION_INCLUDE_GUARD@_version_h_ */

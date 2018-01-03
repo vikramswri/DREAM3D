@@ -49,7 +49,7 @@ QString @VERSION_GEN_NAMESPACE@::Version::Revision()
 //
 // -----------------------------------------------------------------------------
 QString @VERSION_GEN_NAMESPACE@::Version::Package()
-{ return QString("@VERSION_GEN_VER_MAJOR@.@VERSION_GEN_VER_MINOR@");}
+{ return QString("@VERSION_GEN_VER_MAJOR@.@VERSION_GEN_VER_MINOR@.@VERSION_GEN_VER_PATCH@");}
 
 
 // -----------------------------------------------------------------------------
