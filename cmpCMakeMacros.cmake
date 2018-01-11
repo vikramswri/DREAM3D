@@ -621,11 +621,13 @@ macro(CMP_COPY_DEPENDENT_LIBRARIES _libraryList)
             set(BTYPE ".")
           endif()
           if(NOT TARGET ZZ_${upperlib}_DLL_${TYPE}-Copy)
-          ADD_CUSTOM_TARGET(ZZ_${upperlib}_DLL_${TYPE}-Copy ALL
-                          COMMAND ${CMAKE_COMMAND} -E copy_if_different ${${upperlib}_LIBRARY_DLL_${TYPE}}
-                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/
-                          COMMENT "  Copy: ${${upperlib}_LIBRARY_DLL_${TYPE}}\n    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/")
-          set_target_properties(ZZ_${upperlib}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/${upperlib})
+            ADD_CUSTOM_TARGET(ZZ_${upperlib}_DLL_${TYPE}-Copy ALL
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${${upperlib}_LIBRARY_DLL_${TYPE}}
+                            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/
+                            COMMENT "  Copy: ${${upperlib}_LIBRARY_DLL_${TYPE}}\n    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${BTYPE}/")
+            set_target_properties(ZZ_${upperlib}_DLL_${TYPE}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${BTYPE}/${upperlib})
+            get_property(COPY_LIBRARY_TARGETS GLOBAL PROPERTY COPY_LIBRARY_TARGETS)
+            set_property(GLOBAL PROPERTY COPY_LIBRARY_TARGETS ${COPY_LIBRARY_TARGETS} ZZ_${upperlib}_DLL_${TYPE}-Copy) 
           endif()
         ENDFOREACH(BTYPE ${TYPES})
       endif(${upperlib}_IS_SHARED)

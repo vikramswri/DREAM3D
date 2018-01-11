@@ -61,7 +61,8 @@ function(AddQwtCopyInstallRules)
 		              COMMENT "  Copy: ${DLL_VAR}    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
 		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${INT_DIR}/Qwt)
 		install(FILES ${DLL_VAR}  DESTINATION "${destination}" CONFIGURATIONS ${INT_DIR} COMPONENT Applications)
-
+        get_property(COPY_LIBRARY_TARGETS GLOBAL PROPERTY COPY_LIBRARY_TARGETS)
+        set_property(GLOBAL PROPERTY COPY_LIBRARY_TARGETS ${COPY_LIBRARY_TARGETS} ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy) 
 	elseif(SUPPORT_LIB_OPTION EQUAL 1)
 		# This should happen for things like NMake and Ninja
 		# Create a Copy/Install for the Debug Builds
@@ -79,6 +80,8 @@ function(AddQwtCopyInstallRules)
 		              COMMENT "  Copy: ${DLL_VAR}    To: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${INT_DIR}/")
 		set_target_properties(ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy PROPERTIES FOLDER ZZ_COPY_FILES/${INT_DIR}/Qwt)
 		install(FILES ${DLL_VAR}  DESTINATION "${destination}" CONFIGURATIONS ${CMAKE_BUILD_TYPE} COMPONENT Applications)
+        get_property(COPY_LIBRARY_TARGETS GLOBAL PROPERTY COPY_LIBRARY_TARGETS)
+        set_property(GLOBAL PROPERTY COPY_LIBRARY_TARGETS ${COPY_LIBRARY_TARGETS} ZZ_${P_CMAKE_VAR}_DLL_${INT_DIR}-Copy) 
 	elseif(SUPPORT_LIB_OPTION EQUAL 3)
 
 		if(CMAKE_SYSTEM_NAME MATCHES "Linux")
