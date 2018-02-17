@@ -183,7 +183,7 @@ FILE(APPEND "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Resources/qt.co
 
 # ----------------------------------------------------
 # Copy the QtWebEngine parts of the QtWebEngineCore Framework
-if ("@SIMPLView_USE_QtWebEngine@" STREQUAL "ON")
+if ("@SIMPL_USE_QtWebEngine@" STREQUAL "ON")
 
   FILE(COPY "${qtLibDir}/QtWebEngineCore.framework/Versions/5/Helpers"
         DESTINATION "${CMAKE_INSTALL_PREFIX}/${MAC_OS_APP_NAME}/Contents/Frameworks/QtWebEngineCore.framework/Versions/5/")

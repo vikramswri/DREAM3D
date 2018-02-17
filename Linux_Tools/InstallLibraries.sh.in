@@ -87,7 +87,7 @@ done
 
 # ----------------------------------------------------
 # Copy the QtWebEngine parts of the QtWebEngineCore 
-if [ "@SIMPLView_USE_QtWebEngine@" = "ON" ];
+if [ "@SIMPL_USE_QtWebEngine@" = "ON" ];
   then
     if [ ! -e "${InstallPrefix}/bin/resources" ];
       then
