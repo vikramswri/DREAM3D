@@ -526,37 +526,80 @@ endmacro(StaticLibraryProperties)
 #-------------------------------------------------------------------------------
 # This is used if you are creating a plugin that needs to be installed
 #-------------------------------------------------------------------------------
-macro(PluginProperties targetName DEBUG_EXTENSION projectVersion binaryDir pluginfile)
-    if( NOT BUILD_SHARED_LIBS AND MSVC)
-      set_target_properties( ${targetName}
-        PROPERTIES
-        DEBUG_OUTPUT_NAME lib${targetName}
-        RELEASE_OUTPUT_NAME lib${targetName}  )
-    endif()
+function(PluginProperties)
+    set(options )
+    set(oneValueArgs TARGET_NAME DEBUG_EXTENSION VERSION LIB_SUFFIX FOLDER OUTPUT_NAME BINARY_DIR PLUGIN_FILE)
+    set(multiValueArgs )
+    cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     #-- Set the Debug and Release names for the libraries
-    set_target_properties( ${targetName}
+    set_target_properties( ${Z_TARGET_NAME}
         PROPERTIES
-        DEBUG_POSTFIX ${DEBUG_EXTENSION}
-        SUFFIX ".plugin" )
+        DEBUG_POSTFIX ${Z_DEBUG_EXTENSION}
+        SUFFIX ${Z_LIB_SUFFIX}
+        FOLDER ${Z_FOLDER}Plugin
+        OUTPUT_NAME ${Z_OUTPUT_NAME}
+    )
+
+    if( NOT BUILD_SHARED_LIBS AND MSVC)
+      set_target_properties( ${Z_TARGET_NAME}
+        PROPERTIES
+        DEBUG_OUTPUT_NAME lib${Z_OUTPUT_NAME}
+        RELEASE_OUTPUT_NAME lib${Z_OUTPUT_NAME} 
+        )
+    endif()
+
+    if(NOT MSVC)
+        set_target_properties (${Z_TARGET_NAME} PROPERTIES
+            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Plugins    
+        )
+    endif()
 
     # Add the plugin to our list of plugins that will need to be installed
     if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT MSVC)
-        file(APPEND ${pluginfile} "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}${DEBUG_EXTENSION}.plugin;")
+        file(APPEND ${Z_PLUGIN_FILE} "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${Z_TARGET_NAME}${Z_DEBUG_EXTENSION}.plugin;")
     else()
-        file(APPEND ${pluginfile} "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${targetName}.plugin;")
+        file(APPEND ${Z_PLUGIN_FILE} "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${Z_TARGET_NAME}.plugin;")
     endif()
 
     if(NOT APPLE)
         set(BUILD_TYPES "Debug;Release")
         foreach(btype ${BUILD_TYPES})
-            install(TARGETS ${targetName}
+            install(TARGETS ${Z_TARGET_NAME}
                     DESTINATION ./Plugins
                     CONFIGURATIONS ${btype}
                     COMPONENT Applications)
         endforeach()
     endif()
-endmacro()
+
+    # --------------------------------------------------------------------
+    # Add in some compiler definitions
+    # --------------------------------------------------------------------
+    if( CMAKE_BUILD_TYPE MATCHES Debug )
+        target_compile_definitions(${Z_TARGET_NAME} PRIVATE -DDEBUG)
+    endif( CMAKE_BUILD_TYPE MATCHES Debug )
+
+    # On linux we need to set this because some of the libraries are Static
+    # and some are shared.
+    if( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" AND NOT MSVC )
+        target_compile_options(${Z_TARGET_NAME} PRIVATE -fPIC)
+    endif()
+
+    # --------------------------------------------------------------------
+    # If was are using GCC, make the compiler messages on a single line
+    if(CMAKE_COMPILER_IS_GNUCC)
+        target_compile_options(${Z_TARGET_NAME} PRIVATE -fmessage-length=0)
+    endif(CMAKE_COMPILER_IS_GNUCC)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        target_compile_options(${Z_TARGET_NAME} PRIVATE -fmessage-length=0)
+    endif(CMAKE_COMPILER_IS_GNUCXX)
+
+    if(MSVC AND SIMPL_DISABLE_MSVC_WARNINGS)
+        target_compile_definitions(${Z_TARGET_NAME} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+        target_compile_definitions(${Z_TARGET_NAME} PRIVATE -D_SCL_SECURE_NO_WARNINGS)
+    endif()
+
+endfunction()
 
 # --------------------------------------------------------------------
 #-- Copy all the dependent DLLs into the current build directory so that the test
