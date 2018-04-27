@@ -147,7 +147,7 @@ set(DREAM3D_CORE_ITK_MODULES
     ITKClassifiers
     #ITKConnectedComponents
     ITKTransform
-  
+    ITKOptimizers
     #Other
     ITKReview
     
