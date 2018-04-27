@@ -10,9 +10,8 @@
 
 
 #include <QtCore/QString>
-
-#include "@CMP_TOP_HEADER_FILE@"
-
+ 
+@CMP_TOP_HEADER_INCLUDE_STATMENT@
 
 namespace @VERSION_GEN_NAMESPACE@
 {

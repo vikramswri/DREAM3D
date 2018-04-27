@@ -531,6 +531,10 @@ function(PluginProperties)
     set(oneValueArgs TARGET_NAME DEBUG_EXTENSION VERSION LIB_SUFFIX FOLDER OUTPUT_NAME BINARY_DIR PLUGIN_FILE)
     set(multiValueArgs )
     cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+    
+    string(REPLACE "."
+       "_" ARCHIVE_SUFFIX
+       ${Z_LIB_SUFFIX})
 
     #-- Set the Debug and Release names for the libraries
     set_target_properties( ${Z_TARGET_NAME}
@@ -539,6 +543,7 @@ function(PluginProperties)
         SUFFIX ${Z_LIB_SUFFIX}
         FOLDER ${Z_FOLDER}Plugin
         OUTPUT_NAME ${Z_OUTPUT_NAME}
+        ARCHIVE_OUTPUT_NAME ${Z_OUTPUT_NAME}${ARCHIVE_SUFFIX}
     )
 
     if( NOT BUILD_SHARED_LIBS AND MSVC)
@@ -1000,7 +1005,10 @@ function(cmpGitRevisionString)
 
   set(${GVS_PROJECT_NAME}_VERSION_PATCH "${VERSION_GEN_VER_PATCH}" PARENT_SCOPE)
   set(${GVS_PROJECT_NAME}_VERSION_TWEAK "${VERSION_GEN_VER_REVISION}" PARENT_SCOPE)
-
+  set(CMP_TOP_HEADER_INCLUDE_STATMENT "")
+  if(NOT "${CMP_TOP_HEADER_FILE}" STREQUAL "")
+    set(CMP_TOP_HEADER_INCLUDE_STATMENT "#include \"${CMP_TOP_HEADER_FILE}\"")
+  endif()
   if(NOT "${GVS_GENERATED_HEADER_FILE_PATH}" STREQUAL "")
     #message(STATUS "Generating: ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_HEADER_FILE_PATH}")
     cmpConfigureFileWithMD5Check( GENERATED_FILE_PATH        ${${GVS_PROJECT_NAME}_BINARY_DIR}/${GVS_GENERATED_HEADER_FILE_PATH}
