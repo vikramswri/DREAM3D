@@ -528,7 +528,7 @@ endmacro(StaticLibraryProperties)
 #-------------------------------------------------------------------------------
 function(PluginProperties)
     set(options )
-    set(oneValueArgs TARGET_NAME DEBUG_EXTENSION VERSION LIB_SUFFIX FOLDER OUTPUT_NAME BINARY_DIR PLUGIN_FILE)
+    set(oneValueArgs TARGET_NAME DEBUG_EXTENSION VERSION LIB_SUFFIX FOLDER OUTPUT_NAME BINARY_DIR PLUGIN_FILE INSTALL_DEST)
     set(multiValueArgs )
     cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
     
@@ -571,9 +571,11 @@ function(PluginProperties)
         set(BUILD_TYPES "Debug;Release")
         foreach(btype ${BUILD_TYPES})
             install(TARGETS ${Z_TARGET_NAME}
-                    DESTINATION ./Plugins
+                    DESTINATION ${Z_INSTALL_DEST}
                     CONFIGURATIONS ${btype}
-                    COMPONENT Applications)
+                    COMPONENT Applications
+                    ARCHIVE DESTINATION lib
+                    )
         endforeach()
     endif()
 
