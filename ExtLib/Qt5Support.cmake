@@ -478,6 +478,11 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
     set(Qt5_ICU_COMPONENTS "")
   endif()
 
+  # QT 5.10.x
+  if (QM_QT_VERSION VERSION_GREATER 5.9.99 AND QM_QT_VERSION VERSION_LESS 5.10.99)
+    set(Qt5_ICU_COMPONENTS "")
+  endif()
+
   if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(Qt5_ICU_COMPONENTS icui18n icuuc icudata)
   endif()
@@ -546,9 +551,6 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
                 PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
                 PLUGIN_TYPE accessible)
   endif()
-
-  # Append the locations of the Qt libraries to our Library Search Paths
-  list(APPEND CMP_LIB_SEARCH_DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR} )
 
   # Append the locations of the Qt libraries to our Library Search Paths
   list(APPEND CMP_LIB_SEARCH_DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR} )
