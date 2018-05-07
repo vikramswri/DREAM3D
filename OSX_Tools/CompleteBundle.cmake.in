@@ -130,13 +130,22 @@ execute_process(
 # This gets populated from the 'configure_file' stage of cmake
 set(Qt5_MODULES "@QAB_QT5_MODULES@")
 
-# If we link against Qt5Gui then we need this plugin on OS X
+# If we link against Qt5Gui then we need these plugins on OS X
 list(FIND Qt5_MODULES "Gui" moduleFound)
 if(moduleFound GREATER -1)
   CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "platforms" PLUGIN_NAME "libqcocoa.dylib")
   CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "printsupport" PLUGIN_NAME "libcocoaprintersupport.dylib")
-  CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "bearer" PLUGIN_NAME "libqcorewlanbearer.dylib")
   CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "bearer" PLUGIN_NAME "libqgenericbearer.dylib")
+endif()
+
+# If we are less that Qt 5.10.0 then also copy the libqcorewlanbearer.dylib library.
+if ("@QM_QT_VERSION@" VERSION_LESS "5.10.0")
+  CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "bearer" PLUGIN_NAME "libqcorewlanbearer.dylib")
+endif()
+
+# If we are Qt 5.10.x then also copy the libqmacstyle.dylib library from the Styles plugin dir.
+if ("@QM_QT_VERSION@" VERSION_GREATER 5.9.99 AND "@QM_QT_VERSION@" VERSION_LESS 5.10.99)
+  CopyQt5Plugin(QT5_PLUGIN_DIR "${qtPluginsPath}" PLUGIN_GROUP "styles" PLUGIN_NAME "libqmacstyle.dylib")
 endif()
 
 
