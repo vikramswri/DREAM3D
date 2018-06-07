@@ -86,7 +86,7 @@ if("${libharu_INSTALL}" STREQUAL "")
 endif()
 
 
-message(STATUS "libharu_DIR: ${libharu_DIR}")
+#message(STATUS "libharu_DIR: ${libharu_DIR}")
 
 find_package(libharu)
 if(NOT libharu_FOUND)
@@ -97,8 +97,8 @@ if(libharu_FOUND)
   # Add the library directory to the file that has all the search directories stored in it.
   get_property(libharu_STATUS_PRINTED GLOBAL PROPERTY libharu_STATUS_PRINTED)
   if(NOT libharu_STATUS_PRINTED)
-    message(STATUS "libharu Location: ${libharu_INSTALL}")
-    message(STATUS "libharu Version: ${libharu_VERSION_STRING}")
+    message(STATUS "libharu Location: ${libharu_DIR}")
+    #message(STATUS "libharu Version: ${libharu_VERSION_STRING}")
     set_property(GLOBAL PROPERTY libharu_STATUS_PRINTED TRUE)
 
     GET_FILENAME_COMPONENT (libharu_LIBRARY_DIRS "${libharu_INCLUDE_DIR}" PATH)
