@@ -528,6 +528,27 @@ macro(CMP_AddQt5Support Qt5Components NeedQtWebEngine ProjectBinaryDir VarPrefix
                   PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
                   PLUGIN_SUFFIX Plugin
                   PLUGIN_TYPE platforms)
+      AddQt5Plugins(PLUGIN_NAMES QWindowsDirect2DIntegration
+                  PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                  PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                  PLUGIN_SUFFIX Plugin
+                  PLUGIN_TYPE platforms)
+      AddQt5Plugins(PLUGIN_NAMES QMinimalIntegration
+                  PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                  PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                  PLUGIN_SUFFIX Plugin
+                  PLUGIN_TYPE platforms)
+       AddQt5Plugins(PLUGIN_NAMES QOffscreenIntegration
+                  PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                  PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                  PLUGIN_SUFFIX Plugin
+                  PLUGIN_TYPE platforms)
+
+      AddQt5Plugins(PLUGIN_NAMES QWindowsVistaStyle
+                  PLUGIN_FILE "${QT_PLUGINS_FILE}"
+                  PLUGIN_FILE_TEMPLATE "${QT_PLUGINS_FILE_TEMPLATE}"
+                  PLUGIN_SUFFIX Plugin
+                  PLUGIN_TYPE styles)
     endif()
 
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
