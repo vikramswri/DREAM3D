@@ -10,9 +10,9 @@ function(AddlibharuCopyInstallRules)
   cmake_parse_arguments(Z "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   set(INTER_DIR ".")
 
-  message(STATUS "Z_LIBVAR: ${Z_LIBVAR}")
-  message(STATUS "Z_LIBNAME: ${Z_LIBNAME}")
-  message(STATUS "Z_TYPES: ${Z_TYPES}")
+  # message(STATUS "Z_LIBVAR: ${Z_LIBVAR}")
+  # message(STATUS "Z_LIBNAME: ${Z_LIBNAME}")
+  # message(STATUS "Z_TYPES: ${Z_TYPES}")
 
   set(Z_INSTALL_DIR "lib")
   if(WIN32)
@@ -30,7 +30,7 @@ function(AddlibharuCopyInstallRules)
     GET_TARGET_PROPERTY(LibPath ${Z_LIBNAME} IMPORTED_LOCATION_${TYPE})
     #  message(STATUS "LibPath: ${LibPath}")
     if(NOT "${LibPath}" STREQUAL "LibPath-NOTFOUND")
-      message(STATUS "Creating Install Rule for ${LibPath}")
+      # message(STATUS "Creating Install Rule for ${LibPath}")
       if(NOT TARGET ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy)
         ADD_CUSTOM_TARGET(ZZ_${Z_LIBVAR}_DLL_${TYPE}-Copy ALL
                             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LibPath}
