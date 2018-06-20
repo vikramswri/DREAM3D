@@ -534,7 +534,7 @@ function(PluginProperties)
     
     string(REPLACE "."
        "_" ARCHIVE_SUFFIX
-       ${Z_LIB_SUFFIX})
+       "${Z_LIB_SUFFIX}")
 
     #-- Set the Debug and Release names for the libraries
     set_target_properties( ${Z_TARGET_NAME}
