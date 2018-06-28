@@ -28,11 +28,11 @@
 #
 # This module reads hints about search locations from variables:
 #  ENV TBB_ARCH_PLATFORM - for eg. set it to "mic" for Xeon Phi builds
-#  ENV TBB_ROOT or just TBB_ROOT - root directory of tbb installation
+#  ENV TBB_INSTALL_DIR or just TBB_INSTALL_DIR - root directory of tbb installation
 #  ENV TBB_BUILD_PREFIX - specifies the build prefix for user built tbb
-#                         libraries. Should be specified with ENV TBB_ROOT
+#                         libraries. Should be specified with ENV TBB_INSTALL_DIR
 #                         and optionally...
-#  ENV TBB_BUILD_DIR - if build directory is different than ${TBB_ROOT}/build
+#  ENV TBB_BUILD_DIR - if build directory is different than ${TBB_INSTALL_DIR}/build
 #
 #
 # Modified by Robert Maynard from the original OGRE source
@@ -128,23 +128,23 @@ endmacro()
 #
 
 # Get path, convert backslashes as ${ENV_${var}}
-getenv_path(TBB_ROOT)
+getenv_path(TBB_INSTALL_DIR)
 
 # initialize search paths
-set(TBB_PREFIX_PATH ${TBB_ROOT} ${ENV_TBB_ROOT})
+set(TBB_PREFIX_PATH ${TBB_INSTALL_DIR} ${ENV_TBB_INSTALL_DIR})
 set(TBB_INC_SEARCH_PATH "")
 set(TBB_LIB_SEARCH_PATH "")
 
 
 # If user built from sources
 set(TBB_BUILD_PREFIX $ENV{TBB_BUILD_PREFIX})
-if (TBB_BUILD_PREFIX AND ENV_TBB_ROOT)
+if (TBB_BUILD_PREFIX AND ENV_TBB_INSTALL_DIR)
   getenv_path(TBB_BUILD_DIR)
   if (NOT ENV_TBB_BUILD_DIR)
-    set(ENV_TBB_BUILD_DIR ${ENV_TBB_ROOT}/build)
+    set(ENV_TBB_BUILD_DIR ${ENV_TBB_INSTALL_DIR}/build)
   endif ()
 
-  # include directory under ${ENV_TBB_ROOT}/include
+  # include directory under ${ENV_TBB_INSTALL_DIR}/include
   list(APPEND TBB_LIB_SEARCH_PATH
     ${ENV_TBB_BUILD_DIR}/${TBB_BUILD_PREFIX}_release
     ${ENV_TBB_BUILD_DIR}/${TBB_BUILD_PREFIX}_debug)
@@ -374,10 +374,10 @@ endif()
 
 
 if(TBB_FOUND)
-    set(TBB_BIN_DIR ${TBB_ROOT}/bin/${TBB_ARCH_TYPE}/${COMPILER_PREFIX} CACHE PATH "TBB Binary Directory")
+    set(TBB_BIN_DIR ${TBB_INSTALL_DIR}/bin/${TBB_ARCH_TYPE}/${COMPILER_PREFIX} CACHE PATH "TBB Binary Directory")
     mark_as_advanced(TBB_BIN_DIR)
     #message(STATUS "TBB_BIN_DIR: ${TBB_BIN_DIR}")
-    set(TBB_MALLOC_BIN_DIR ${TBB_ROOT}/bin/${TBB_ARCH_TYPE}/${COMPILER_PREFIX} CACHE PATH "TBB Binary Directory")
+    set(TBB_MALLOC_BIN_DIR ${TBB_INSTALL_DIR}/bin/${TBB_ARCH_TYPE}/${COMPILER_PREFIX} CACHE PATH "TBB Binary Directory")
     mark_as_advanced(TBB_MALLOC_BIN_DIR)
     #message(STATUS "TBB_MALLOC_BIN_DIR: ${TBB_MALLOC_BIN_DIR}")
 
@@ -388,7 +388,7 @@ if(TBB_FOUND)
 
     get_property(TBB_STATUS_PRINTED GLOBAL PROPERTY TBB_STATUS_PRINTED)
     if(NOT TBB_STATUS_PRINTED)
-      message(STATUS "Intel TBB Location: ${TBB_ROOT}")
+      message(STATUS "Intel TBB Location: ${TBB_INSTALL_DIR}")
       set_property(GLOBAL PROPERTY TBB_STATUS_PRINTED TRUE)
     endif()
 
