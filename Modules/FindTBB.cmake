@@ -181,9 +181,11 @@ if (WIN32 AND MSVC)
     set(COMPILER_PREFIX "vc14")
   elseif(MSVC_VERSION EQUAL 1913) # Visual Studio 2017 uses same libs as 2015
     set(COMPILER_PREFIX "vc14")
-    elseif(MSVC_VERSION EQUAL 1914) # Visual Studio 2017 uses same libs as 2015
+  elseif(MSVC_VERSION EQUAL 1914) # Visual Studio 2017 uses same libs as 2015
     set(COMPILER_PREFIX "vc14")
-  else()
+    elseif(MSVC_VERSION EQUAL 1915) # Visual Studio 2017 uses same libs as 2015
+    set(COMPILER_PREFIX "vc14")  
+    else()
     message(FATAL_ERROR "Unknown version of MSVC: ${MSVC_VERSION}")
   endif ()
 
