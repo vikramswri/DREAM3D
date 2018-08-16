@@ -81,8 +81,8 @@ endfunction()
 # TBB now comes with everything that is needed for CMake to load
 # up the targets (Exported) that it needs. We just need to find where TBB is installed.
 #------------------------------------------------------------------------------
-#message(STATUS "TBB_DIR: ${TBB_DIR}")
-GET_FILENAME_COMPONENT(TBB_INSTALL ${TBB_DIR} PATH)
+message(STATUS "TBB_DIR: ${TBB_DIR}")
+GET_FILENAME_COMPONENT(TBB_INSTALL "${TBB_DIR}" PATH)
 
 find_package(TBB NAMES TBB)
 if(NOT TBB_FOUND)
