@@ -122,15 +122,6 @@ if(TBB_FOUND)
                         TYPES ${BUILD_TYPES})
   endif()
 
-  # The next CMake variable is needed for Linux to properly generate a shell script
-  # that will properly install the TBB files.
-  if(NOT APPLE AND NOT WIN32)
-    STRING(TOUPPER "${CMAKE_BUILD_TYPE}" TYPE)
-    get_target_property(TBB_C_LIB_PATH ${TBB_C_TARGET_NAME} IMPORTED_LOCATION_${TYPE})
-    get_target_property(TBB_CXX_LIB_PATH ${TBB_CXX_TARGET_NAME} IMPORTED_LOCATION_${TYPE})
-    set(TBB_COMPONENTS ${TBB_C_LIB_PATH} ${TBB_CXX_LIB_PATH})
-  endif()
-
 ELSE(TBB_FOUND)
     MESSAGE(FATAL_ERROR "Cannot build without TBB.  Please set TBB_INSTALL environment variable to point to your TBB installation.")
 ENDif(TBB_FOUND)
