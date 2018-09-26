@@ -1,0 +1,52 @@
+[submodule "Submodules/SIMPLView"]
+	path = Submodules/SIMPLView
+	url = https://github.com/bluequartzsoftware/SIMPLView
+	branch = develop
+[submodule "Submodules/SIMPL"]
+	path = Submodules/SIMPL
+	url = https://github.com/bluequartzsoftware/SIMPL
+	branch = develop
+[submodule "Submodules/CMP"]
+	path = Submodules/CMP
+	url = https://github.com/bluequartzsoftware/CMP
+	branch = develop
+[submodule "Submodules/Plugins/Anisotropy"]
+	path = Submodules/Plugins/Anisotropy
+	url = https://github.com/dream3d/Anisotropy
+	branch = develop
+[submodule "Submodules/Plugins/DDDAnalysisToolbox"]
+	path = Submodules/Plugins/DDDAnalysisToolbox
+	url = https://github.com/dream3d/DDDAnalysisToolbox
+	branch = develop
+[submodule "Submodules/Plugins/DREAM3DReview"]
+	path = Submodules/Plugins/DREAM3DReview
+	url = https://github.com/dream3d/DREAM3DReview
+	branch = develop
+[submodule "Submodules/Plugins/HEDMAnalysis"]
+	path = Submodules/Plugins/HEDMAnalysis
+	url = https://github.com/dream3d/HEDMAnalysis
+	branch = develop
+[submodule "Submodules/Plugins/ITKImageProcessing"]
+	path = Submodules/Plugins/ITKImageProcessing
+	url = https://github.com/bluequartzsoftware/ITKImageProcessing
+	branch = develop
+[submodule "Submodules/Plugins/ImageProcessing"]
+	path = Submodules/Plugins/ImageProcessing
+	url = https://github.com/dream3d/ImageProcessing
+	branch = develop
+[submodule "Submodules/Plugins/MASSIFUtilities"]
+	path = Submodules/Plugins/MASSIFUtilities
+	url = https://github.com/dream3d/MASSIFUtilities
+	branch = develop
+[submodule "Submodules/Plugins/SimulationIO"]
+	path = Submodules/Plugins/SimulationIO
+	url = https://github.com/bluequartzsoftware/SimulationIO
+	branch = develop
+[submodule "Submodules/Plugins/TransformationPhase"]
+	path = Submodules/Plugins/TransformationPhase
+	url = https://github.com/dream3d/TransformationPhase
+	branch = develop
+[submodule "Submodules/Plugins/UCSBUtilities"]
+	path = Submodules/Plugins/UCSBUtilities
+	url = https://github.com/dream3d/UCSBUtilities
+	branch = develop

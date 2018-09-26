@@ -77,23 +77,35 @@ function(DREAM3D_ADD_PLUGINS)
 
 
       if(NOT DEFINED ${d3dPlugin}_SOURCE_DIR)
-          set(pluginSearchDir ${PROJECT_CODE_DIR}/Plugins/${d3dPlugin})
-          if(EXISTS ${pluginSearchDir})
-            set(${d3dPlugin}_SOURCE_DIR ${pluginSearchDir} CACHE PATH "")
-            message(STATUS "Plugin: Defining ${d3dPlugin}_SOURCE_DIR to ${${d3dPlugin}_SOURCE_DIR}")
-          else()
+          set(PluginSearchDirs 
+                    ${PROJECT_CODE_DIR}/Plugins/${d3dPlugin} 
+                    ${DREAM3D_ExternalProject_DIR}/Plugins/${d3dPlugin} 
+                    ${DREAM3D_PARENT_DIR}/DREAM3D_Plugins/${d3dPlugin}
+                    )
+          foreach()
+            if(EXISTS ${pluginSearchDir})
+              set(${d3dPlugin}_SOURCE_DIR ${pluginSearchDir} CACHE PATH "")
+              message(STATUS "Plugin: Defining ${d3dPlugin}_SOURCE_DIR to ${${d3dPlugin}_SOURCE_DIR}")
+            endif()
+          endforeach(pluginSearchDir ${PluginSearchDirs})
+          
+          # set(pluginSearchDir ${PROJECT_CODE_DIR}/Plugins/${d3dPlugin})
+          # if(EXISTS ${pluginSearchDir})
+          #   set(${d3dPlugin}_SOURCE_DIR ${pluginSearchDir} CACHE PATH "")
+          #   message(STATUS "Plugin: Defining ${d3dPlugin}_SOURCE_DIR to ${${d3dPlugin}_SOURCE_DIR}")
+          # else()
 
-            set(pluginSearchDir ${DREAM3DProj_SOURCE_DIR}/ExternalProjects/Plugins/${d3dPlugin})
-            if(EXISTS ${pluginSearchDir})
-                set(${d3dPlugin}_SOURCE_DIR ${pluginSearchDir} CACHE PATH "")
-                message(STATUS "Plugin: Defining ${d3dPlugin}_SOURCE_DIR to ${${d3dPlugin}_SOURCE_DIR}")
-            endif()
-            set(pluginSearchDir ${DREAM3D_PARENT_DIR}/DREAM3D_Plugins/${d3dPlugin})
-            if(EXISTS ${pluginSearchDir})
-                set(${d3dPlugin}_SOURCE_DIR ${pluginSearchDir} CACHE PATH "")
-                message(STATUS "Plugin: Defining ${d3dPlugin}_SOURCE_DIR to ${${d3dPlugin}_SOURCE_DIR}")
-            endif()
-          endif()
+          #   set(pluginSearchDir ${DREAM3D_ExternalProject_DIR}/Plugins/${d3dPlugin})
+          #   if(EXISTS ${pluginSearchDir})
+          #       set(${d3dPlugin}_SOURCE_DIR ${pluginSearchDir} CACHE PATH "")
+          #       message(STATUS "Plugin: Defining ${d3dPlugin}_SOURCE_DIR to ${${d3dPlugin}_SOURCE_DIR}")
+          #   endif()
+          #   set(pluginSearchDir ${DREAM3D_PARENT_DIR}/DREAM3D_Plugins/${d3dPlugin})
+          #   if(EXISTS ${pluginSearchDir})
+          #       set(${d3dPlugin}_SOURCE_DIR ${pluginSearchDir} CACHE PATH "")
+          #       message(STATUS "Plugin: Defining ${d3dPlugin}_SOURCE_DIR to ${${d3dPlugin}_SOURCE_DIR}")
+          #   endif()
+          # endif()
       endif()
 
       # Mark these variables as advanced
@@ -129,7 +141,6 @@ set_property(GLOBAL PROPERTY PluginNumFilters ${PluginNumFilters})
 set(DREAM3D_BASE_PLUGINS
   EMMPM
   Generic
-  #ImageIO
   IO
   OrientationAnalysis
   Processing
@@ -138,7 +149,6 @@ set(DREAM3D_BASE_PLUGINS
   Statistics
   SurfaceMeshing
   SyntheticBuilding
-  #StatsGenerator
 )
 
 get_filename_component(DREAM3D_PARENT_DIR  ${DREAM3DProj_SOURCE_DIR} DIRECTORY)
