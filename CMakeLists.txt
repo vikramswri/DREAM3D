@@ -417,7 +417,7 @@ endif()
 #-------------------------------------------------------------------------------
 # Should we build the documentation
 get_property(SIMPLView_BUILD_DOCUMENTATION GLOBAL PROPERTY SIMPLView_BUILD_DOCUMENTATION)
-message(STATUS "SIMPLView_BUILD_DOCUMENTATION: ${SIMPLView_BUILD_DOCUMENTATION}")
+#message(STATUS "SIMPLView_BUILD_DOCUMENTATION: ${SIMPLView_BUILD_DOCUMENTATION}")
 if(SIMPLView_BUILD_DOCUMENTATION)
   set(DOCUMENTATION_RESOURCES_DIR ${DREAM3DProj_SOURCE_DIR}/Resources/DocConfigFiles)
 
@@ -448,6 +448,8 @@ file(APPEND "${SIMPLibSearchDirs}" "${CMP_LIB_SEARCH_DIRS};")
 
 message(STATUS "*******************************************************************************")
 message(STATUS "* DREAM.3D Configuration Summary")
+message(STATUS "* DREAM3D_VERSION_SHORT: ${DREAM3D_VERSION_SHORT}")
+message(STATUS "* DREAM3DProj_RELEASE_TYPE: ${DREAM3DProj_RELEASE_TYPE}")
 message(STATUS "* BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 message(STATUS "* System: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "* Version: ${CMAKE_SYSTEM_VERSION}")
