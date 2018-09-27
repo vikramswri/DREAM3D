@@ -82,7 +82,7 @@ function(DREAM3D_ADD_PLUGINS)
                     ${DREAM3D_ExternalProject_DIR}/Plugins/${d3dPlugin} 
                     ${DREAM3D_PARENT_DIR}/DREAM3D_Plugins/${d3dPlugin}
                     )
-          foreach()
+          foreach(pluginSearchDir ${PluginSearchDirs})
             if(EXISTS ${pluginSearchDir})
               set(${d3dPlugin}_SOURCE_DIR ${pluginSearchDir} CACHE PATH "")
               message(STATUS "Plugin: Defining ${d3dPlugin}_SOURCE_DIR to ${${d3dPlugin}_SOURCE_DIR}")
