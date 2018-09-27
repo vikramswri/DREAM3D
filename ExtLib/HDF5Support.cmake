@@ -85,7 +85,7 @@ if("${HDF5_INSTALL}" STREQUAL "")
     set(HDF5_INSTALL  $ENV{HDF5_INSTALL})
 endif()
 
-message(STATUS "HDF5_DIR: ${HDF5_DIR}")
+#message(STATUS "HDF5_DIR: ${HDF5_DIR}")
 
 find_package(HDF5 NAMES hdf5)
 if(NOT HDF5_FOUND)
