@@ -98,12 +98,8 @@ if(libharu_FOUND)
   get_property(libharu_STATUS_PRINTED GLOBAL PROPERTY libharu_STATUS_PRINTED)
   if(NOT libharu_STATUS_PRINTED)
     message(STATUS "libharu Location: ${libharu_DIR}")
-    #message(STATUS "libharu Version: ${libharu_VERSION_STRING}")
     set_property(GLOBAL PROPERTY libharu_STATUS_PRINTED TRUE)
-
-    GET_FILENAME_COMPONENT (libharu_LIBRARY_DIRS "${libharu_INCLUDE_DIR}" PATH)
-    set(libharu_LIBRARY_DIRS ${libharu_LIBRARY_DIRS}/lib)
-    file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${libharu_LIBRARY_DIRS};")
+    file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${libharu_LIB_DIRS};")
   endif()
 
   if(MSVC_IDE)
