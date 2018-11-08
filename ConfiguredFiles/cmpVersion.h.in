@@ -19,7 +19,12 @@ namespace @VERSION_GEN_NAMESPACE@
   class Version
   {
     public:
-      virtual ~Version();
+      ~Version() = default;
+      Version(const Version&) = delete; // Copy Constructor Not Implemented
+      Version(Version&&) = delete;      // Move Constructor Not Implemented
+      Version& operator=(const Version&) = delete; // Copy Assignment Not Implemented
+      Version& operator=(Version&&) = delete;      // Move Assignment Not Implemented
+
 
       static @VERSION_GEN_NAMESPACE_EXPORT@ QString Complete();
       static @VERSION_GEN_NAMESPACE_EXPORT@ QString Major   ();
@@ -31,7 +36,7 @@ namespace @VERSION_GEN_NAMESPACE@
       static @VERSION_GEN_NAMESPACE_EXPORT@ QString BuildDate();
 
     protected:
-      Version();
+      Version() = default;
 
   };
 }
