@@ -195,6 +195,11 @@ function(BuildQtAppBundle)
                 DEBUG_OUTPUT_NAME ${QAB_TARGET}${QAB_DEBUG_EXTENSION}
                 RELEASE_OUTPUT_NAME ${QAB_TARGET}
     )
+    # enable per object parallel compilation in this large library
+    if(MSVC)
+        target_compile_options(${QAB_TARGET} PRIVATE "/MP")
+    endif()
+    
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         set_target_properties( ${QAB_TARGET}
                 PROPERTIES
@@ -462,11 +467,16 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
 
     set_target_properties( ${targetName} PROPERTIES FOLDER ${targetName}Proj)
 
-
     #-- Set the Debug and Release names for the libraries
     set_target_properties( ${targetName}
         PROPERTIES
-        DEBUG_POSTFIX ${DEBUG_EXTENSION} )
+        DEBUG_POSTFIX ${DEBUG_EXTENSION}
+    )
+
+    # enable per object parallel compilation in this large library
+    if(MSVC)
+        target_compile_options(${targetName} PRIVATE "/MP")
+    endif()
 
     if(BUILD_SHARED_LIBS)
       if(APPLE)
@@ -483,14 +493,14 @@ macro(LibraryProperties targetName DEBUG_EXTENSION)
         # which point to directories outside the build tree to the install RPATH
         SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-    endif(APPLE)
+      endif(APPLE)
 
-    if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-      set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
-      set_target_properties( ${targetName}
-                PROPERTIES
-                INSTALL_RPATH \$ORIGIN/../lib)
-    endif()
+      if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+        set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
+        set_target_properties( ${targetName}
+                    PROPERTIES
+                    INSTALL_RPATH \$ORIGIN/../lib)
+      endif()
 
    endif( BUILD_SHARED_LIBS)
 
@@ -596,7 +606,7 @@ function(PluginProperties)
     endif()
 
     # --------------------------------------------------------------------
-    # If was are using GCC, make the compiler messages on a single line
+    # If we are using GCC, make the compiler messages on a single line
     if(CMAKE_COMPILER_IS_GNUCC)
         target_compile_options(${Z_TARGET_NAME} PRIVATE -fmessage-length=0)
     endif(CMAKE_COMPILER_IS_GNUCC)
@@ -607,6 +617,11 @@ function(PluginProperties)
     if(MSVC AND SIMPL_DISABLE_MSVC_WARNINGS)
         target_compile_definitions(${Z_TARGET_NAME} PRIVATE -D_CRT_SECURE_NO_WARNINGS)
         target_compile_definitions(${Z_TARGET_NAME} PRIVATE -D_SCL_SECURE_NO_WARNINGS)
+    endif()
+
+    # enable per object parallel compilation in this large library
+    if(MSVC)
+        target_compile_options(${Z_TARGET_NAME} PRIVATE "/MP")
     endif()
 
 endfunction()
