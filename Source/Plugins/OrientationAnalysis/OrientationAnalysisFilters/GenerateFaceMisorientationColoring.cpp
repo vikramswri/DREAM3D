@@ -85,9 +85,7 @@ public:
   {
     m_OrientationOps = LaueOps::getOrientationOpsQVector();
   }
-  virtual ~CalculateFaceMisorientationColorsImpl()
-  {
-  }
+  virtual ~CalculateFaceMisorientationColorsImpl() = default;
 
   void generate(size_t start, size_t end) const
   {
@@ -171,11 +169,6 @@ GenerateFaceMisorientationColoring::GenerateFaceMisorientationColoring()
 , m_FeaturePhasesArrayPath(SIMPL::Defaults::ImageDataContainerName, SIMPL::Defaults::CellFeatureAttributeMatrixName, SIMPL::FeatureData::Phases)
 , m_CrystalStructuresArrayPath(SIMPL::Defaults::ImageDataContainerName, SIMPL::Defaults::CellEnsembleAttributeMatrixName, SIMPL::EnsembleData::CrystalStructures)
 , m_SurfaceMeshFaceMisorientationColorsArrayName(SIMPL::FaceData::SurfaceMeshFaceMisorientationColors)
-, m_SurfaceMeshFaceLabels(nullptr)
-, m_AvgQuats(nullptr)
-, m_FeaturePhases(nullptr)
-, m_CrystalStructures(nullptr)
-, m_SurfaceMeshFaceMisorientationColors(nullptr)
 {
 }
 
@@ -362,7 +355,7 @@ void GenerateFaceMisorientationColoring::execute()
 #endif
 
 #ifdef SIMPL_USE_PARALLEL_ALGORITHMS
-  if(doParallel == true)
+  if(doParallel)
   {
     tbb::parallel_for(tbb::blocked_range<size_t>(0, numTriangles),
                       CalculateFaceMisorientationColorsImpl(m_SurfaceMeshFaceLabels, m_FeaturePhases, m_AvgQuats, m_SurfaceMeshFaceMisorientationColors, m_CrystalStructures), tbb::auto_partitioner());
@@ -383,7 +376,7 @@ void GenerateFaceMisorientationColoring::execute()
 AbstractFilter::Pointer GenerateFaceMisorientationColoring::newFilterInstance(bool copyFilterParameters) const
 {
   GenerateFaceMisorientationColoring::Pointer filter = GenerateFaceMisorientationColoring::New();
-  if(true == copyFilterParameters)
+  if(copyFilterParameters)
   {
     copyFilterParameterInstanceVariables(filter.get());
   }

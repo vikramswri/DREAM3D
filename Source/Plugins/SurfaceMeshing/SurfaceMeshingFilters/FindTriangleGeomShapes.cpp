@@ -61,12 +61,6 @@ FindTriangleGeomShapes::FindTriangleGeomShapes()
 , m_AxisLengthsArrayName(SIMPL::FeatureData::AxisLengths)
 , m_AxisEulerAnglesArrayName(SIMPL::FeatureData::AxisEulerAngles)
 , m_AspectRatiosArrayName(SIMPL::FeatureData::AspectRatios)
-, m_FaceLabels(nullptr)
-, m_Centroids(nullptr)
-, m_AxisEulerAngles(nullptr)
-, m_AxisLengths(nullptr)
-, m_Omega3s(nullptr)
-, m_AspectRatios(nullptr)
 , m_ScaleFactor(1.0f)
 {
   featuremoments = nullptr;
@@ -142,7 +136,7 @@ void FindTriangleGeomShapes::dataCheck()
   QVector<size_t> cDims(1, 2);
   m_FaceLabelsPtr = getDataContainerArray()->getPrereqArrayFromPath<DataArray<int32_t>, AbstractFilter>(this, getFaceLabelsArrayPath(),
                                                                                                         cDims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
-  if (nullptr != m_FaceLabelsPtr.lock().get())                                                                   /* Validate the Weak Pointer wraps a non-nullptr pointer to a DataArray<T> object */
+  if(nullptr != m_FaceLabelsPtr.lock())                                                                         /* Validate the Weak Pointer wraps a non-nullptr pointer to a DataArray<T> object */
   {
 	  m_FaceLabels = m_FaceLabelsPtr.lock()->getPointer(0);
   } /* Now assign the raw pointer to data from the DataArray<T> object */
@@ -151,7 +145,7 @@ void FindTriangleGeomShapes::dataCheck()
   cDims[0] = 3;
   m_CentroidsPtr = getDataContainerArray()->getPrereqArrayFromPath<DataArray<float>, AbstractFilter>(this, getCentroidsArrayPath(),
 	  cDims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
-  if (nullptr != m_CentroidsPtr.lock().get())                                                                 /* Validate the Weak Pointer wraps a non-nullptr pointer to a DataArray<T> object */
+  if(nullptr != m_CentroidsPtr.lock()) /* Validate the Weak Pointer wraps a non-nullptr pointer to a DataArray<T> object */
   {
 	  m_Centroids = m_CentroidsPtr.lock()->getPointer(0);
   } /* Now assign the raw pointer to data from the DataArray<T> object */
@@ -159,7 +153,7 @@ void FindTriangleGeomShapes::dataCheck()
   cDims[0] = 1;
   m_VolumesPtr = getDataContainerArray()->getPrereqArrayFromPath<DataArray<float>, AbstractFilter>(this, getVolumesArrayPath(),
 	  cDims); /* Assigns the shared_ptr<> to an instance variable that is a weak_ptr<> */
-  if (nullptr != m_VolumesPtr.lock().get())                                                                 /* Validate the Weak Pointer wraps a non-nullptr pointer to a DataArray<T> object */
+  if(nullptr != m_VolumesPtr.lock()) /* Validate the Weak Pointer wraps a non-nullptr pointer to a DataArray<T> object */
   {
 	  m_Volumes = m_VolumesPtr.lock()->getPointer(0);
   } /* Now assign the raw pointer to data from the DataArray<T> object */
@@ -709,7 +703,7 @@ void FindTriangleGeomShapes::execute()
 AbstractFilter::Pointer FindTriangleGeomShapes::newFilterInstance(bool copyFilterParameters) const
 {
   FindTriangleGeomShapes::Pointer filter = FindTriangleGeomShapes::New();
-  if(true == copyFilterParameters)
+  if(copyFilterParameters)
   {
     copyFilterParameterInstanceVariables(filter.get());
   }

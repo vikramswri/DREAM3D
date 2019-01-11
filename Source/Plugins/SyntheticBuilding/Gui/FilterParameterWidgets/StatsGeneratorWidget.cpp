@@ -192,16 +192,6 @@ void StatsGeneratorWidget::setupGui()
   // Catch when the filter wants its values updated
   connect(getFilter(), SIGNAL(updateFilterParameters(AbstractFilter*)), this, SLOT(filterNeedsInputParameters(AbstractFilter*)));
   
-  editPhase->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(editPhase->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::CogImagePath));
-  addPhase->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(addPhase->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::AddImagePath));
-  deletePhase->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(deletePhase->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::DeleteImagePath));
-
-  updatePipelineBtn->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(updatePipelineBtn->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::ReloadImagePath));
-  openStatsFile->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(openStatsFile->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::LoadImagePath));
-  saveJsonBtn->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(saveJsonBtn->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::ReloadImagePath));
-  saveH5Btn->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(saveH5Btn->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::HDFImagePath));
-
-
   // Hide the debugging buttons
   updatePipelineBtn->hide();
   saveJsonBtn->hide();
@@ -307,7 +297,7 @@ void StatsGeneratorWidget::beforePreflight()
   for(int i = 0; i < phaseTabs->count(); i++)
   {
     StatsGenWidget* sgwidget = qobject_cast<StatsGenWidget*>(phaseTabs->widget(i));
-    if(!qobject_cast<MatrixPhaseWidget*>(sgwidget) && !qobject_cast<BoundaryPhaseWidget*>(sgwidget) && !qobject_cast<TransformationPhaseWidget*>(sgwidget))
+    if((qobject_cast<MatrixPhaseWidget*>(sgwidget) == nullptr) && (qobject_cast<BoundaryPhaseWidget*>(sgwidget) == nullptr) && (qobject_cast<TransformationPhaseWidget*>(sgwidget) == nullptr))
     {
       if(!sgwidget->getDataHasBeenGenerated())
       {
@@ -505,7 +495,7 @@ void StatsGeneratorWidget::on_editPhase_clicked()
   else if(dialog.getPhaseType() == PhaseType::Type::Precipitate)
   {
     PrecipitatePhaseWidget* ppw = qobject_cast<PrecipitatePhaseWidget*>(sgwidget);
-    if(ppw)
+    if(ppw != nullptr)
     {
       dialog.setPptFraction(ppw->getPptFraction());
     }
@@ -513,7 +503,7 @@ void StatsGeneratorWidget::on_editPhase_clicked()
   else if(dialog.getPhaseType() == PhaseType::Type::Transformation)
   {
     TransformationPhaseWidget* tpw = qobject_cast<TransformationPhaseWidget*>(sgwidget);
-    if(tpw)
+    if(tpw != nullptr)
     {
       // dialog.setParentPhase(tpw->getParentPhase());
     }
@@ -645,7 +635,7 @@ bool StatsGeneratorWidget::verifyOutputPathParentExists(QString outFilePath, QLi
 bool StatsGeneratorWidget::verifyPathExists(const QString& outFilePath, QLineEdit* lineEdit)
 {
   QFileInfo fileinfo(outFilePath);
-  if(false == fileinfo.exists())
+  if(!fileinfo.exists())
   {
     lineEdit->setStyleSheet("border: 1px solid red;");
   }
@@ -758,7 +748,7 @@ void StatsGeneratorWidget::on_saveJsonBtn_clicked()
   QString proposedFile = m_OpenDialogLastFilePath + QDir::separator() + "Untitled.json";
   QString outFile = QFileDialog::getSaveFileName(this, tr("Save JSON File"), proposedFile, tr("JSON Files (*.json)"));
 
-  if(true == outFile.isEmpty())
+  if(outFile.isEmpty())
   {
     return;
   }
@@ -788,7 +778,9 @@ void StatsGeneratorWidget::on_saveJsonBtn_clicked()
 
   QFile file(outFile);
   if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+  {
     return;
+  }
 
   QByteArray binary = doc.toJson();
   file.write(binary.data(), binary.length());
@@ -803,7 +795,7 @@ void StatsGeneratorWidget::on_saveH5Btn_clicked()
 
   QString h5file = QFileDialog::getSaveFileName(this, tr("Save DREAM.3D File"), proposedFile, tr("DREAM.3D Files (*.dream3d)"));
 
-  if(true == h5file.isEmpty())
+  if(h5file.isEmpty())
   {
     return;
   }

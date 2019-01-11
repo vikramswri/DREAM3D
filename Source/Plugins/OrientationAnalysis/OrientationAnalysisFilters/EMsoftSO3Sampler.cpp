@@ -62,7 +62,6 @@ EMsoftSO3Sampler::EMsoftSO3Sampler()
 , m_OffsetGrid(false)
 , m_DataContainerName(SIMPL::Defaults::ImageDataContainerName)
 , m_EMsoftAttributeMatrixName(SIMPL::Defaults::CellAttributeMatrixName)
-, m_EulerAngles(nullptr)
 {
   m_RefOr.x = 0.0;
   m_RefOr.y = 0.0;
@@ -630,15 +629,21 @@ bool EMsoftSO3Sampler::IsinsideFZ(double* rod, int FZtype, int FZorder)
     break;
   case OrientationAnalysisConstants::DihedralType:
     if(!std::isinf(rod[3]))
+    {
       insideFZ = insideDihedralFZ(rod, FZorder);
+    }
     break;
   case OrientationAnalysisConstants::TetrahedralType:
     if(!std::isinf(rod[3]))
+    {
       insideFZ = insideCubicFZ(rod, OrientationAnalysisConstants::TetrahedralType);
+    }
     break;
   case OrientationAnalysisConstants::OctahedralType:
     if(!std::isinf(rod[3]))
+    {
       insideFZ = insideCubicFZ(rod, OrientationAnalysisConstants::OctahedralType);
+    }
     break;
   default:
     insideFZ = false;
@@ -758,7 +763,7 @@ bool EMsoftSO3Sampler::insideCubicFZ(double* rod, int ot)
 AbstractFilter::Pointer EMsoftSO3Sampler::newFilterInstance(bool copyFilterParameters) const
 {
   EMsoftSO3Sampler::Pointer filter = EMsoftSO3Sampler::New();
-  if(true == copyFilterParameters)
+  if(copyFilterParameters)
   {
     copyFilterParameterInstanceVariables(filter.get());
   }

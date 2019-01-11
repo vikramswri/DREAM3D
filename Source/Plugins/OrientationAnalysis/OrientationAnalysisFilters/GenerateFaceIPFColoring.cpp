@@ -89,9 +89,7 @@ public:
   , m_CrystalStructures(crystalStructures)
   {
   }
-  virtual ~CalculateFaceIPFColorsImpl()
-  {
-  }
+  virtual ~CalculateFaceIPFColorsImpl() = default;
 
   void generate(size_t start, size_t end) const
   {
@@ -211,12 +209,6 @@ GenerateFaceIPFColoring::GenerateFaceIPFColoring()
 , m_FeaturePhasesArrayPath(SIMPL::Defaults::ImageDataContainerName, SIMPL::Defaults::CellFeatureAttributeMatrixName, SIMPL::FeatureData::Phases)
 , m_CrystalStructuresArrayPath(SIMPL::Defaults::ImageDataContainerName, SIMPL::Defaults::CellEnsembleAttributeMatrixName, SIMPL::EnsembleData::CrystalStructures)
 , m_SurfaceMeshFaceIPFColorsArrayName(SIMPL::FaceData::SurfaceMeshFaceIPFColors)
-, m_SurfaceMeshFaceLabels(nullptr)
-, m_SurfaceMeshFaceNormals(nullptr)
-, m_FeatureEulerAngles(nullptr)
-, m_FeaturePhases(nullptr)
-, m_CrystalStructures(nullptr)
-, m_SurfaceMeshFaceIPFColors(nullptr)
 {
 }
 
@@ -420,7 +412,7 @@ void GenerateFaceIPFColoring::execute()
 #endif
 
 #ifdef SIMPL_USE_PARALLEL_ALGORITHMS
-  if(doParallel == true)
+  if(doParallel)
   {
     tbb::parallel_for(tbb::blocked_range<size_t>(0, numTriangles),
                       CalculateFaceIPFColorsImpl(m_SurfaceMeshFaceLabels, m_FeaturePhases, m_SurfaceMeshFaceNormals, m_FeatureEulerAngles, m_SurfaceMeshFaceIPFColors, m_CrystalStructures),
@@ -443,7 +435,7 @@ void GenerateFaceIPFColoring::execute()
 AbstractFilter::Pointer GenerateFaceIPFColoring::newFilterInstance(bool copyFilterParameters) const
 {
   GenerateFaceIPFColoring::Pointer filter = GenerateFaceIPFColoring::New();
-  if(true == copyFilterParameters)
+  if(copyFilterParameters)
   {
     copyFilterParameterInstanceVariables(filter.get());
   }

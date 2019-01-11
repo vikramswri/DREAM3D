@@ -98,9 +98,7 @@ public:
     m_OrientationOps = LaueOps::getOrientationOpsQVector();
   }
 
-  virtual ~TrisProcessor()
-  {
-  }
+  virtual ~TrisProcessor() = default;
 
   void process(size_t start, size_t end) const
   {
@@ -251,15 +249,6 @@ FindDistsToCharactGBs::FindDistsToCharactGBs()
 , m_DistToTwistArrayPath(SIMPL::Defaults::TriangleDataContainerName, SIMPL::Defaults::FaceAttributeMatrixName, "DistanceToTwist")
 , m_DistToSymmetricArrayPath(SIMPL::Defaults::TriangleDataContainerName, SIMPL::Defaults::FaceAttributeMatrixName, "DistanceToSymmetric")
 , m_DistTo180TiltArrayPath(SIMPL::Defaults::TriangleDataContainerName, SIMPL::Defaults::FaceAttributeMatrixName, "DistanceTo180tilt")
-, m_CrystalStructures(nullptr)
-, m_FeatureEulerAngles(nullptr)
-, m_FeaturePhases(nullptr)
-, m_SurfaceMeshFaceLabels(nullptr)
-, m_SurfaceMeshFaceNormals(nullptr)
-, m_DistToTilt(nullptr)
-, m_DistToTwist(nullptr)
-, m_DistToSymmetric(nullptr)
-, m_DistTo180Tilt(nullptr)
 {
 }
 
@@ -515,7 +504,7 @@ void FindDistsToCharactGBs::execute()
     }
 
 #ifdef SIMPL_USE_PARALLEL_ALGORITHMS
-    if(doParallel == true)
+    if(doParallel)
     {
       tbb::parallel_for(tbb::blocked_range<size_t>(i, i + trisChunkSize),
                         TrisProcessor(m_DistToTilt, m_DistToTwist, m_DistToSymmetric, m_DistTo180Tilt, m_CrystalStructures, m_Eulers, m_Phases, m_FaceLabels, m_FaceNormals), tbb::auto_partitioner());
@@ -537,7 +526,7 @@ void FindDistsToCharactGBs::execute()
 AbstractFilter::Pointer FindDistsToCharactGBs::newFilterInstance(bool copyFilterParameters) const
 {
   FindDistsToCharactGBs::Pointer filter = FindDistsToCharactGBs::New();
-  if(true == copyFilterParameters)
+  if(copyFilterParameters)
   {
     copyFilterParameterInstanceVariables(filter.get());
   }

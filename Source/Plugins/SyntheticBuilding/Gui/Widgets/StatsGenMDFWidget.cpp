@@ -84,6 +84,7 @@
 
 #include "SyntheticBuilding/Gui/Widgets/TableModels/SGMDFTableModel.h"
 #include "SyntheticBuilding/SyntheticBuildingFilters/StatsGeneratorUtilities.h"
+#include "SyntheticBuilding/SyntheticBuildingConstants.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -131,12 +132,6 @@ void StatsGenMDFWidget::setupGui()
   QAbstractItemDelegate* aid = m_MDFTableModel->getItemDelegate();
   m_MDFTableView->setItemDelegate(aid);
   m_PlotCurve = new QwtPlotCurve;
-  
-  // Apple the Style to the buttons
-  addMDFRowBtn->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(addMDFRowBtn->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::AddImagePath));  
-  deleteMDFRowBtn->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(deleteMDFRowBtn->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::DeleteImagePath));
-  loadMDFBtn->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(loadMDFBtn->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::LoadImagePath));
-  m_MDFUpdateBtn->setStyleSheet(SVStyle::Instance()->StyleSheetForButton(m_MDFUpdateBtn->objectName(), SVWidgets::Styles::PushButtonStyleSheet, SVWidgets::Styles::ReloadImagePath));
 
 }
 
@@ -159,7 +154,7 @@ void StatsGenMDFWidget::initQwtPlot(QString xAxisName, QString yAxisName, QwtPlo
 {
 
   QPalette pal;
-  pal.setColor(QPalette::Text, Qt::white);
+  pal.setColor(QPalette::Text, SVStyle::Instance()->getQLabel_color());
   pal.setColor(QPalette::Foreground, Qt::white);
   pal.setColor(QPalette::Window, Qt::black);
 
@@ -178,20 +173,23 @@ void StatsGenMDFWidget::initQwtPlot(QString xAxisName, QString yAxisName, QwtPlo
   canvas->setPalette(pal);
   plot->setCanvas(canvas);
 
-  QFont font;
-  font.setBold(true);
+  QFont font = SVStyle::Instance()->GetUIFont();
+  font.setWeight(QFont::Bold);
+  font.setPointSize(SG_FONT_SIZE);
 
   QwtText xAxis(xAxisName);
-  xAxis.setColor(Qt::white);
   xAxis.setRenderFlags(Qt::AlignHCenter | Qt::AlignTop);
   xAxis.setFont(font);
+  xAxis.setColor(SVStyle::Instance()->getQLabel_color());
+  plot->setAxisTitle(QwtPlot::xBottom, xAxisName);
 
   QwtText yAxis(yAxisName);
-  yAxis.setColor(Qt::white);
   yAxis.setRenderFlags(Qt::AlignHCenter | Qt::AlignTop);
   yAxis.setFont(font);
+  yAxis.setColor(SVStyle::Instance()->getQLabel_color());
+  plot->setAxisTitle(QwtPlot::yLeft, yAxisName);
 
-  const int margin = 5;
+  const int margin = 0;
   plot->setContentsMargins(margin, margin, margin, margin);
 
   plot->setAxisTitle(QwtPlot::xBottom, xAxis);
@@ -201,7 +199,7 @@ void StatsGenMDFWidget::initQwtPlot(QString xAxisName, QString yAxisName, QwtPlo
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void StatsGenMDFWidget::on_m_MDFUpdateBtn_clicked()
+void StatsGenMDFWidget::updatePlots()
 {
   // Generate the ODF Data from the current values in the ODFTableModel
   QVector<float> e1s;
@@ -209,7 +207,10 @@ void StatsGenMDFWidget::on_m_MDFUpdateBtn_clicked()
   QVector<float> e3s;
   QVector<float> weights;
   QVector<float> sigmas;
-
+  if(nullptr == m_ODFTableModel)
+  {
+    return;
+  }
   // Initialize xMax and yMax....
   e1s = m_ODFTableModel->getData(SGODFTableModel::Euler1);
   e2s = m_ODFTableModel->getData(SGODFTableModel::Euler2);
@@ -229,6 +230,14 @@ void StatsGenMDFWidget::on_m_MDFUpdateBtn_clicked()
   updateMDFPlot(odf);
 
   emit dataChanged();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void StatsGenMDFWidget::on_m_MDFUpdateBtn_clicked()
+{
+  updatePlots();
 }
 
 // -----------------------------------------------------------------------------
@@ -364,12 +373,11 @@ void StatsGenMDFWidget::on_loadMDFBtn_clicked()
 {
   QString proposedFile = m_OpenDialogLastFilePath;
   QString file = QFileDialog::getOpenFileName(this, tr("Open MDF File"), proposedFile, tr("Text Document (*.txt)"));
-  if(true == file.isEmpty())
+  if(file.isEmpty())
   {
     return;
   }
-  else
-  {
+
     QFileInfo fi(file);
     m_OpenDialogLastFilePath = fi.filePath();
 
@@ -401,7 +409,6 @@ void StatsGenMDFWidget::on_loadMDFBtn_clicked()
       QModelIndex index = m_MDFTableModel->index(m_MDFTableModel->rowCount() - 1, 0);
       m_MDFTableView->setCurrentIndex(index);
     }
-  }
 }
 
 // -----------------------------------------------------------------------------
@@ -451,7 +458,7 @@ void StatsGenMDFWidget::extractStatsData(int index, StatsData* statsData, PhaseT
       ::memcpy(&(weights.front()), arrays[i]->getVoidPointer(0), sizeof(float) * weights.size());
     }
   }
-  if(arrays.size() > 0)
+  if(!arrays.empty())
   {
     // Load the data into the table model
     m_MDFTableModel->setTableData(angle, axis, weights);

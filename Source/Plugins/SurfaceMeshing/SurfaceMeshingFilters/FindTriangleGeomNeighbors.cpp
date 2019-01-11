@@ -56,8 +56,6 @@ FindTriangleGeomNeighbors::FindTriangleGeomNeighbors()
 , m_NeighborListArrayName(SIMPL::FeatureData::NeighborList)
 , m_FaceLabelsArrayPath(SIMPL::Defaults::ImageDataContainerName, SIMPL::Defaults::CellAttributeMatrixName, SIMPL::CellData::FeatureIds)
 , m_NumNeighborsArrayName(SIMPL::FeatureData::NumNeighbors)
-, m_FaceLabels(nullptr)
-, m_NumNeighbors(nullptr)
 {
   m_NeighborList = NeighborList<int32_t>::NullPointer();
 
@@ -297,7 +295,7 @@ void FindTriangleGeomNeighbors::execute()
 AbstractFilter::Pointer FindTriangleGeomNeighbors::newFilterInstance(bool copyFilterParameters) const
 {
   FindTriangleGeomNeighbors::Pointer filter = FindTriangleGeomNeighbors::New();
-  if(true == copyFilterParameters)
+  if(copyFilterParameters)
   {
     copyFilterParameterInstanceVariables(filter.get());
   }

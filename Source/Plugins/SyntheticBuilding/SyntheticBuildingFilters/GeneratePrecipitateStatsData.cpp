@@ -54,7 +54,6 @@ GeneratePrecipitateStatsData::GeneratePrecipitateStatsData()
 , m_DataContainerName(SIMPL::Defaults::StatsGenerator)
 , m_CellEnsembleAttributeMatrixName(SIMPL::Defaults::CellEnsembleAttributeMatrixName)
 , m_AppendToExistingAttributeMatrix(false)
-, m_SelectedEnsembleAttributeMatrix()
 , m_PrecipitateStatsData(nullptr)
 {
   initialize();
@@ -431,7 +430,6 @@ void GeneratePrecipitateStatsData::execute()
 
   QMap<QString, QVector<float>> dataMap;
   dataMap[AbstractMicrostructurePreset::kBinNumbers] = binSizes;
-  QVector<SIMPL::Rgb> colors;
 
   AbstractMicrostructurePreset::Pointer absPresetPtr;
   if(m_MicroPresetModel == 0)
@@ -474,7 +472,7 @@ void GeneratePrecipitateStatsData::execute()
   }
 
   {
-    absPresetPtr->initializeOmega3TableModel(dataMap, colors); // Beta
+    absPresetPtr->initializeOmega3TableModel(dataMap); // Beta
     VectorOfFloatArray data;
     FloatArrayType::Pointer d1 = FloatArrayType::FromQVector(dataMap[AbstractMicrostructurePreset::kAlpha], SIMPL::StringConstants::Alpha);
     FloatArrayType::Pointer d2 = FloatArrayType::FromQVector(dataMap[AbstractMicrostructurePreset::kBeta], SIMPL::StringConstants::Beta);
@@ -485,7 +483,7 @@ void GeneratePrecipitateStatsData::execute()
   }
 
   {
-    absPresetPtr->initializeBOverATableModel(dataMap, colors); // Beta
+    absPresetPtr->initializeBOverATableModel(dataMap); // Beta
     VectorOfFloatArray data;
     FloatArrayType::Pointer d1 = FloatArrayType::FromQVector(dataMap[AbstractMicrostructurePreset::kAlpha], SIMPL::StringConstants::Alpha);
     FloatArrayType::Pointer d2 = FloatArrayType::FromQVector(dataMap[AbstractMicrostructurePreset::kBeta], SIMPL::StringConstants::Beta);
@@ -496,7 +494,7 @@ void GeneratePrecipitateStatsData::execute()
   }
 
   {
-    absPresetPtr->initializeCOverATableModel(dataMap, colors); // Beta
+    absPresetPtr->initializeCOverATableModel(dataMap); // Beta
     VectorOfFloatArray data;
     FloatArrayType::Pointer d1 = FloatArrayType::FromQVector(dataMap[AbstractMicrostructurePreset::kAlpha], SIMPL::StringConstants::Alpha);
     FloatArrayType::Pointer d2 = FloatArrayType::FromQVector(dataMap[AbstractMicrostructurePreset::kBeta], SIMPL::StringConstants::Beta);
@@ -671,7 +669,7 @@ void GeneratePrecipitateStatsData::normalizePhaseFractions(StatsDataArray* stats
 AbstractFilter::Pointer GeneratePrecipitateStatsData::newFilterInstance(bool copyFilterParameters) const
 {
   GeneratePrecipitateStatsData::Pointer filter = GeneratePrecipitateStatsData::New();
-  if(true == copyFilterParameters)
+  if(copyFilterParameters)
   {
     copyFilterParameterInstanceVariables(filter.get());
   }
