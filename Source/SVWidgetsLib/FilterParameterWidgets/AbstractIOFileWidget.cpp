@@ -1,0 +1,360 @@
+/* ============================================================================
+* Copyright (c) 2009-2016 BlueQuartz Software, LLC
+*
+* Redistribution and use in source and binary forms, with or without modification,
+* are permitted provided that the following conditions are met:
+*
+* Redistributions of source code must retain the above copyright notice, this
+* list of conditions and the following disclaimer.
+*
+* Redistributions in binary form must reproduce the above copyright notice, this
+* list of conditions and the following disclaimer in the documentation and/or
+* other materials provided with the distribution.
+*
+* Neither the name of BlueQuartz Software, the US Air Force, nor the names of its
+* contributors may be used to endorse or promote products derived from this software
+* without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+* USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+* The code contained herein was partially funded by the followig contracts:
+*    United States Air Force Prime Contract FA8650-07-D-5800
+*    United States Air Force Prime Contract FA8650-10-D-5210
+*    United States Prime Contract Navy N00173-07-C-2068
+*
+* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#include "AbstractIOFileWidget.h"
+
+#include <QtCore/QDir>
+#include <QtCore/QMetaProperty>
+#include <QtCore/QFileInfo>
+
+#include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMenu>
+
+#include "SIMPLib/FilterParameters/OutputFileFilterParameter.h"
+#include "SIMPLib/Utilities/SIMPLDataPathValidator.h"
+
+#include "SVWidgetsLib/Widgets/SVStyle.h"
+#include "SVWidgetsLib/Core/SVWidgetsLibConstants.h"
+#include "SVWidgetsLib/QtSupport/QtSFileCompleter.h"
+#include "SVWidgetsLib/QtSupport/QtSFileUtils.h"
+
+#include "FilterParameterWidgetsDialogs.h"
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+AbstractIOFileWidget::AbstractIOFileWidget(FilterParameter* parameter, AbstractFilter* filter, QWidget* parent)
+: FilterParameterWidget(parameter, filter, parent)
+{
+  setupUi(this);
+  setupGui();
+  if(filter != nullptr)
+  {
+    QString currentPath = filter->property(PROPERTY_NAME_AS_CHAR).toString();
+    if(!currentPath.isEmpty())
+    {
+      currentPath = QDir::toNativeSeparators(currentPath);
+      // Store the last used directory into the private instance variable
+      QFileInfo fi(currentPath);
+      m_LineEdit->setText(fi.filePath());
+    }
+    else
+    {
+      m_LineEdit->setText(QDir::homePath());
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+AbstractIOFileWidget::~AbstractIOFileWidget() = default;
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::setIcon(const QPixmap& path)
+{
+  m_Icon = path;
+  setupMenuField();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QPixmap AbstractIOFileWidget::getIcon()
+{
+  return m_Icon;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::setupGui()
+{
+  // Catch when the filter is about to execute the preflight
+  connect(getFilter(), SIGNAL(preflightAboutToExecute()), this, SLOT(beforePreflight()));
+
+  // Catch when the filter is finished running the preflight
+  connect(getFilter(), SIGNAL(preflightExecuted()), this, SLOT(afterPreflight()));
+
+  // Catch when the filter wants its m_LineEdits updated
+  connect(getFilter(), SIGNAL(updateFilterParameters(AbstractFilter*)), this, SLOT(filterNeedsInputParameters(AbstractFilter*)));
+
+  QtSFileCompleter* com = new QtSFileCompleter(this, false);
+  m_LineEdit->setCompleter(com);
+  QObject::connect(com, SIGNAL(activated(const QString&)), this, SLOT(on_m_LineEdit_textChanged(const QString&)));
+
+  setupMenuField();
+
+  absPathLabel->hide();
+  // absPathNameLabel->hide();
+
+  // Update the widget when the data directory changes
+  SIMPLDataPathValidator* validator = SIMPLDataPathValidator::Instance();
+  connect(validator, &SIMPLDataPathValidator::dataDirectoryChanged, [=] {
+    blockSignals(true);
+    on_m_LineEdit_textChanged(m_LineEdit->text());
+    on_m_LineEdit_fileDropped(m_LineEdit->text());
+    on_m_LineEdit_returnPressed();
+    blockSignals(false);
+
+    emit parametersChanged();
+  });
+
+  if(getFilterParameter() != nullptr)
+  {
+    label->setText(getFilterParameter()->getHumanLabel());
+
+    QString currentPath = getFilter()->property(PROPERTY_NAME_AS_CHAR).toString();
+    m_LineEdit->setText(currentPath);
+    on_m_LineEdit_fileDropped(currentPath);
+    on_m_LineEdit_returnPressed();
+  }
+
+  m_CurrentText = m_LineEdit->text();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_Escape)
+  {  
+    SVStyle* style = SVStyle::Instance();
+    m_LineEdit->setText(m_CurrentText);
+    style->LineEditClearStyle(m_LineEdit);
+    m_LineEdit->setToolTip("");
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::setupMenuField()
+{
+  QFileInfo fi(m_LineEdit->text());
+
+  QMenu* lineEditMenu = new QMenu(m_LineEdit);
+  m_LineEdit->setButtonMenu(QtSLineEdit::Left, lineEditMenu);
+
+  m_LineEdit->setButtonVisible(QtSLineEdit::Left, true);
+
+  QPixmap pixmap(8, 8);
+  pixmap.fill(Qt::transparent);
+  QPainter painter(&pixmap);
+  painter.drawPixmap(0, (pixmap.height() - m_Icon.height()) / 2, m_Icon);
+  m_LineEdit->setButtonPixmap(QtSLineEdit::Left, pixmap);
+
+  {
+    m_ShowFileAction = new QAction(lineEditMenu);
+    m_ShowFileAction->setObjectName(QString::fromUtf8("showFileAction"));
+#if defined(Q_OS_WIN)
+  m_ShowFileAction->setText("Show in Windows Explorer");
+#elif defined(Q_OS_MAC)
+  m_ShowFileAction->setText("Show in Finder");
+#else
+  m_ShowFileAction->setText("Show in File System");
+#endif
+    lineEditMenu->addAction(m_ShowFileAction);
+    connect(m_ShowFileAction, SIGNAL(triggered()), this, SLOT(showFileInFileSystem()));
+  }
+
+  if(!m_LineEdit->text().isEmpty() && fi.exists())
+  {
+    m_ShowFileAction->setEnabled(true);
+  }
+  else
+  {
+    m_ShowFileAction->setDisabled(true);
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool AbstractIOFileWidget::verifyPathExists(const QString& filePath, QLineEdit* lineEdit)
+{
+  QFileInfo fileinfo(filePath);
+  SVStyle* style = SVStyle::Instance();
+  if(!fileinfo.exists())
+  {
+    style->LineEditErrorStyle(lineEdit);
+  }
+  else
+  {
+    style->LineEditClearStyle(lineEdit);
+  }
+  return fileinfo.exists();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::on_m_LineEdit_editingFinished()
+{
+  SIMPLDataPathValidator* validator = SIMPLDataPathValidator::Instance();
+  QString path = validator->convertToAbsolutePath(m_LineEdit->text());
+
+  QFileInfo fi(m_LineEdit->text());
+  if (fi.isRelative())
+  {
+    absPathLabel->setText(path);
+    absPathLabel->show();
+  }
+  else
+  {
+    absPathLabel->hide();
+  }
+  
+  SVStyle* style = SVStyle::Instance();
+  style->LineEditClearStyle(m_LineEdit);
+  m_CurrentText = m_LineEdit->text();
+  emit parametersChanged(); // This should force the preflight to run because we are emitting a signal
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::on_m_LineEdit_returnPressed()
+{
+  on_m_LineEdit_editingFinished();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::on_m_LineEdit_textChanged(const QString& text)
+{
+  SIMPLDataPathValidator* validator = SIMPLDataPathValidator::Instance();
+  QString inputPath = validator->convertToAbsolutePath(text);
+ 
+  QFileInfo fi(text);
+  if (fi.isRelative())
+  {
+    absPathLabel->setText(inputPath);
+  }
+
+  if(hasValidFilePath(inputPath))
+  {
+    m_ShowFileAction->setEnabled(true);
+  }
+  else
+  {
+    m_ShowFileAction->setDisabled(true);
+  }
+
+  SVStyle* style = SVStyle::Instance();
+
+  if (text != m_CurrentText)
+  {
+    style->LineEditBackgroundErrorStyle(m_LineEdit);
+    m_LineEdit->setToolTip("Press the 'Return' key to apply your changes");
+  }
+  else
+  {
+    style->LineEditClearStyle(m_LineEdit);
+    m_LineEdit->setToolTip("");
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::on_m_LineEdit_fileDropped(const QString& text)
+{
+  SIMPLDataPathValidator* validator = SIMPLDataPathValidator::Instance();
+  QString inputPath = validator->convertToAbsolutePath(text);
+
+  setOpenDialogLastFilePath(text);
+  // Set/Remove the red outline if the file does exist
+  verifyPathExists(inputPath, m_LineEdit);
+
+  emit parametersChanged(); // This should force the preflight to run because we are emitting a signal
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::filterNeedsInputParameters(AbstractFilter* filter)
+{
+  QString text = m_LineEdit->text();
+
+  SIMPLDataPathValidator* validator = SIMPLDataPathValidator::Instance();
+  text = validator->convertToAbsolutePath(text);
+
+  bool ok = filter->setProperty(PROPERTY_NAME_AS_CHAR, text);
+  if(!ok)
+  {
+    getFilter()->notifyMissingProperty(getFilterParameter());
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::beforePreflight()
+{
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::afterPreflight()
+{
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractIOFileWidget::setOpenDialogLastFilePath(const QString& val)
+{
+  m_LineEdit->setText(val);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QString AbstractIOFileWidget::getOpenDialogLastFilePath() 
+{
+  if(m_LineEdit->text().isEmpty())
+  {
+    return QDir::homePath();
+  }
+  return m_LineEdit->text();
+}

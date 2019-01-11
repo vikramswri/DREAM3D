@@ -1,15 +1,16 @@
 
-if(${CMAKE_MAJOR_VERSION} VERSION_GREATER_EQUAL "3.1.0")
-  cmake_policy(SET CMP0002 NEW)
-  cmake_policy(SET CMP0054 NEW)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.1.0")
+cmake_policy(SET CMP0002 NEW)
+cmake_policy(SET CMP0054 NEW)
 endif()
 
-if(${CMAKE_MAJOR_VERSION} VERSION_GREATER_EQUAL "3.12.0")
-  cmake_policy(SET CMP0074 NEW)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+cmake_policy(SET CMP0074 NEW)
 endif()
 
-if(${CMAKE_MAJOR_VERSION} VERSION_GREATER_EQUAL "3.13.0")
-  cmake_policy(SET CMP0079 NEW)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0")
+cmake_policy(SET CMP0079 NEW)
+cmake_policy(SET CMP0077 NEW)
 endif()
 
 cmake_minimum_required(VERSION 3.10.0)
@@ -19,55 +20,27 @@ if(NOT "${DREAM3D_SDK}" STREQUAL "")
   include("${DREAM3D_SDK}/DREAM3D_SDK.cmake")
   get_property(DREAM3D_SDK_STATUS_PRINTED GLOBAL PROPERTY DREAM3D_SDK_STATUS_PRINTED)
   if(NOT DREAM3D_SDK_STATUS_PRINTED)
-    #message(STATUS "DREAM3D_SDK Location: ${DREAM3D_SDK}")
+    message(STATUS "DREAM3D_SDK Location: ${DREAM3D_SDK}")
     set_property(GLOBAL PROPERTY DREAM3D_SDK_STATUS_PRINTED TRUE)
   endif()
-else()
-  message(STATUS "You have elected to NOT set a DREAM3D_SDK CMake variable. You will")
-  message(STATUS "need to point to the various dependecies that DREAM.3D requires for")
-  message(STATUS "building. Those that are undefined are listed next:")
-
-  if(NOT DEFINED HDF5_DIR)
-      message(STATUS "Set HDF5_DIR variable to the directory where the hdf5-config.cmake is located.")
-  endif()
-
-  if(NOT DEFINED ITK_DIR)
-      message(STATUS "Set ITK_DIR variable to the directory where the ITKConfig.cmake is located.")
-  endif()
-
-  if(NOT DEFINED EIGEN_INSTALL)
-      message(STATUS "Set EIGEN_INSTALL variable to the root directory of the Eigen installation.")
-  endif()
-
-  if(NOT DEFINED Qt5_DIR)
-      message(STATUS "Set Qt5_DIR variable to the directory where the Qt5Config.cmake is located.")
-  endif()
-
-  if(NOT DEFINED QWT_INSTALL)
-      message(STATUS "Set QWT_INSTALL variable to the root directory where Qwt is located.")
-  endif()
-
-  if(NOT DEFINED TBB_DIR)
-      message(STATUS "Set TBB_DIR variable to the root directory where TBB is located.")
-  endif()
-
 endif()
 
 # Request C++11 standard, using new CMake variables.
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS False)
 
 
 #------------------------------------------------------------------------------
 # Create the Top level Project
-project(DREAM3DProj VERSION 6.5.0.0)
-set(PROJECT_CODE_DIR ${PROJECT_SOURCE_DIR}/Source)
+#
+project(SIMPLProj VERSION 1.2.0.0)
+
 
 # ---------- Setup output Directories -------------------------
 if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-    ${DREAM3DProj_BINARY_DIR}/Bin
+    ${SIMPLProj_BINARY_DIR}/Bin
     CACHE PATH
     "Single Directory for all Libraries"
     )
@@ -76,7 +49,7 @@ endif()
 # --------- Setup the Executable output Directory -------------
 if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
-    ${DREAM3DProj_BINARY_DIR}/Bin
+    ${SIMPLProj_BINARY_DIR}/Bin
     CACHE PATH
     "Single Directory for all Executables."
     )
@@ -85,7 +58,7 @@ endif()
 # --------- Setup the Executable output Directory -------------
 if(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-    ${DREAM3DProj_BINARY_DIR}/Bin
+    ${SIMPLProj_BINARY_DIR}/Bin
     CACHE PATH
     "Single Directory for all static libraries."
     )
@@ -96,91 +69,90 @@ endif()
 # Find the Git Package for Versioning. It should be ok if Git is NOT found
 Find_package(Git)
 
-get_filename_component(DREAM3D_PARENT ${DREAM3DProj_SOURCE_DIR} DIRECTORY CACHE)
-set(DREAM3D_ExternalProject_DIR "${DREAM3DProj_SOURCE_DIR}/ExternalProjects")
-set(UnitTestAnalysisFile ${DREAM3DProj_BINARY_DIR}/UnitTestAnalysis.md)
-file(WRITE ${UnitTestAnalysisFile} "## Unit Test Analysis ##\n")
-set(TotalFilters 0)
-set(TotalTestedFilters 0)
+get_filename_component(SIMPL_PARENT ${SIMPLProj_SOURCE_DIR} DIRECTORY CACHE)
 
 #------------------------------------------------------------------------------
 # If the developer has set another CMP directory then use that, otherwise look
 # for the CMP directory at the same level as the SIMPL directory
 if("${CMP_SOURCE_DIR}" STREQUAL "")
-  if(EXISTS "${DREAM3DProj_SOURCE_DIR}/ExternalProjects/CMP")
-    set(CMP_SOURCE_DIR "${DREAM3DProj_SOURCE_DIR}/ExternalProjects/CMP")
-  elseif(EXISTS "${DREAM3D_PARENT}/CMP")
-    set(CMP_SOURCE_DIR ${DREAM3D_PARENT}/CMP)
-  else()
-    message(FATAL_ERROR "CMP_SOURCE_DIR was not set. Where is the CMP project directory. Please set the CMP_SOURCE_DIR variable to the CMP directory.")
-  endif()
+  set(CMP_SOURCE_DIR ${SIMPL_PARENT}/CMP)
   message(STATUS "CMP_SOURCE_DIR: ${CMP_SOURCE_DIR}")
 endif()
 
-#------------------------------------------------------------------------------
-# If the developer has set another SIMPL directory then use that, otherwise look
-# for the SIMPLView directory at the same level as the SIMPL directory
-if("${SIMPLProj_SOURCE_DIR}" STREQUAL "")
-  if(EXISTS "${DREAM3DProj_SOURCE_DIR}/ExternalProjects/SIMPL")
-    set(SIMPLProj_SOURCE_DIR "${DREAM3DProj_SOURCE_DIR}/ExternalProjects/SIMPL")
-  elseif(EXISTS "${DREAM3D_PARENT}/SIMPL")
-    set(SIMPLProj_SOURCE_DIR ${DREAM3D_PARENT}/SIMPL)
-  else()
-    message(FATAL_ERROR "SIMPLProj_SOURCE_DIR was not set. Where is the CMP project directory. Please set the SIMPLProj_SOURCE_DIR variable to the CMP directory.")
-  endif()
-  message(STATUS "SIMPLProj_SOURCE_DIR: ${SIMPLProj_SOURCE_DIR}")
+if(NOT EXISTS "${CMP_SOURCE_DIR}")
+  message(FATAL_ERROR "CMP_SOURCE_DIR does not exist at '${CMP_SOURCE_DIR}'")
 endif()
 
-
-#------------------------------------------------------------------------------
-# If the developer has set another SIMPLView directory then use that, otherwise look
-# for the SIMPLView directory at the same level as the SIMPL directory
-if("${SIMPLViewProj_SOURCE_DIR}" STREQUAL "")
-  if(EXISTS "${DREAM3DProj_SOURCE_DIR}/ExternalProjects/SIMPLView")
-    set(SIMPLViewProj_SOURCE_DIR "${DREAM3DProj_SOURCE_DIR}/ExternalProjects/SIMPLView")
-  elseif(EXISTS "${DREAM3D_PARENT}/SIMPLView")
-    set(SIMPLViewProj_SOURCE_DIR "${DREAM3D_PARENT}/SIMPLView")
-  else()
-    message(FATAL_ERROR "SIMPLViewProj_SOURCE_DIR was not set. Where is the CMP project directory. Please set the SIMPLViewProj_SOURCE_DIR variable to the CMP directory.")
-  endif()
-  message(STATUS "SIMPLViewProj_SOURCE_DIR: ${SIMPLViewProj_SOURCE_DIR}")
-endif()
-
-set_property(GLOBAL PROPERTY COPY_LIBRARY_TARGETS "")
 
 #------------------------------------------------------------------------------
 # There are several different Release Types that we are going to use.
 # Official: This is an official release from BlueQuartz Software
 # Beta: This is a Beta release that has is getting ready to be officially released.
 # Development: This is currently in development and probably has bugs.
-get_property(DREAM3DProj_RELEASE_TYPE GLOBAL PROPERTY PACKAGE_RELEASE_TYPE)
-if("${DREAM3DProj_RELEASE_TYPE}" STREQUAL "")
-  set(DREAM3DProj_RELEASE_TYPE "Development")
-  set_property(GLOBAL PROPERTY PACKAGE_RELEASE_TYPE "${DREAM3DProj_RELEASE_TYPE}")
+get_property(SIMPLProj_RELEASE_TYPE GLOBAL PROPERTY PACKAGE_RELEASE_TYPE)
+if("${SIMPLProj_RELEASE_TYPE}" STREQUAL "")
+  set(SIMPLProj_RELEASE_TYPE "Development")
+  set_property(GLOBAL PROPERTY PACKAGE_RELEASE_TYPE "${SIMPLProj_RELEASE_TYPE}")
 endif()
 
 include(CMakeParseArguments)
 
-#------------------------------------------------------------------------------
-# If we have not defined a "BrandedSIMPLView_DIR" then define it to the default
-# generic set of ICONs. Needs to be defined BEFORE we setup the SIMPLView project
-if(NOT DEFINED BrandedSIMPLView_DIR)
-  set(BrandedSIMPLView_DIR ${DREAM3DProj_SOURCE_DIR}/Resources/OpenSourceEdition)
-endif()
 
-# Set the Application Name to DREAM3D to rebrand SIMPLView with the correct icons and badges
-set(SIMPLView_APPLICATION_NAME "DREAM3D")
-set(SIMPLView_VERSION_HDR_FILE "SIMPLViewVersion.h")
-set(SIMPLView_VERSION_SRC_FILE "SIMPLViewVersion.cpp")
+#Enable use of Solution Folders
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(PROJECT_CODE_DIR ${PROJECT_SOURCE_DIR}/Source)
+set(PROJECT_RESOURCES_DIR ${SIMPLProj_SOURCE_DIR}/Resources)
 set(EXE_DEBUG_EXTENSION "_debug")
+set(PROJECT_INSTALL_EXECUTABLES "1")
 
 # -----------------------------------------------------------------------
-# Set these CMP variables because the Version Files need them set
-set(CMP_TOP_HEADER_FILE "SIMPLView.h")
+# The project generally does NOT want to install headers. See if another
+# project has over ridden that property
+get_property(CMP_PROJECT_INSTALL_HEADERS GLOBAL PROPERTY CMP_PROJECT_INSTALL_HEADERS)
+if("${CMP_PROJECT_INSTALL_HEADERS}" STREQUAL "")
+  set_property(GLOBAL PROPERTY CMP_PROJECT_INSTALL_HEADERS "1")
+  get_property(CMP_PROJECT_INSTALL_HEADERS GLOBAL PROPERTY CMP_PROJECT_INSTALL_HEADERS)
+endif()
+
+# -----------------------------------------------------------------------
+# Setup a Global property that is used to gather Documentation Information
+# into a single known location
+get_property(DREAM3DDocRoot GLOBAL PROPERTY DREAM3DDocRoot)
+if("${DREAM3DDocRoot}" STREQUAL "")
+  set_property(GLOBAL PROPERTY DREAM3DDocRoot "${SIMPLProj_BINARY_DIR}")
+  get_property(DREAM3DDocRoot GLOBAL PROPERTY DREAM3DDocRoot)
+  file(WRITE "${SIMPLProj_BINARY_DIR}/DREAM3DDocGroupList" "")
+endif()
+
+
+get_property(SIMPLPluginList GLOBAL PROPERTY SIMPLPluginList)
+if("${SIMPLPluginList}" STREQUAL "")
+  set_property(GLOBAL PROPERTY SIMPLPluginList "${SIMPLProj_BINARY_DIR}/SIMPLPluginList.txt")
+  get_property(SIMPLPluginList GLOBAL PROPERTY SIMPLPluginList)
+  file(WRITE "${SIMPLProj_BINARY_DIR}/SIMPLPluginList.txt" "")
+endif()
+
+
+get_property(SIMPLibSearchDirs GLOBAL PROPERTY SIMPLibSearchDirs)
+if("${SIMPLibSearchDirs}" STREQUAL "")
+  set_property(GLOBAL PROPERTY SIMPLibSearchDirs "${SIMPLProj_BINARY_DIR}/LibSearchDirs.txt")
+  get_property(SIMPLibSearchDirs GLOBAL PROPERTY SIMPLibSearchDirs)
+  file(WRITE "${SIMPLProj_BINARY_DIR}/LibSearchDirs.txt" "")
+endif()
+
+
+set(PROJECT_INSTALL_HEADERS "${CMP_PROJECT_INSTALL_HEADERS}")
 set(CMP_CONFIGURED_FILES_SOURCE_DIR ${CMP_SOURCE_DIR}/ConfiguredFiles)
 
 
 INCLUDE (${CMP_SOURCE_DIR}/cmpCMakeMacros.cmake )
+set(CMP_ENABLE_PLUGINS "1")
+set(CMP_PLUGIN_LIST_FILE "${SIMPLPluginList}")
+set(CMP_PLUGIN_SEARCHDIR_FILE "${SIMPLibSearchDirs}")
+file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${PROJECT_BINARY_DIR}/Bin/plugins;")
+file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${PROJECT_BINARY_DIR}/Bin;")
+set(CMP_LIB_SEARCH_DIRS "")
+set(CMP_MODULES_SOURCE_DIR ${CMP_SOURCE_DIR}/Modules CACHE INTERNAL "")
 
 # -----------------------------------------------------------------------
 # Generate a set of Version Cpp/H files that will be used by SIMPLView to
@@ -212,44 +184,192 @@ if("${DREAM3DDocRoot}" STREQUAL "")
   get_property(DREAM3DDocRoot GLOBAL PROPERTY DREAM3DDocRoot)
 endif()
 
+# ------------------
+# Generate a Revision String
+cmpRevisionString( GENERATED_HEADER_FILE_PATH "SIMPLFileNotUsed.h"
+                        GENERATED_SOURCE_FILE_PATH "SIMPLFileNotUsed.cpp"
+                        NAMESPACE "SIMPLProj"
+                        PROJECT_NAME "${PROJECT_NAME}"
+                        EXPORT_MACRO "SIMPLProj_EXPORT")
 
-get_property(SIMPLPluginList GLOBAL PROPERTY SIMPLPluginList)
-if("${SIMPLPluginList}" STREQUAL "")
-  set_property(GLOBAL PROPERTY SIMPLPluginList "${DREAM3DProj_BINARY_DIR}/SIMPLPluginList.txt")
-  get_property(SIMPLPluginList GLOBAL PROPERTY SIMPLPluginList)
-  file(WRITE "${SIMPLPluginList}" "")
+# --------------------------------------------------------------------
+# Override CMake's built in module directory by prepending cmp's module
+# directory first
+set(CMAKE_MODULE_PATH ${CMP_MODULES_SOURCE_DIR} ${CMAKE_MODULE_PATH})
+
+# Build shared libraries
+OPTION (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
+set(LIB_TYPE STATIC)
+if(BUILD_SHARED_LIBS)
+  #message(FATAL_ERROR "Due to issues exporting symbols with MSVC DREAM3D does NOT currently support intermediate shared libraries. Please turn OFF BUILD_SHARED_LIBS")
+  set(LIB_TYPE SHARED)
+  list(APPEND CMP_LIB_SEARCH_DIRS  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
+  if(MSVC)
+    list(APPEND CMP_LIB_SEARCH_DIRS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
+                          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release )
+  endif()
+
+else()
+  message(FATAL_ERROR "BUILD_SHARED_LIBS Must be set to ON in order to build properly.")
+endif(BUILD_SHARED_LIBS)
+
+if(MSVC)
+  option(SIMPL_DISABLE_MSVC_WARNINGS "Disable some MSVC Compiler warnings" ON)
+  if(SIMPL_DISABLE_MSVC_WARNINGS)
+    set(SIMPLib_DISABLE_MSVC_WARNINGS "1")
+  endif()
+endif()
+
+# Check relative paths
+OPTION (SIMPL_RELATIVE_PATH_CHECK "Check relative paths" OFF)
+
+#-------------------------------------------------------------------------------
+# SIMPL_ENABLE_GROUP
+# 
+function(SIMPL_ENABLE_GROUP)
+  set(options)
+  set(oneValueArgs GROUP_NAME DESC ENABLE)
+  set(multiValueArgs DEPENDENCIES)
+
+  cmake_parse_arguments(P "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  option(SIMPL_Group_${P_GROUP_NAME} "${P_DESC}" ${P_ENABLE})
+
+  if(SIMPL_Group_${P_GROUP_NAME})
+    foreach(group ${P_DEPENDENCIES})
+      set(SIMPL_Group_${group} ON CACHE BOOL "" FORCE)
+    endforeach()
+  endif()
+endfunction()
+
+# --------------------------------------------------------------------
+# Turn on SIMPLib Groups to compile
+
+SIMPL_ENABLE_GROUP(GROUP_NAME BASE
+            ENABLE ON
+            DESC "Compile SIMPL Base functionality")
+SIMPL_ENABLE_GROUP(GROUP_NAME FILTERS
+            ENABLE ON
+            DESC "Compile SIMPL Filtering functionality"
+            DEPENDENCIES BASE)
+SIMPL_ENABLE_GROUP(GROUP_NAME PLUGIN
+            ENABLE ON
+            DESC "Compile SIMPL Plugin functionality"
+            DEPENDENCIES BASE FILTERS)
+SIMPL_ENABLE_GROUP(GROUP_NAME REST
+            ENABLE ON
+            DESC "Compile SIMPL REST functionality"
+            DEPENDENCIES BASE)
+SIMPL_ENABLE_GROUP(GROUP_NAME WIDGETS
+            ENABLE ON
+            DESC "Compile SIMPL Qt Widgets functionality"
+            DEPENDENCIES BASE FILTERS PLUGIN)
+
+OPTION(SIMPL_BUILD_TESTING "Compile the test programs" ON)
+
+# --------------------------------------------------------------------
+# Find HDF5 Headers/Libraries
+# HDF5 now comes with everything that is needed for CMake to load
+# up the targets (Exported) that it needs. We just need to find where
+# HDF5 is installed.
+include(${CMP_SOURCE_DIR}/ExtLib/HDF5Support.cmake)
+
+# --------------------------------------------------------------------
+# Should we use Intel Threading Building Blocks
+# --------------------------------------------------------------------
+set(SIMPL_USE_PARALLEL_ALGORITHMS "")
+option(SIMPL_USE_MULTITHREADED_ALGOS "Use MultiThreaded Algorithms" OFF)
+if(SIMPL_USE_MULTITHREADED_ALGOS)
+  include(${CMP_SOURCE_DIR}/ExtLib/TBBSupport.cmake)
+  set(SIMPL_USE_PARALLEL_ALGORITHMS "1")
+endif()
+
+# --------------------------------------------------------------------
+# SIMPL needs the Eigen library for Least Squares fit and Eigen value/vector calculations.
+set(SIMPL_USE_EIGEN "")
+Find_Package(Eigen REQUIRED)
+if(EIGEN_FOUND)
+  message(STATUS "Found Eigen Library")
+  set(SIMPL_USE_EIGEN "1")
+else()
+  message(WARNING "The Eigen Library is required for some algorithms to execute. These algorithms will be disabled.")
 endif()
 
 
-get_property(SIMPLibSearchDirs GLOBAL PROPERTY SIMPLibSearchDirs)
-if("${SIMPLibSearchDirs}" STREQUAL "")
-  set_property(GLOBAL PROPERTY SIMPLibSearchDirs "${DREAM3DProj_BINARY_DIR}/LibSearchDirs.txt")
-  get_property(SIMPLibSearchDirs GLOBAL PROPERTY SIMPLibSearchDirs)
-  file(WRITE "${SIMPLibSearchDirs}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY};")
+# --------------------------------------------------------------------
+# Find and Use the Qt5 Libraries
+include(${CMP_SOURCE_DIR}/ExtLib/Qt5Support.cmake)
+set(SIMPL_Qt5_COMPONENTS Core Network)
+if( SIMPL_Group_WIDGETS)
+  set(SIMPL_Qt5_COMPONENTS Core Widgets Network Gui Concurrent Svg Xml OpenGL PrintSupport)
 endif()
+set(USE_QtWebEngine FALSE)
+CMP_AddQt5Support( "${SIMPL_Qt5_COMPONENTS}" "${USE_QtWebEngine}" "${SIMPLProj_BINARY_DIR}" "SIMPL")
 
-# -----------------------------------------------------------------------
-# Set a global value to NOT install headers
-# -----------------------------------------------------------------------
-set_property(GLOBAL PROPERTY CMP_PROJECT_INSTALL_HEADERS "0")
+# --------------------------------------------------------------------
+# Should we use enable NTFS file checking on Windows
+# --------------------------------------------------------------------
+if(WIN32)
+  set(SIMPL_NTFS_FILE_CHECK "")
+  option(SIMPL_ENABLE_NTFS_FILE_CHECKING "Enable NTFS File Permissions Checking" ON)
+  if(SIMPL_ENABLE_NTFS_FILE_CHECKING)
+      set(SIMPL_NTFS_FILE_CHECK "1")
+  endif()
+endif()
 
 # -----------------------------------------------------------------------
 # Set a Global Prefix where everthing is going to get intalled. For OS X we are
 # going to try to install everything into the .app package
 # -----------------------------------------------------------------------
-set_property(GLOBAL PROPERTY DREAM3D_PACKAGE_DEST_PREFIX ".")
-if(APPLE)
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set_property(GLOBAL PROPERTY DREAM3D_PACKAGE_DEST_PREFIX "${SIMPLView_APPLICATION_NAME}${EXE_DEBUG_EXTENSION}.app/Contents/")
-  else()
-    set_property(GLOBAL PROPERTY DREAM3D_PACKAGE_DEST_PREFIX "${SIMPLView_APPLICATION_NAME}.app/Contents/")
-  endif()
+# set_property(GLOBAL PROPERTY DREAM3D_PACKAGE_DEST_PREFIX ".")
+get_property(DREAM3D_PACKAGE_DEST_PREFIX GLOBAL PROPERTY DREAM3D_PACKAGE_DEST_PREFIX)
+if("${DREAM3D_PACKAGE_DEST_PREFIX}" STREQUAL "")
+  set_property(GLOBAL PROPERTY DREAM3D_PACKAGE_DEST_PREFIX ".")
+  get_property(DREAM3D_PACKAGE_DEST_PREFIX GLOBAL PROPERTY DREAM3D_PACKAGE_DEST_PREFIX)
+  set(APPLE_RESOURCES_DIR "share/SIMPL")
+else ()
+    set(APPLE_RESOURCES_DIR "${DREAM3D_PACKAGE_DEST_PREFIX}/Resources")
+
 endif()
 get_property(DREAM3D_PACKAGE_DEST_PREFIX GLOBAL PROPERTY DREAM3D_PACKAGE_DEST_PREFIX)
 
+# --------------------------------------------------------------------
+# Now that we have found all of our required libraries and packages we can start the all
+# the tests
 
-# ------- Enable the CTest testing. ---------------
-OPTION(SIMPL_BUILD_TESTING "Compile the test programs" ON)
+# We do NOT want to install any of the headers
+set(SIMPLProj_INSTALL_FILES "${PROJECT_INSTALL_HEADERS}")
+
+# --------------------------------------------------------------------
+# Generate our ReadMe and License Files
+configure_file(${PROJECT_RESOURCES_DIR}/SIMPL/SIMPLLicense.txt
+                ${PROJECT_BINARY_DIR}/SIMPL/SIMPLLicense.txt )
+
+# --------------------------------------------------------------------
+# Generate install rules for the text files
+if(APPLE)
+  install(FILES ${PROJECT_BINARY_DIR}/SIMPL/SIMPLLicense.txt
+          DESTINATION "${APPLE_RESOURCES_DIR}"
+          COMPONENT Applications)
+else()
+  install(FILES ${PROJECT_BINARY_DIR}/SIMPL/SIMPLLicense.txt
+          DESTINATION "${DREAM3D_PACKAGE_DEST_PREFIX}"
+          COMPONENT Applications)
+endif()
+install(FILES ${PROJECT_BINARY_DIR}/DREAM3D/DREAM3DLicense.txt
+        DESTINATION "${INSTALL_DESTINATION}"
+        COMPONENT Applications)
+
+# -----------------------------------------------------------------------
+# Setup a Global property that is used to gather Documentation Information
+# into a single known location
+get_property(DREAM3DDocRoot GLOBAL PROPERTY DREAM3DDocRoot)
+if("${DREAM3DDocRoot}" STREQUAL "")
+  set_property(GLOBAL PROPERTY DREAM3DDocRoot "${SIMPLProj_BINARY_DIR}")
+endif()
+file(WRITE ${SIMPLProj_BINARY_DIR}/DREAM3DDocGroupList "")
+
+# ------- Enable the CTest testing. Use make test to run all tests ---------------
 # -------------------------------------------------------------------- 
 # If Testing is enabled, turn on the Unit Tests 
 if(SIMPL_BUILD_TESTING)
@@ -258,185 +378,112 @@ if(SIMPL_BUILD_TESTING)
 endif()
 
 
-
-# --------------------------------------------------------------------
-# This is set to "1" so that our test files are deleted at the end of the tests
-set(DREAM3D_REMOVE_TEST_FILES "1")
-
-# --------------------------------------------------------------------
-# Over ride CMake's built in module directory by prepending cmp's module
-# directory first
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMP_MODULES_SOURCE_DIR} )
-
-# Build shared libraries
-OPTION (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
-set(LIB_TYPE STATIC)
-if(BUILD_SHARED_LIBS)
-  #message(FATAL_ERROR "Due to issues exporting symbols with MSVC DREAM3D does NOT currently support intermediate shared libraries. Please turn OFF BUILD_SHARED_LIBS")
-    set(LIB_TYPE SHARED)
-    list(APPEND CMP_LIB_SEARCH_DIRS  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
-    if(MSVC)
-        list(APPEND CMP_LIB_SEARCH_DIRS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
-                                        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release )
-    endif()
-
-else()
-  message(FATAL_ERROR "BUILD_SHARED_LIBS Must be set to ON in order to build properly.")
-endif(BUILD_SHARED_LIBS)
-
-
-# -----------------------------------------------------------------------
-# Bring in the SIMPLView Project, which will bring in SIMPLib
-# -----------------------------------------------------------------------
-add_subdirectory( ${SIMPLViewProj_SOURCE_DIR} ${PROJECT_BINARY_DIR}/SIMPLView)
-
-# --------------------------------------------------------------------
-# Find and Use the Qt5 Libraries
-include(${CMP_SOURCE_DIR}/ExtLib/Qt5Support.cmake)
-set(DREAM3D_Qt5_Components Core Widgets Network Gui Concurrent Xml OpenGL PrintSupport Sql)
-CMP_AddQt5Support( "${DREAM3D_Qt5_Components}"
-                    "${SIMPL_USE_QtWebEngine}"
-                    "${DREAM3DProj_BINARY_DIR}"
-                    "DREAM3D")
-
-#Enable use of Solution Folders
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set(PROJECT_RESOURCES_DIR ${DREAM3DProj_SOURCE_DIR}/Resources)
-set(PROJECT_INSTALL_HEADERS "0")
-set(PROJECT_INSTALL_EXECUTABLES "1")
-
-
-set(DREAM3D_DOCUMENTATION_DIR ${PROJECT_SOURCE_DIR}/Documentation)
-set(DREAM3D_SUPPORT_DIR ${PROJECT_SOURCE_DIR}/Support)
-
-
-set(CMP_ENABLE_PLUGINS "1")
-set(CMP_PLUGIN_LIST_FILE "${SIMPLPluginList}")
-set(CMP_PLUGIN_SEARCHDIR_FILE "${SIMPLibSearchDirs}")
-file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${PROJECT_BINARY_DIR}/Bin/plugins;")
-file(APPEND ${CMP_PLUGIN_SEARCHDIR_FILE} "${PROJECT_BINARY_DIR}/Bin;")
-set(CMP_LIB_SEARCH_DIRS "")
-set(CMP_MODULES_SOURCE_DIR ${CMP_SOURCE_DIR}/Modules CACHE INTERNAL "")
-
-if(UNIX AND NOT APPLE)
-    set(DREAM3D_LINUX_SYSTEM ${CMAKE_SYSTEM_NAME} CACHE STRING "The Name of the linux distrubution for packaging")
-endif()
-
-
 # --------------------------------------------------------------------
 #
-if("${DREAM3D_DATA_DIR}" STREQUAL "")
-  set(DREAM3D_DATA_DIR "${DREAM3D_PARENT}/DREAM3D_Data/"  CACHE PATH "The directory where to find test data files")
-endif()
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/SIMPL/SIMPLTargetsConfigVersion.cmake"
+  VERSION ${SIMPL_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
 
-if("${DREAM3D_DATA_DIR}" STREQUAL "")
-   message(FATAL_ERROR "The DREAM3D_DATA_DIR variable is not set and it needs to be set to a location where the test data is located")
-endif()
+configure_file(${SIMPLProj_SOURCE_DIR}/SIMPLConfig.cmake
+  "${CMAKE_CURRENT_BINARY_DIR}/SIMPL/SIMPLConfig.cmake"
+  COPYONLY
+)
 
-
-# --------------------------------------------------------------------
-# Now that we have found all of our required libraries and packages we can start the all
-# the tests
-
-# We do NOT want to install any of the headers
-set(DREAM3DProj_INSTALL_FILES "${PROJECT_INSTALL_HEADERS}")
-
-# --------------------------------------------------------------------
-# Generate our ReadMe and License Files
-configure_file(${PROJECT_RESOURCES_DIR}/DREAM3D/DREAM3DLicense.txt
-                ${PROJECT_BINARY_DIR}/DREAM3D/DREAM3DLicense.txt )
-
-# --------------------------------------------------------------------
-# Generate install rules for the text files
+set(ConfigPackageLocation lib/cmake/SIMPL)
 if(APPLE)
-  set(INSTALL_DESTINATION "${DREAM3D_PACKAGE_DEST_PREFIX}/Resources")
-else()
-  set(INSTALL_DESTINATION "${DREAM3D_PACKAGE_DEST_PREFIX}")
+  set(ConfigPackageLocation ${DREAM3D_PACKAGE_DEST_PREFIX}${ConfigPackageLocation})
 endif()
-install(FILES ${PROJECT_BINARY_DIR}/DREAM3D/DREAM3DLicense.txt
-        DESTINATION "${INSTALL_DESTINATION}"
-        COMPONENT Applications)
+
+install(
+  FILES
+    "${SIMPLProj_SOURCE_DIR}/SIMPLConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/SIMPL/SIMPLTargetsConfigVersion.cmake"
+  DESTINATION
+    ${ConfigPackageLocation}
+  COMPONENT
+    Devel
+)
 
 
-
-# Include some directories for the compiler
+# --------------------------------------------------------------------
+# Use ITK
+option(SIMPL_USE_ITK "Use ITK For Image Processing" ON)
 
 # -----------------------------------------------------------------------
-# -- Build the EbsdLib Library
-#add_subdirectory( ${DREAM3DProj_SOURCE_DIR}/Source/libharu ${PROJECT_BINARY_DIR}/libharu)
+# Add in the Necessary HDF5 Support Sources into a library
+# -----------------------------------------------------------------------
+add_subdirectory( ${SIMPLProj_SOURCE_DIR}/Source/H5Support ${PROJECT_BINARY_DIR}/H5Support)
 
 # -----------------------------------------------------------------------
-# -- Build the EbsdLib Library
-add_subdirectory( ${DREAM3DProj_SOURCE_DIR}/Source/EbsdLib ${PROJECT_BINARY_DIR}/EbsdLib)
-
+# Add in the support to host the documentation over a thin-http server
 # -----------------------------------------------------------------------
-# -- Build the OrientationLib Library
-add_subdirectory( ${DREAM3DProj_SOURCE_DIR}/Source/OrientationLib ${PROJECT_BINARY_DIR}/OrientationLib)
+add_subdirectory(${SIMPLProj_SOURCE_DIR}/ThirdParty/QtWebApp )
+
 
 # -----------------------------------------------------------------------
 # This needs to be set here as we are going to look for files in this directory
 # -----------------------------------------------------------------------
-set(FilterWidgetsLib_BINARY_DIR ${DREAM3DProj_BINARY_DIR}/FilterWidgetsLib)
+if("${FilterWidgetsLib_BINARY_DIR}" STREQUAL "")
+  set(FilterWidgetsLib_BINARY_DIR ${SIMPLProj_BINARY_DIR}/FilterWidgetsLib)
+endif()
 
-#- Add in the Main DREAM.3D Application
-set(DREAM3D_DOCS_ROOT_DIR "${DREAM3DProj_BINARY_DIR}/Bin/Help/DREAM3D")
+# -----------------------------------------------------------------------
+# -- Add in the SIMPL Sources into a library
+add_subdirectory( ${SIMPLProj_SOURCE_DIR}/Source/SIMPLib ${PROJECT_BINARY_DIR}/SIMPLib)
 
-#-------------------------------------------------------------------------------
-# Compile the Core Plugins that come with DREAM3D and any other Plugins that the
-# developer has added.
-include(${PROJECT_CODE_DIR}/Plugins/Plugins.cmake)
-
-# add the Command line utilities
+# --------------------------------------------------------------------
+# add the Command line PipelineRunner
 # Figure out here if we are going to build the command line tools
-option(SIMPL_BUILD_CLI_TOOLS "Build the command line versions of the applications" ON)
-if( SIMPL_BUILD_CLI_TOOLS )
-  add_subdirectory(${DREAM3DProj_SOURCE_DIR}/Tools ${PROJECT_BINARY_DIR}/Tools)
+add_subdirectory(${SIMPLProj_SOURCE_DIR}/Source/PipelineRunner ${PROJECT_BINARY_DIR}/PipelineRunner)
 
-  if(TARGET PipelineRunner AND APPLE)
-    set(QAB_BINARY_DIR ${DREAM3DProj_BINARY_DIR}/Tools)
-    set(QAB_TARGET "PipelineRunner")
-    set(QAB_COMPONENT Applications)
-    set(osx_app_name "PipelineRunner")
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-      set(osx_app_name "PipelineRunner_debug")
-    endif()
+# --------------------------------------------------------------------
+# add the Command line MakeFilterUuid
+# Figure out here if we are going to build the command line tools
+add_subdirectory(${SIMPLProj_SOURCE_DIR}/Source/MakeFilterUuid ${PROJECT_BINARY_DIR}/MakeFilterUuid)
 
-    set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
-                        "${QAB_BINARY_DIR}/OSX_Scripts/${QAB_TARGET}_CompleteTool.cmake")
-    set(OPTIMIZE_BUNDLE_SHELL_SCRIPT
-                        "${QAB_BINARY_DIR}/OSX_Scripts/${QAB_TARGET}_OptimizeTool.sh")
 
-    set(PROJECT_INSTALL_DIR "bin")
-    configure_file( "${CMP_OSX_TOOLS_SOURCE_DIR}/CompleteTool.cmake.in"
-                    "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
-
-    configure_file("${CMP_OSX_TOOLS_SOURCE_DIR}/CompleteTool.sh.in"
-                    "${OPTIMIZE_BUNDLE_SHELL_SCRIPT}" @ONLY IMMEDIATE)
-
-    install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT ${QAB_COMPONENT})
-
-  endif()
+# --------------------------------------------------------------------
+# add the Command line PipelineRunner
+option(SIMPL_BUILD_EXPERIMENTAL "Build experimental codes." OFF)
+if(SIMPL_BUILD_EXPERIMENTAL)
+  include(${SIMPLProj_SOURCE_DIR}/Source/Experimental/SourceList.cmake)
 endif()
 
-#-------------------------------------------------------------------------------
-# Should we build the documentation
-get_property(SIMPLView_BUILD_DOCUMENTATION GLOBAL PROPERTY SIMPLView_BUILD_DOCUMENTATION)
-message(STATUS "SIMPLView_BUILD_DOCUMENTATION: ${SIMPLView_BUILD_DOCUMENTATION}")
-if(SIMPLView_BUILD_DOCUMENTATION)
-  set(DOCUMENTATION_RESOURCES_DIR ${DREAM3DProj_SOURCE_DIR}/Resources/DocConfigFiles)
-
-  # Now add each subdirectory that holds our documentation files
-  add_subdirectory(${DREAM3DProj_SOURCE_DIR}/Documentation/ReferenceManual ${PROJECT_BINARY_DIR}/Documentation/ReferenceManual)
+# --------------------------------------------------------------------
+# Build the SVWidgetsLib Library which holds all the GUI Specific Widgets such
+# as the Filter Parameter Widgets and various building block widgets for the GUI applications.
+# The plugins are also going to depend on these being built
+if(SIMPL_Group_WIDGETS)
+  add_subdirectory( ${SIMPLProj_SOURCE_DIR}/Source/SVWidgetsLib ${PROJECT_BINARY_DIR}/SVWidgetsLib)
 endif()
 
+# --------------------------------------------------------------------
+# Include any REST related CMake codes
+if(SIMPL_Group_REST)
+  add_subdirectory( ${SIMPLProj_SOURCE_DIR}/Source/RESTClient ${PROJECT_BINARY_DIR}/RESTClient)
+  add_subdirectory( ${SIMPLProj_SOURCE_DIR}/Source/RESTServer ${PROJECT_BINARY_DIR}/RESTServer)
+endif()
+
+# --------------------------------------------------------------------
 # This should be the last line in this file:
 include(${PROJECT_RESOURCES_DIR}/CPack/PackageProject.cmake)
 
-# ------- Enable the CTest testing. Use make test to run all tests ---------------
-# -------------------------------------------------------------------- 
-# If Testing is enabled, turn on the Unit Tests 
-if(SIMPL_BUILD_TESTING)
-    include(${DREAM3DProj_SOURCE_DIR}/Test/CMakeLists.txt)
+# --------------------------------------------------------------------
+# Include any Support related CMake codes
+include(${SIMPLProj_SOURCE_DIR}/Support/Support.cmake)
+
+# --------------------------------------------------------------------------
+# Find the Pybind11 installation
+option(SIMPL_WRAP_PYTHON "Generate and Compile Python wrapping codes" OFF)
+message(STATUS "SIMPL_WRAP_PYTHON: ${SIMPL_WRAP_PYTHON}")
+if(SIMPL_WRAP_PYTHON)
+  # --------------------------------------------------------------------
+  # add the Pybind11 Python Wrapping
+  add_subdirectory(${SIMPLProj_SOURCE_DIR}/Wrapping/Python/Pybind11 ${PROJECT_BINARY_DIR}/Pybind11)
+
 endif()
 
 #-------------------------------------------------------------------------------

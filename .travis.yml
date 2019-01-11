@@ -8,7 +8,7 @@ python:
 
 notifications:
   email: false
-  
+ 
 dist: precise
 addons:
   apt:

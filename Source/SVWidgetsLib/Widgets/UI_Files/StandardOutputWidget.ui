@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>StandardOutputWidget</class>
+ <widget class="QWidget" name="StandardOutputWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>567</width>
+    <height>289</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Standard Output Widget</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetDefaultConstraint</enum>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>-1</number>
+   </property>
+   <item row="0" column="0" colspan="2">
+    <widget class="QTextEdit" name="stdOutTextEdit"/>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../../../Resources/SIMPL.qrc"/>
+ </resources>
+ <connections/>
+</ui>
